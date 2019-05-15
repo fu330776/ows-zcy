@@ -1,0 +1,79 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    #name: ows-demo-${sys-channel}
+    name: ows-zcy
+  #  #mysql
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    username: root
+    #url: jdbc:log4jdbc:mysql://172.16.30.145:3306/demo?useSSL=false&useUnicode=true&zeroDateTimeBehavior=convertToNull
+    url: jdbc:log4jdbc:mysql://192.168.0.106:3306/party_building_index?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf-8
+    #url: jdbc:log4jdbc:mysql://localhost:3306/party_building_index?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf-8
+    password: goodsogood
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    hikari:
+      connection-test-query: SELECT 1 FROM DUAL
+      minimum-idle: 5
+      maximum-pool-size: 10
+      pool-name: hikari-jdbc-pool
+      idle-timeout: 30000
+      max-lifetime: 2000000
+      connection-timeout: 30000
+      register-mbeans: true
+
+
+  messages:
+    basename: messages
+    encoding: UTF-8
+
+  jpa:
+    properties:
+      enable: false
+      javax:
+        persistence:
+          validation:
+            mode: none
+
+
+
+#MyBatis helper
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+monitor-props:
+  # span_id (int) 如果没配置，使用hostName:server.port
+  # spanId: 1
+  # node_name(String) 如果没配置，使用spring.application.name
+  # nodeName: test
+  #default false
+  debug: true
+
+swagger:
+  show: true
+
+#系统级和业务特殊异常（表单/请求验证异常请配置在ValidationMessages.properties中，默认错误类型为9906）
+#支持${index}方式替换，index从0开始
+error-message:
+  errors:
+    9999: 当前接口已废除
+    9901: 未知错误
+    9902: 当前请求过多或服务器繁忙，请稍后再试
+    9903: 调用外部接口发生错误
+    9904: 当前客户端版本已经过期
+    9905: 当前登录token已经过期
+    9404: ${0}找不到
+
+  endpoints:
+  health:
+    enabled: true
+    sensitive: false
+
+management:
+  security:
+    enabled: false

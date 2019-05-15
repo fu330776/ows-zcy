@@ -1,0 +1,19 @@
+#节点
+sys-id: 1
+#局点
+sys-channel: goodsogood.com
+##数据库
+#sys-db0:
+#    db-url:
+#    db-name:
+#    db-user:
+#    db-password:
+##redis
+#sys-redis-config:
+#    database: 0
+#      #host: 192.168.2.238
+#      password: goodsogood
+#      host: 172.16.30.33
+#      #host: 192.168.1.50
+#      port: 6379
+

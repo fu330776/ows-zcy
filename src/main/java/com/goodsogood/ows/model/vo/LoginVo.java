@@ -26,4 +26,6 @@ public class LoginVo {
     @NotEmpty
     @ApiModelProperty(value = "md5后的密码", required = true)
     public String password;
+    @ApiModelProperty(name = "登录类型")
+    public  Integer gence;
 }

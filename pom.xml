@@ -26,6 +26,7 @@
         <java.version>1.8</java.version>
     </properties>
 
+
     <dependencies>
         <dependency>
             <groupId>com.goodsogood</groupId>
@@ -80,6 +81,12 @@
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>2.7</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.wxpay</groupId>
+            <artifactId>wxpay-sdk</artifactId>
+            <version>0.0.3</version>
         </dependency>
     </dependencies>
 

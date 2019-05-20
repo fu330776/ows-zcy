@@ -1,12 +1,13 @@
 package com.goodsogood.ows.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.CacheConfiguration;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
-import com.goodsogood.ows.helper.AesEncryptUtils;
 import com.goodsogood.ows.helper.HeaderHelper;
-import com.goodsogood.ows.helper.MD5Utils;
+import com.goodsogood.ows.helper.HttpUtil;
 import com.goodsogood.ows.model.db.*;
 import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.*;
@@ -14,16 +15,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.Md5Crypt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/v-login")
@@ -37,8 +37,12 @@ public class LoginController {
     private final AccountsUsersRolesService accountsUsersRolesService;
     private final LoginService loginService;
     private final MenusService menusService;
+    private final String secret_key = "";
+    private final Integer template_id = 30;
+    private final String url = "";
+    private Map<String, String> map;
 
-    @Autowired
+
     public LoginController(Errors errors, UsersService userService, AccountsUsersRolesService aurService, LoginService logins, MenusService menus) {
         this.errors = errors;
         this.usersService = userService;
@@ -48,7 +52,7 @@ public class LoginController {
     }
 
     /**
-     * 注册账号
+     * 注册账号(推荐人分享)
      */
     @ApiOperation(value = "注册账号")
     @PostMapping("/add")
@@ -58,10 +62,33 @@ public class LoginController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
+        if (user.phoneCode.isEmpty()) {
+            throw new ApiException("验证码，不可为空！", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
 
         Result<Boolean> result = new Result<>(this.usersService.Register(user), errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
+    }
+
+
+    /**
+     * 注册账号(管理员分享)
+     */
+    @ApiOperation(value = "注册账号")
+    @PostMapping("/addAdmin")
+    public ResponseEntity<Result<Boolean>> addAdminUser(@RequestHeader HttpHeaders headers, @Valid @RequestBody UsersForm user, BindingResult bindingResult) {
+        log.debug("header[_cl]->{}", headers.get(HeaderHelper.OPERATOR_CHANNEL));
+        log.debug("bindingResult->{}", bindingResult);
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean bool = this.usersService.AdminRegister(user);
+        if (!bool) {
+            throw new ApiException("注册失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Result<Boolean> result = new Result<>(bool, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     /**
@@ -131,5 +158,78 @@ public class LoginController {
 
     }
 
+    @ApiOperation(value = "获取验证码")
+    @PostMapping(value = "/code")
+    public ResponseEntity<Result<SmssEntity>> getCode(@Valid @RequestBody LoginVo entity, BindingResult bindingResult) throws Exception {
+        Date time = new Date();
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        String entity_v = HttpUtil.postEncrypt(restTemplate, url, getResArgs(entity.getMobile(), ""), headers, new TypeReference<String>() {});
+        ObjectMapper mapper = new ObjectMapper();
+        VerificationCode verificationCode = mapper.readValue(entity_v, VerificationCode.class);
+        String code = map.get("code");
+        String sms = "【知创云】验证码：" + code + "，请不要把验证码泄露给他人，谢谢！";
+        SmssEntity smsEntity = new SmssEntity();
+        smsEntity.setSmsPhone(map.get("phoneNum"));
+        smsEntity.setSmsCode(code);
+        smsEntity.setSmsContent(sms);
+        smsEntity.setAddtime(time);
 
+        if (verificationCode.getCode() == 0) {
+
+            smsEntity.setSmsSendType(1); //短信发送类型 1、文字 2、语音
+            smsEntity.setSmsType(1); //短信类型 1、注册账号 2、修改密码
+            smsEntity.setSmsSendFrequency(1); //发送次数
+            smsEntity.setSmsUse(1);
+            smsEntity.setSmsExpireDate(stampToDate(verificationCode.getTimestamp()));    //失效时间
+
+        }
+        SmssEntity smsEntities = this.usersService.SmsInsert(smsEntity,1);
+        Result<SmssEntity> result = new Result<>(smsEntities, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    public Map<String, Object> getResArgs(String phoneNum, String code) throws Exception {
+        //生成6位数验证码
+        String codeNew = String.valueOf(new Random().nextInt(899999) + 100000);
+        if (code != "") {
+            codeNew = code;
+        }
+        map = new HashMap<>();
+        map.put("code", codeNew);
+        map.put("phoneNum", phoneNum);
+        //组装数据
+        List<Map<String, String>> sms_placeholders = new ArrayList<>();
+        Map<String, String> sms_placeholder = new HashMap<>();
+        sms_placeholder.put("name", "code");
+        sms_placeholder.put("value", codeNew);
+        sms_placeholders.add(sms_placeholder);
+        List<Map<String, Object>> sms_thirds = new ArrayList<>();
+        Map<String, Object> sms_third = new HashMap<>();
+        sms_third.put("third_id", phoneNum);
+        sms_third.put("sms_placeholders", sms_placeholders);
+        sms_thirds.add(sms_third);
+        Map<String, Object> args = new HashMap<>();
+        //模板 id
+        args.put("template_id", template_id);
+        //消息结果回调地址
+//        args.put("notify_url","");
+        //消息 id 指定了消息中心不会新增一个消息,会从之前的批次累积
+//        if(!StringUtils.isBlank(recordId)||recordId!=null)args.put("record_id",recordId);
+        //密匙
+        args.put("secret_key", secret_key);
+        //占位符和手机号
+        args.put("sms_thirds", sms_thirds);
+        return args;
+    }
+
+    /*
+     * 将时间戳转换为时间并加10分钟
+     */
+    public Date stampToDate(Long s) {
+        Date date = new Date(s);
+        date.setTime(date.getTime() + 10 * 60 * 1000);
+        return date;
+    }
 }

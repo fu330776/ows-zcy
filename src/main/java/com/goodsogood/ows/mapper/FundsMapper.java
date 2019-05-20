@@ -51,7 +51,7 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
 
             "<script>",
             "UPDATE zcy_funds SET ",
-            "title=#{title,jdbcType=VARCHAR},introduction=#{introduction,jdbcType=LONGTEXT}",
+            "title=#{title,jdbcType=VARCHAR},introduction=#{introduction,jdbcType=VARCHAR}",
             "WHERE fund_id=#{fundId,jdbcType=BIGINT}",
             "</script>"
 

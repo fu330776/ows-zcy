@@ -73,4 +73,7 @@ public class UsersForm {
 
     @ApiModelProperty(value = "角色名")
     public  String roleName;
+
+    @ApiModelProperty(value = "验证码")
+    public  String phoneCode;
 }

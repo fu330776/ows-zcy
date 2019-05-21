@@ -9,12 +9,11 @@ import com.goodsogood.ows.helper.HttpUtil;
 import com.goodsogood.ows.model.db.SmssEntity;
 import com.goodsogood.ows.model.db.UsersEntity;
 import com.goodsogood.ows.model.db.VerificationCode;
-import com.goodsogood.ows.model.vo.LoginVo;
-import com.goodsogood.ows.model.vo.PwdFrom;
-import com.goodsogood.ows.model.vo.Result;
-import com.goodsogood.ows.model.vo.UserinfoForm;
+import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.UsersService;
+import com.goodsogood.ows.service.WithdrawsService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ResultContext;
@@ -38,15 +37,17 @@ public class UsersController {
 
     private final Errors errors;
     private final UsersService usersService;
+    private final WithdrawsService withdrawsService;
     private final String secret_key = "";
     private final Integer template_id = 30;
     private final String url = "";
     private Map<String, String> map;
 
     @Autowired
-    public UsersController(Errors error, UsersService users) {
+    public UsersController(Errors error, UsersService users, WithdrawsService withdrawsService) {
         this.usersService = users;
         this.errors = error;
+        this.withdrawsService = withdrawsService;
     }
 
     /**
@@ -207,4 +208,107 @@ public class UsersController {
         return date;
     }
 
+    /**
+     * 提现
+     *
+     * @param wids
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "个人金额提现")
+    @PostMapping("/cash")
+    public ResponseEntity<Result<Boolean>> userCash(@Valid @RequestBody List<Long> wids, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if (wids.size() <= 0) {
+            throw new ApiException("服务器繁忙，提现失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean bool = false;
+        if (wids.size() == 1) {
+            bool = this.withdrawsService.cashOut(wids.get(0));
+        } else {
+            bool = this.withdrawsService.cashOuts(wids);
+        }
+        Result<Boolean> result = new Result<>(bool, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     * 获取当前登录用户 金额
+     *
+     * @param userId        用户唯一标识
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation("获取当前用户 金额信息")
+    @PostMapping("/getMoney")
+    public ResponseEntity<Result<UserMoneyVo>> getSumMoney(@Valid @RequestBody Long userId, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        UserMoneyVo vo = new UserMoneyVo();
+        vo.noMoney = this.withdrawsService.getSum(userId);
+        vo.tooMoney = this.withdrawsService.getSumToo(userId);
+        Result<UserMoneyVo> result = new Result<>(vo, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    /**
+     * 获取当前用户信息
+     *
+     * @param uId           用户唯一标识
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation("获取当前用户信息")
+    @PostMapping("/getUsers")
+    public ResponseEntity<Result<UserInfoVo>> getUserInfo(@Valid @RequestBody Long uId, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+
+        UserInfoVo vo = this.usersService.GetByUser(uId);
+        Result<UserInfoVo> result = new Result<>(vo, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /***
+     *  获取所有账户信息
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "获取所有账户信息")
+    @GetMapping("/getAll")
+    public ResponseEntity<Result<List<UserInfoVo>>> getByAll(BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        List<UserInfoVo> userInfoVos = this.usersService.GetAll();
+        Result<List<UserInfoVo>> result = new Result<>(userInfoVos, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     * 封禁账号（isdel=2） 解封账号 （isdel=1）
+     *
+     * @param user
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "封装or解封")
+    @PostMapping("/close")
+    public ResponseEntity<Result<Boolean>> isClose(@Valid @RequestBody UserCloseForm user, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        UserInfoVo vo = this.usersService.GetByUser(user.userid);
+        if (vo == null) {
+            throw new ApiException("用户不存在或该账号已被封禁", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        this.usersService.sealByUser(user.userid, user.isdel);
+        Result<Boolean> result = new Result<>(true, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

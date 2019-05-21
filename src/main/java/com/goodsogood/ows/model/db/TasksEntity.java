@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -39,7 +40,7 @@ public class TasksEntity extends BaseEntity {
     @Column(name = "task_file_url")
     public String taskFileUrl;
 
-    public Data addtime;
+    public Date addtime;
 
     @ApiModelProperty(value = "任务金额")
     @Column(name = "task_money")
@@ -58,5 +59,16 @@ public class TasksEntity extends BaseEntity {
     @ApiModelProperty(value = "是否已领取酬劳 1、未领取 2、已领取")
     public Integer is_pay;
 
+    @ApiModelProperty(value = "总完成天数")
+    @Column(name = "task_completion_days")
+    public Integer taskCompletionDays;
+
+    @ApiModelProperty(value = "已完成天数")
+    @Column(name = "task_completed_days")
+    public Integer taskCompletedDays;
+
+    @ApiModelProperty(value = "1、个人任务书，2、企业委托书")
+    @Column(name="task_type")
+    public  Integer taskType;
 
 }

@@ -6,6 +6,7 @@ import com.goodsogood.ows.helper.RandomUtils;
 import com.goodsogood.ows.mapper.*;
 import com.goodsogood.ows.model.db.*;
 import com.goodsogood.ows.model.vo.UserForm;
+import com.goodsogood.ows.model.vo.UserInfoVo;
 import com.goodsogood.ows.model.vo.UsersForm;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 /***
  * 用户操作
@@ -227,8 +229,8 @@ public class UsersService {
     /**
      * 添加发送记录
      */
-    public SmssEntity SmsInsert(SmssEntity smssEntity,Integer type) {
-        SmssEntity sms = this.smssMapper.GetByPhone(smssEntity.getSmsPhone(), smssEntity.getAddtime(),type);
+    public SmssEntity SmsInsert(SmssEntity smssEntity, Integer type) {
+        SmssEntity sms = this.smssMapper.GetByPhone(smssEntity.getSmsPhone(), smssEntity.getAddtime(), type);
         if (sms != null) {
             sms.setSmsSendFrequency(sms.getSmsSendFrequency() + 1);
             this.smssMapper.updateByPrimaryKey(sms);
@@ -238,5 +240,33 @@ public class UsersService {
         return smssEntity;
     }
 
+    /**
+     * 管理员查询所有账户
+     *
+     * @return
+     */
+    public List<UserInfoVo> GetAll() {
+        return this.mapper.GetByAll();
+    }
+
+    /**
+     * 查询单个用户信息
+     *
+     * @param userId 用户唯一标识
+     * @return
+     */
+    public UserInfoVo GetByUser(Long userId) {
+        return this.mapper.GetUserById(userId);
+    }
+
+    /**
+     * 封禁账号(2)or 解封账号(1)
+     *
+     * @param userId 账号唯一标识
+     * @return
+     */
+    public Boolean sealByUser(Long userId, Integer seal) {
+        return this.mapper.UpdateForbidden(userId, seal) > 0;
+    }
 
 }

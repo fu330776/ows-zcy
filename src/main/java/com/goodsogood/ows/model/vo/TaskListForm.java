@@ -1,24 +1,19 @@
-package com.goodsogood.ows.model.db;
+package com.goodsogood.ows.model.vo;
 
-import com.goodsogood.ows.model.BaseEntity;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
-import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.Date;
 
-@EqualsAndHashCode(callSuper = true)
+
 @Data
 @ApiModel
-@Table(name = "zcy_TaskOrder")
-public class TaskOrderEntity extends BaseEntity {
-
-    @Column(name = "task_id")
+public class TaskListForm {
     public Long taskId;
 
     @ApiModelProperty(value = "任务书名称")
@@ -33,7 +28,7 @@ public class TaskOrderEntity extends BaseEntity {
     @Column(name = "task_file_url")
     public String taskFileUrl;
 
-    public Date addtime;
+    public Data addtime;
 
     @ApiModelProperty(value = "任务金额")
     @Column(name = "task_money")
@@ -47,12 +42,23 @@ public class TaskOrderEntity extends BaseEntity {
     public Integer is_fulfill;
 
     @ApiModelProperty(value = "完成进度百分比（最大100%）")
-    @Max(value = 100, message = "{Min.zcy_tasks.schedule}")
+    @Max(value = 100, message = "{Max.zcy_tasks.schedule}")
     public float schedule;
     @ApiModelProperty(value = "是否已领取酬劳 1、未领取 2、已领取")
     public Integer is_pay;
 
-    @Column(name = "task_order_id")
-    public Long taskOrderId;
+    @ApiModelProperty(value = "总完成天数")
+    @Column(name = "task_completion_days")
+    public Integer taskCompletionDays;
+
+    @ApiModelProperty(value = "已完成天数")
+    @Column(name = "task_completed_days")
+    public Integer taskCompletedDays;
+
+    @ApiModelProperty(value = "1、个人任务书，2、企业委托书")
+    @Column(name = "task_type")
+    public Integer taskType;
+
+    public String userName;
 
 }

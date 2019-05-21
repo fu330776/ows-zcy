@@ -1,7 +1,11 @@
 package com.goodsogood.ows.model.vo;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
+@ApiModel
 public class UsersForm {
 
     @ApiModelProperty(value = "电话")

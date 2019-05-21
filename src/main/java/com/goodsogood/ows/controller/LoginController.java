@@ -22,7 +22,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 @RestController
@@ -164,7 +168,8 @@ public class LoginController {
         Date time = new Date();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        String entity_v = HttpUtil.postEncrypt(restTemplate, url, getResArgs(entity.getMobile(), ""), headers, new TypeReference<String>() {});
+        String entity_v = HttpUtil.postEncrypt(restTemplate, url, getResArgs(entity.getMobile(), ""), headers, new TypeReference<String>() {
+        });
         ObjectMapper mapper = new ObjectMapper();
         VerificationCode verificationCode = mapper.readValue(entity_v, VerificationCode.class);
         String code = map.get("code");
@@ -184,7 +189,7 @@ public class LoginController {
             smsEntity.setSmsExpireDate(stampToDate(verificationCode.getTimestamp()));    //失效时间
 
         }
-        SmssEntity smsEntities = this.usersService.SmsInsert(smsEntity,1);
+        SmssEntity smsEntities = this.usersService.SmsInsert(smsEntity, 1);
         Result<SmssEntity> result = new Result<>(smsEntities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -232,4 +237,34 @@ public class LoginController {
         date.setTime(date.getTime() + 10 * 60 * 1000);
         return date;
     }
+
+
+    /**
+     * 维信授权页面
+     *
+     * @param response
+     */
+  /*  @ApiOperation(value = "跳转到微信授权页面")
+    @RequestMapping("/authorization")
+    public void wxAuthorization(HttpServletResponse response) {
+        //回调地址
+        try {
+            String redirect_url = URLEncoder.encode("http://www.baidu.com", "UTF-8");
+            String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" +
+                    "appid=APPID" +
+                    "&redirect_uri=REDIRECT_URI" +
+                    "&response_type=code" +
+                    "&scope=SCOPE" +
+                    "&state=123#wechat_redirect";
+            response.sendRedirect(url.replace("APPID", "wx9baa227ef518b9cc").replace("REDIRECT_URL", redirect_url).replace("SCOPE", "snsapi_userinfo"));
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+*/
+
+
 }

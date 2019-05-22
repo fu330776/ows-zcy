@@ -64,27 +64,27 @@ public class UsersController {
         }
         //注册资料
         UsersEntity entity = new UsersEntity();
-        entity.setUserName(user.userName);
+        entity.setUserName(user.getUserName());
         entity.setAddtime(new Date());
-        entity.setCompanyCode(user.companyCode);
-        entity.setCompanyName(user.companyName);
-        entity.setEnable(user.enable);
-        entity.setIsReferrer(user.isReferrer);
-        entity.setOrganizationCode(user.organizationCode);
-        entity.setOrganizationName(user.organizationName);
-        entity.setReferrer(user.referrer);
-        entity.setReview(user.review);
+        entity.setCompanyCode(user.getCompanyCode());
+        entity.setCompanyName(user.getCompanyName());
+        entity.setEnable(user.getEnable());
+        entity.setIsReferrer(user.getIsReferrer());
+        entity.setOrganizationCode(user.getOrganizationCode());
+        entity.setOrganizationName(user.getOrganizationName());
+        entity.setReferrer(user.getReferrer());
+        entity.setReview(user.getReview());
         entity.setUpdatetime(new Date());
-        entity.setUserBankCardNumber(user.userBankCardNumber);
-        entity.setUserCardholderIdcard(user.userCardholderIdcard);
-        entity.setUserCardholderName(user.userCardholderName);
-        entity.setUserCardholderPhone(user.userCardholderPhone);
-        entity.setUserDepartment(user.userDepartment);
-        entity.setUserEmail(user.userEmail);
-        entity.setUserHospital(user.userHospital);
-        entity.setUserPosition(user.userPosition);
-        entity.setCode(user.code);
-        entity.setUserId(user.userId);
+        entity.setUserBankCardNumber(user.getUserBankCardNumber());
+        entity.setUserCardholderIdcard(user.getUserCardholderIdcard());
+        entity.setUserCardholderName(user.getUserCardholderName());
+        entity.setUserCardholderPhone(user.getUserCardholderPhone());
+        entity.setUserDepartment(user.getUserDepartment());
+        entity.setUserEmail(user.getUserEmail());
+        entity.setUserHospital(user.getUserHospital());
+        entity.setUserPosition(user.getUserPosition());
+        entity.setCode(user.getCode());
+        entity.setUserId(user.getUserId());
         Integer num = this.usersService.Update(entity);
         if (num <= 0) {
             throw new ApiException("个人信息修改失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));

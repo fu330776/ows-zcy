@@ -93,7 +93,7 @@ public class LoginController {
      * 登录校验是否存在多个身份
      */
     @ApiOperation(value = "登录校验是否存在多个身份")
-    @GetMapping("/isLoigin")
+    @PostMapping("/isLoigin")
     public ResponseEntity<Result<List<RoleUserEntity>>> IsLoigin(@Valid @RequestBody LoginForm user, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
@@ -122,7 +122,7 @@ public class LoginController {
      * 登录
      */
     @ApiOperation(value = "登录，返回菜单")
-    @GetMapping("/index")
+    @PostMapping("/index")
     public ResponseEntity<Result<UserMenusVo>> Login(@Valid @RequestBody Long userid, BindingResult bindingResult) throws Exception {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
@@ -142,7 +142,7 @@ public class LoginController {
      * 身份效验
      */
     @ApiOperation(value = "根据账号及权限ID 查询身份是否存在")
-    @GetMapping("/isIdentity")
+    @PostMapping("/isIdentity")
     public ResponseEntity<Result<Boolean>> IsIdentity(@Valid @RequestBody IdentityForm identityForm, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
@@ -156,7 +156,26 @@ public class LoginController {
 
     }
 
-
+    /**
+     *  管理员登录
+     * @param form
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "根据账号及权限ID 查询身份是否存在")
+    @PostMapping("/adminlogin")
+    public ResponseEntity<Result<Boolean>> AdminLogin(@Valid @RequestBody AdminForm form, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if(form.phone.isEmpty() || form.pwd.isEmpty())
+        {
+            throw new ApiException("账号或密码，不可为空", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean bool=this.accountsUsersRolesService.GetByFind(form.phone,MD5Utils.MD5(form.pwd));
+        Result<Boolean> result=new Result<>(bool,errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
 
     /**

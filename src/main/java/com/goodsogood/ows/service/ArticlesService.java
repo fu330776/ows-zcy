@@ -1,7 +1,11 @@
 package com.goodsogood.ows.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.ArticlesMapper;
 import com.goodsogood.ows.model.db.ArticlesEntity;
+import com.goodsogood.ows.model.db.PageNumber;
+import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +50,11 @@ public class ArticlesService {
      * @param type  文章类型
      * @return
      */
-    public List<ArticlesEntity> GetByType(Integer type) {
-        return this.mapper.Get(type);
+    public PageInfo<ArticlesEntity> GetByType(Integer type, PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.Get(type)) ;
+
     }
 }

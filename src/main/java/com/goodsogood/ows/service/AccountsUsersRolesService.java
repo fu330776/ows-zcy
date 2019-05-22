@@ -25,6 +25,16 @@ public class AccountsUsersRolesService {
      * 根据账号和角色查询
      **/
     public AccountsUsersRolesEntity Get(String phone, String roleid) {
-        return  this.mapper.Get(phone,roleid);
+        return this.mapper.Get(phone, roleid);
+    }
+
+    /**
+     *  管理员 验证
+     * @param phone 手机号
+     * @param pwd  md5密码
+     * @return
+     */
+    public String GetByFind(String phone, String pwd) {
+        return this.mapper.GetAdminFind(phone, pwd);
     }
 }

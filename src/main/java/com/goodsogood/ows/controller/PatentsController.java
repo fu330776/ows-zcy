@@ -1,15 +1,19 @@
 package com.goodsogood.ows.controller;
 
 
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
+import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.PatentsEntity;
 import com.goodsogood.ows.model.vo.PatentApplicationForm;
 import com.goodsogood.ows.model.vo.Result;
 import com.goodsogood.ows.service.PatentsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -86,4 +90,59 @@ public class PatentsController {
     }
 
 
+    /**
+     * 用户根据类型查询
+     *
+     * @param type
+     * @param userId
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @ApiOperation(value = "用户根据类型查询")
+    @GetMapping("/get/{type}")
+    public ResponseEntity<Result<PageInfo<PatentsEntity>>> get(@ApiParam(value = "type", required = true)
+                                                               @PathVariable Integer type, Long userId, Integer page, Integer pageSize) {
+        if (page == null) {
+            page = 1;
+        }
+        PageInfo<PatentsEntity> patentsEntityPageInfo = this.service.Get(userId, type, new PageNumber(page, pageSize));
+        Result<PageInfo<PatentsEntity>> result = new Result<>(patentsEntityPageInfo, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     * 根据类型查询
+     *
+     * @param type
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @ApiOperation(value = "根据类型查询")
+    @GetMapping("/getAll/{type}")
+    public ResponseEntity<Result<PageInfo<PatentsEntity>>> getByAll(@ApiParam(value = "type", required = true)
+                                                                    @PathVariable Integer type, Integer page, Integer pageSize) {
+        if (page == null) {
+            page = 1;
+        }
+        PageInfo<PatentsEntity> pageInfo = this.service.GetAll(type, new PageNumber(page, pageSize));
+        Result<PageInfo<PatentsEntity>> result = new Result<>(pageInfo, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     * 根据唯一标识查询
+     *
+     * @param pid
+     * @return
+     */
+    @ApiOperation(value = "唯一标识查询")
+    @GetMapping("/getFind/{pid}")
+    public ResponseEntity<Result<PatentsEntity>> getFind(@ApiParam(value = "pid", required = true)
+                                                         @PathVariable Long pid) {
+        PatentsEntity entity = this.service.GetFind(pid);
+        Result<PatentsEntity> result = new Result<>(entity, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

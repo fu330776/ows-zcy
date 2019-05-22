@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
@@ -50,8 +51,8 @@ public class ArticlesController {
         }
         ArticlesEntity entity = new ArticlesEntity();
         entity.setAddtime(new Date());
-        entity.setContent(form.content);
-        entity.setContent(form.title);
+        entity.setContent(form.getContent());
+        entity.setTitle(form.getTitle());
         entity.setType(1);
         Boolean bool = this.service.AddArticle(entity);
         Result<Boolean> result = new Result<>(bool, errors);
@@ -67,13 +68,13 @@ public class ArticlesController {
      */
     @ApiOperation(value = "添加（新技术新产品）文章")
     @PostMapping("/addProduct")
-    public ResponseEntity<Result<Boolean>> addProduct(@Valid @RequestBody ArticlesEntity form, BindingResult bindingResult) {
+    public ResponseEntity<Result<Boolean>> addProduct(@Valid @RequestBody ArticlesForm form, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         ArticlesEntity entity = new ArticlesEntity();
-        entity.setTitle(form.title);
-        entity.setContent(form.content);
+        entity.setTitle(form.getTitle());
+        entity.setContent(form.getContent());
         entity.setType(2);
         entity.setAddtime(new Date());
         Boolean bool = this.service.AddArticle(entity);
@@ -84,15 +85,11 @@ public class ArticlesController {
     /**
      * （行业动态）文章
      *
-     * @param bindingResult
      * @return
      */
     @ApiOperation(value = "查询（行业动态）文章")
     @PostMapping("/getTrends")
-    public ResponseEntity<Result<List<ArticlesEntity>>> getTrends(BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
+    public ResponseEntity<Result<List<ArticlesEntity>>> getTrends() {
         List<ArticlesEntity> entities = this.service.GetByType(1);
         Result<List<ArticlesEntity>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -101,15 +98,11 @@ public class ArticlesController {
     /**
      * 查询（新技术新产品）文章
      *
-     * @param bindingResult
      * @return
      */
     @ApiOperation(value = "查询（新技术新产品）文章")
     @PostMapping("/getProduct")
-    public ResponseEntity<Result<List<ArticlesEntity>>> getProduct(BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
+    public ResponseEntity<Result<List<ArticlesEntity>>> getProduct() {
         List<ArticlesEntity> entities = this.service.GetByType(2);
         Result<List<ArticlesEntity>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);

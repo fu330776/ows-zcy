@@ -1,8 +1,10 @@
 package com.goodsogood.ows.controller;
 
+import com.goodsogood.log4j2cm.annotation.HttpMonitorLogger;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
+import com.goodsogood.ows.helper.HeaderHelper;
 import com.goodsogood.ows.helper.UploadUtils;
 import com.goodsogood.ows.model.db.TasksEntity;
 import com.goodsogood.ows.model.vo.*;
@@ -12,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -50,6 +53,7 @@ public class TasksController {
      * @param bindingResult
      * @return
      */
+    @HttpMonitorLogger
     @ApiOperation(value = "添加任务")
     @PostMapping("/addTasks")
     public ResponseEntity<Result<Boolean>> Add(@Valid @RequestBody TaskListForm vo, MultipartFile file, HttpServletRequest request, BindingResult bindingResult) {
@@ -59,7 +63,8 @@ public class TasksController {
         String url;
         TasksEntity entity = new TasksEntity();
         try {
-            url = UploadUtils.importData(file, request);
+            UploadUtils uploadUtils = new UploadUtils();
+            url = uploadUtils.importData(file, request);
             if (url.isEmpty() || url == null) {
                 throw new ApiException("文件上传失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
             }
@@ -91,23 +96,27 @@ public class TasksController {
      * @param bindingResult
      * @return
      */
-    @ApiOperation(value = "添加委托")
-    @PostMapping("/AddEntrust")
-    public ResponseEntity<Result<Boolean>> AddE(@Valid @RequestBody TaskListForm vo, BindingResult bindingResult) {
+    @HttpMonitorLogger
+    @PutMapping("/AddEntrust")
+    public ResponseEntity<Result<Boolean>> AddE(@Valid @RequestBody EntrustForm vo, BindingResult bindingResult) {
+
+        log.debug("bindingResult->{}", bindingResult);
+
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         TasksEntity entity = new TasksEntity();
-//        entity.setIs_pay(1);
-//        entity.setSchedule(1);
+        entity.setIs_pay(1);
+        entity.setSchedule(0);
         entity.setTaskType(vo.getTaskType());
-        entity.setTaskCompletionDays(vo.taskCompletionDays);
-        entity.setTaskCompletedDays(vo.taskCompletedDays);
+        entity.setTaskCompletionDays(0);
+        entity.setTaskCompletedDays(0);
         entity.setUserId(vo.userId);
-//        entity.setAddtime(new Date());
+        entity.setAddtime(new Date());
         entity.setTaskContent(vo.taskContent);
-        entity.setTaskMoney(vo.taskMoney);
+        entity.setTaskMoney(0);
         entity.setTaskName(vo.taskName);
+        entity.setTaskFileUrl("");
         entity.setIs_fulfill(1);
         Boolean bool = this.service.Insert(entity);
         Result<Boolean> result = new Result<>(bool, errors);
@@ -150,7 +159,8 @@ public class TasksController {
         }
         if (entity.getTaskFileUrl().isEmpty()) {
             try {
-                String url = UploadUtils.importData(file, request);
+                UploadUtils uploadUtils = new UploadUtils();
+                String url = uploadUtils.importData(file, request);
                 if (url.isEmpty() || url == null) {
                     throw new ApiException("文件上传失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
                 }
@@ -261,7 +271,7 @@ public class TasksController {
     @ApiOperation(value = "管理员根据类型查询")
     @GetMapping("/getType")
     public ResponseEntity<Result<List<TaskListForm>>> getType(@ApiParam(value = "type", required = true)
-                                                            @PathVariable Integer type, BindingResult bindingResult) {
+                                                              @PathVariable Integer type, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }

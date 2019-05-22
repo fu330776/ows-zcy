@@ -1,13 +1,15 @@
 package com.goodsogood.ows.service;
 
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.helper.MD5Utils;
 import com.goodsogood.ows.helper.RandomUtils;
 import com.goodsogood.ows.mapper.*;
 import com.goodsogood.ows.model.db.*;
-import com.goodsogood.ows.model.vo.UserForm;
 import com.goodsogood.ows.model.vo.UserInfoVo;
 import com.goodsogood.ows.model.vo.UsersForm;
+import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,52 +57,58 @@ public class UsersService {
 
     @Transactional
     public Boolean AdminRegister(UsersForm user) {
+
         //查询账号是否已经注册
-        AccountsEntity accountsEntity = this.amapper.GetByPhone(user.Phone);
+        AccountsEntity entituy = this.amapper.GetByPhone(user.getPhone());
         Long AccountId;
-        if (accountsEntity != null) {
-            AccountId = accountsEntity.getAccountId();
+        if (entituy != null) {
+            AccountId = entituy.getAccountId();
         } else {
-            accountsEntity = new AccountsEntity();
-            accountsEntity.setAddtime(new Date());
-            accountsEntity.setPhone(user.Phone);
-            accountsEntity.setPassWordLaws(user.PassWord);
-            accountsEntity.setPassWord(MD5Utils.MD5(user.PassWord));
-            AccountId = this.amapper.Insert(accountsEntity);
+            entituy = new AccountsEntity();
+            entituy.setAddtime(new Date());
+            entituy.setPhone(user.getPhone());
+            entituy.setPassWordLaws(user.getPassword());
+            entituy.setPassWord(MD5Utils.MD5(user.getPassword()));
+            AccountId = this.amapper.Insert(entituy);
+        }
+        if (AccountId <= 0L) {
+            return false;
         }
 
         //注册资料
         UsersEntity entity = new UsersEntity();
-        entity.setUserName(user.userName);
+        entity.setUserName(user.getUserName());
         entity.setAddtime(new Date());
         entity.setCode(GetCode());
-        entity.setCompanyCode(user.companyCode);
-        entity.setCompanyName(user.companyName);
+        entity.setCompanyCode(user.getCompanyCode());
+        entity.setCompanyName(user.getCompanyName());
         entity.setEnable(1);
-        entity.setIsReferrer(user.isReferrer);
-        entity.setOrganizationCode(user.organizationCode);
-        entity.setOrganizationName(user.organizationName);
-        entity.setReferrer(user.referrer);
+        entity.setIsReferrer(user.getIsReferrer());
+        entity.setOrganizationCode(user.getOrganizationCode());
+        entity.setOrganizationName(user.getOrganizationName());
+        entity.setReferrer(user.getReferrer());
         entity.setReview(2);
         entity.setUpdatetime(new Date());
-        entity.setUserBankCardNumber(user.userBankCardNumber);
-        entity.setUserCardholderIdcard(user.userCardholderIdcard);
-        entity.setUserCardholderName(user.userCardholderName);
-        entity.setUserCardholderPhone(user.userCardholderPhone);
-        entity.setUserDepartment(user.userDepartment);
-        entity.setUserEmail(user.userEmail);
-        entity.setUserHospital(user.userHospital);
-        entity.setUserPosition(user.userPosition);
+        entity.setUserBankCardNumber(user.getUserBankCardNumber());
+        entity.setUserCardholderIdcard(user.getUserCardholderIdCard());
+        entity.setUserCardholderName(user.getUserCardholderName());
+        entity.setUserCardholderPhone(user.getUserCardholderPhone());
+        entity.setUserDepartment(user.getUserDepartment());
+        entity.setUserEmail(user.getUserEmail());
+        entity.setUserHospital(user.getUserHospital());
+        entity.setUserPosition(user.getUserPosition());
         Long userid = this.mapper.Insert(entity);
+
         if (userid <= 0L) {
             return false;
         }
+        System.out.println("AccountId:" + AccountId + ",userid:" + userid);
         //添加关联
-        AccountsUsersRolesEntity accountsUsersRolesEntity = new AccountsUsersRolesEntity();
-        accountsUsersRolesEntity.setAccountId(AccountId);
-        accountsUsersRolesEntity.setRoleId(user.roleId);
-        accountsUsersRolesEntity.setUserId(userid);
-        Long aurid = this.aurmapper.RewriteInsert(accountsUsersRolesEntity);
+        AccountsUsersRolesEntity usersRolesEntity = new AccountsUsersRolesEntity();
+        usersRolesEntity.setAccountId(AccountId);
+        usersRolesEntity.setRoleId(user.getRoleId());
+        usersRolesEntity.setUserId(userid);
+        Long aurid = this.aurmapper.RewriteInsert(usersRolesEntity);
         if (aurid <= 0L) {
             return false;
         }
@@ -121,60 +129,62 @@ public class UsersService {
     @Transactional
     public Boolean Register(UsersForm user) {
         //校验手机验证码
-        SmssEntity sms = this.smssMapper.GetByPhone(user.Phone, new Date(), 1);
+        SmssEntity sms = this.smssMapper.GetByPhone(user.getPhone(), new Date(), 1);
         if (sms == null) {
             return false;
         }
-        if (sms.getSmsCode() != user.phoneCode) {
+        if (sms.getSmsCode() != user.getPhoneCode()) {
             return false;
         }
-        this.smssMapper.Update(user.Phone, new Date());
+        this.smssMapper.Update(user.getPhone(), new Date());
         //查询账号是否已经注册
-        AccountsEntity accountsEntity = this.amapper.GetByPhone(user.Phone);
+        AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
         Long AccountId;
-        if (accountsEntity != null) {
-            AccountId = accountsEntity.getAccountId();
+        if (entitys != null) {
+            AccountId = entitys.getAccountId();
         } else {
-            accountsEntity = new AccountsEntity();
-            accountsEntity.setAddtime(new Date());
-            accountsEntity.setPhone(user.Phone);
-            accountsEntity.setPassWordLaws(user.PassWord);
-            accountsEntity.setPassWord(MD5Utils.MD5(user.PassWord));
-            AccountId = this.amapper.Insert(accountsEntity);
+            entitys = new AccountsEntity();
+            entitys.setAddtime(new Date());
+            entitys.setPhone(user.getPhone());
+            entitys.setPassWordLaws(user.getPassword());
+            entitys.setPassWord(MD5Utils.MD5(user.getPassword()));
+            AccountId = this.amapper.Insert(entitys);
         }
-
+        if (AccountId <= 0L) {
+            return false;
+        }
         //注册资料
         UsersEntity entity = new UsersEntity();
-        entity.setUserName(user.userName);
+        entity.setUserName(user.getUserName());
         entity.setAddtime(new Date());
         entity.setCode(GetCode());
-        entity.setCompanyCode(user.companyCode);
-        entity.setCompanyName(user.companyName);
+        entity.setCompanyCode(user.getCompanyCode());
+        entity.setCompanyName(user.getCompanyName());
         entity.setEnable(1);
-        entity.setIsReferrer(user.isReferrer);
-        entity.setOrganizationCode(user.organizationCode);
-        entity.setOrganizationName(user.organizationName);
-        entity.setReferrer(user.referrer);
-        entity.setReview(1);
+        entity.setIsReferrer(user.getIsReferrer());
+        entity.setOrganizationCode(user.getOrganizationCode());
+        entity.setOrganizationName(user.getOrganizationName());
+        entity.setReferrer(user.getReferrer());
+        entity.setReview(user.getReview());
         entity.setUpdatetime(new Date());
-        entity.setUserBankCardNumber(user.userBankCardNumber);
-        entity.setUserCardholderIdcard(user.userCardholderIdcard);
-        entity.setUserCardholderName(user.userCardholderName);
-        entity.setUserCardholderPhone(user.userCardholderPhone);
-        entity.setUserDepartment(user.userDepartment);
-        entity.setUserEmail(user.userEmail);
-        entity.setUserHospital(user.userHospital);
-        entity.setUserPosition(user.userPosition);
+        entity.setUserBankCardNumber(user.getUserBankCardNumber());
+        entity.setUserCardholderIdcard(user.getUserCardholderIdCard());
+        entity.setUserCardholderName(user.getUserCardholderName());
+        entity.setUserCardholderPhone(user.getUserCardholderPhone());
+        entity.setUserDepartment(user.getUserDepartment());
+        entity.setUserEmail(user.getUserEmail());
+        entity.setUserHospital(user.getUserHospital());
+        entity.setUserPosition(user.getUserPosition());
         Long userid = this.mapper.Insert(entity);
         if (userid <= 0L) {
             return false;
         }
         //添加关联
-        AccountsUsersRolesEntity accountsUsersRolesEntity = new AccountsUsersRolesEntity();
-        accountsUsersRolesEntity.setAccountId(AccountId);
-        accountsUsersRolesEntity.setRoleId(user.roleId);
-        accountsUsersRolesEntity.setUserId(userid);
-        Long aurid = this.aurmapper.RewriteInsert(accountsUsersRolesEntity);
+        AccountsUsersRolesEntity UsersRolesEntity = new AccountsUsersRolesEntity();
+        UsersRolesEntity.setAccountId(AccountId);
+        UsersRolesEntity.setRoleId(user.getRoleId());
+        UsersRolesEntity.setUserId(userid);
+        Long aurid = this.aurmapper.RewriteInsert(UsersRolesEntity);
         if (aurid <= 0L) {
             return false;
         }
@@ -222,8 +232,8 @@ public class UsersService {
     /**
      * 登录后修改密码
      */
-    public Integer UpdatePassWord(Long userid, String pwd) {
-        return this.amapper.UpdatePassword(userid, pwd, MD5Utils.MD5(pwd));
+    public Integer UpdatePassWord(Long userId, String pwd) {
+        return this.amapper.UpdatePassword(userId, pwd, MD5Utils.MD5(pwd));
     }
 
     /**
@@ -245,8 +255,11 @@ public class UsersService {
      *
      * @return
      */
-    public List<UserInfoVo> GetAll() {
-        return this.mapper.GetByAll();
+    public PageInfo<UserInfoVo> GetAll(PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetByAll()) ;
     }
 
     /**

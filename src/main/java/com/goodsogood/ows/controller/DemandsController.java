@@ -1,9 +1,12 @@
 package com.goodsogood.ows.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.model.db.DemandsEntity;
+import com.goodsogood.ows.model.db.PageNumber;
+import com.goodsogood.ows.model.vo.DemandAddForm;
 import com.goodsogood.ows.model.vo.DemandsForm;
 import com.goodsogood.ows.model.vo.Result;
 import com.goodsogood.ows.service.DemandsService;
@@ -38,11 +41,18 @@ public class DemandsController {
 
     @ApiOperation(value = "添加需求")
     @PostMapping("/add")
-    public ResponseEntity<Result<Boolean>> addDemands(@Valid @RequestBody DemandsEntity demandsEntity, BindingResult bindingResult) {
+    public ResponseEntity<Result<Boolean>> addDemands(@Valid @RequestBody DemandAddForm addForm, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean bool = this.service.Insert(demandsEntity);
+        DemandsEntity entity = new DemandsEntity();
+        entity.setAddtime(new Date());
+        entity.setDemandContent(addForm.getDemandContent());
+        entity.setDemandName(addForm.getDemandName());
+        entity.setDemandType(addForm.getDemandType());
+        entity.setIsContact(addForm.getIsContact());
+        entity.setUserId(addForm.getUserId());
+        Boolean bool = this.service.Insert(entity);
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -76,45 +86,48 @@ public class DemandsController {
     }
 
     @ApiModelProperty(value = "用户根据类型查询")
-    @GetMapping("/GetTypeById")
-    public ResponseEntity<Result<List<DemandsEntity>>> GetTypeById(
-            @ApiParam(value = "demandId", required = true)
+    @GetMapping("/GetTypeById/{id}")
+    public ResponseEntity<Result<PageInfo<DemandsEntity>>> GetTypeById(
+            @ApiParam(value = "id", required = true)
             @PathVariable
-                    Long demandId,
-            @ApiParam(value = "type", required = true)
-            @PathVariable
-                    Integer type,
-            @ApiParam(value = "isContact", required = true)
-            @PathVariable
-                    Integer isContact
+                    Long id,
+            Integer type,
+            Integer isContact, Integer page, Integer pageSize
     ) {
-        List<DemandsEntity> demandsEntityList = this.service.Get(demandId, type, isContact);
-        Result<List<DemandsEntity>> result = new Result<>(demandsEntityList, errors);
+        if (page == null) {
+            page = 0;
+        }
+        PageInfo<DemandsEntity> demandsEntityList = this.service.Get(id, type, isContact, new PageNumber(page, pageSize));
+        Result<PageInfo<DemandsEntity>> result = new Result<>(demandsEntityList, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @ApiModelProperty(value = "管理员根据类型查询所有")
-    @GetMapping("/GetAdminType")
-    public ResponseEntity<Result<List<DemandsEntity>>> GetAdminByType(
+    @GetMapping("/GetAdminType/{type}")
+    public ResponseEntity<Result<PageInfo<DemandsEntity>>> GetAdminByType(
             @ApiParam(value = "type", required = true)
             @PathVariable
-                    Integer type
+                    Integer type, Integer IsCount, Integer page, Integer pageSize
+
     ) {
-        List<DemandsEntity> demandsEntityList = this.service.GetTypeAll(type);
-        Result<List<DemandsEntity>> result = new Result<>(demandsEntityList, errors);
+        if (page == null) {
+            page = 0;
+        }
+        PageInfo<DemandsEntity> demandsEntityList = this.service.GetTypeAll(type, IsCount, new PageNumber(page, pageSize));
+        Result<PageInfo<DemandsEntity>> result = new Result<>(demandsEntityList, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @ApiModelProperty(value = "根据唯一标识查询")
-    @GetMapping("/GetById")
-    public  ResponseEntity<Result<DemandsEntity>> GetById(
-            @ApiParam(value = "demandId", required = true)
+    @GetMapping("/GetById/{id}")
+    public ResponseEntity<Result<DemandsEntity>> GetById(
+            @ApiParam(value = "id", required = true)
             @PathVariable
-            Long demandId
-    ){
-        DemandsEntity demandsEntity=this.service.GetByOne(demandId);
-        Result<DemandsEntity> result=new Result<>(demandsEntity,errors);
-        return  new ResponseEntity<>(result,HttpStatus.OK);
+                    Long id
+    ) {
+        DemandsEntity demandsEntity = this.service.GetByOne(id);
+        Result<DemandsEntity> result = new Result<>(demandsEntity, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 

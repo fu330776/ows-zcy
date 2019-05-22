@@ -2,10 +2,12 @@ package com.goodsogood.ows.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.helper.HttpUtil;
+import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.SmssEntity;
 import com.goodsogood.ows.model.db.UsersEntity;
 import com.goodsogood.ows.model.db.VerificationCode;
@@ -15,6 +17,7 @@ import com.goodsogood.ows.service.WithdrawsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ResultContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +35,7 @@ import java.util.*;
 @RequestMapping("/v-users")
 @Log4j2
 @CrossOrigin(origins = "*", maxAge = 3600)
-@Api(value = "用户信息操作", tags = {"操作用户信息"})
+@Api(value = "Users", tags = {"操作用户信息"})
 public class UsersController {
 
     private final Errors errors;
@@ -276,17 +279,18 @@ public class UsersController {
 
     /***
      *  获取所有账户信息
-     * @param bindingResult
      * @return
      */
     @ApiOperation(value = "获取所有账户信息")
-    @GetMapping("/getAll")
-    public ResponseEntity<Result<List<UserInfoVo>>> getByAll(BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+    @GetMapping("/getAll/{page}")
+    public ResponseEntity<Result<PageInfo<UserInfoVo>>> getByAll(@ApiParam(value = "page", required = true)
+                                                                 @PathVariable Integer page, Integer pageSize) {
+
+        if (page == null) {
+            page = 0;
         }
-        List<UserInfoVo> userInfoVos = this.usersService.GetAll();
-        Result<List<UserInfoVo>> result = new Result<>(userInfoVos, errors);
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetAll(new PageNumber(page, pageSize));
+        Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

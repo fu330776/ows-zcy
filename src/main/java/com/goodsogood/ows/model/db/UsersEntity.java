@@ -29,39 +29,39 @@ public class UsersEntity extends BaseEntity {
 
     @ApiModelProperty(value = "个人姓名")
     @Column(name = "user_name")
-    public  String userName;
+    public String userName;
 
     @ApiModelProperty(value = "个人所属医院")
     @Column(name = "user_hospital")
-    public  String userHospital;
+    public String userHospital;
 
     @ApiModelProperty(value = "个人所属科室")
     @Column(name = "user_department")
-    public  String userDepartment;
+    public String userDepartment;
 
     @ApiModelProperty(value = "个人职位：1、医生 2、护士")
     @Column(name = "user_position")
-    public  String userPosition;
+    public Integer userPosition;
 
     @ApiModelProperty(value = "个人邮箱")
     @Column(name = "user_email")
-    public  String userEmail;
+    public String userEmail;
 
     @ApiModelProperty(value = "个人银行卡号")
     @Column(name = "user_bank_card_number")
-    public  String userBankCardNumber;
+    public String userBankCardNumber;
 
     @ApiModelProperty(value = "个人持卡人姓名")
     @Column(name = "user_cardholder_name")
-    public  String userCardholderName;
+    public String userCardholderName;
 
     @ApiModelProperty(value = "个人持卡人电话")
     @Column(name = "user_cardholder_phone")
-    public  String userCardholderPhone;
+    public String userCardholderPhone;
 
     @ApiModelProperty(value = "个人持卡人身份证")
     @Column(name = "user_cardholder_idcard")
-    public  String userCardholderIdcard;
+    public String userCardholderIdcard;
 
     @ApiModelProperty(value = "企业名称")
     @Column(name = "company_name")
@@ -69,32 +69,32 @@ public class UsersEntity extends BaseEntity {
 
     @ApiModelProperty(value = "企业代码")
     @Column(name = "company_code")
-    public  String companyCode;
+    public String companyCode;
 
     @ApiModelProperty(value = "机构名称")
     @Column(name = "organization_name")
-    public  String organizationName;
+    public String organizationName;
 
     @ApiModelProperty(value = "机构代码")
     @Column(name = "organization_code")
-    public  String organizationCode;
+    public String organizationCode;
     @ApiModelProperty(value = "是否审核 1、未审核 2、已审核")
-    public  Integer review;
+    public Integer review;
 
-    @ApiModelProperty(value ="是否起禁用 1、启用  2、禁用" )
-    public  Integer enable;
+    @ApiModelProperty(value = "是否起禁用 1、启用  2、禁用")
+    public Integer enable;
 
     @ApiModelProperty(value = "推荐码（自动生成4~6位唯一，字母+数字混合）")
-    public  String code;
+    public String code;
 
     @ApiModelProperty(value = "推荐人（对应其他用户的推荐码）")
-    public  Long referrer;
+    public Long referrer;
 
     @ApiModelProperty(value = "是否被管理员指定为推荐人 1、不是 2、是")
     @Column(name = "is_referrer")
-    public  Integer isReferrer;
+    public Integer isReferrer;
 
     public Date addtime;
 
-    public  Date updatetime;
+    public Date updatetime;
 }

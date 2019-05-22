@@ -14,12 +14,13 @@ public interface AccountsMapper extends MyMapper<AccountsEntity> {
             "<if test='AccountId !=null' >account_id,</if> ",
             "phone,pass_word,pass_word_laws)",
             " VALUES( ",
-            "<if test='AccountId !=null' >#{account_id,jdbcType=BIGINT},</if>",
-            " #{phone,jdbcType=VARCHAR},#{pass_word,jdbcType=VARCHAR},",
-            "#{pass_word_laws,jdbcType=VARCHAR} )",
+            "<if test='AccountId !=null' >#{AccountId,jdbcType=BIGINT},</if>",
+            " #{phone,jdbcType=VARCHAR},#{PassWord,jdbcType=VARCHAR},",
+            "#{PassWordLaws,jdbcType=VARCHAR} )",
             "</script>"
     })
     @Options(useGeneratedKeys = true, keyProperty = "AccountId", keyColumn = "account_id")
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyColumn = "account_id", keyProperty = "AccountId", before = false, resultType = Long.class)
     Long Insert(AccountsEntity accountsEntity);
 
     @Select({
@@ -30,14 +31,21 @@ public interface AccountsMapper extends MyMapper<AccountsEntity> {
     })
     AccountsEntity GetByPhone(@Param(value = "phone") String phone);
 
+    @Select({
+            "<script>",
+            "SELECT * FROM zcy_accounts WHERE phone=#{phone,jdbcType=VARCHAR} and pass_word=#{password,jdbcType=VARCHAR} and enable=1",
+            "</script>"
+    })
+    AccountsEntity GetByUser(@Param(value = "phone") String phone, @Param(value = "password") String password);
+
     @Update({
             "<script>",
             "UPDATE zcy_accounts SET pass_word_laws=#{newPwd,jdbcType=VARCHAR},pass_word=#{pwds,jdbcType=VARCHAR} ",
             "where phone=#{Phone,jdbcType=VARCHAR}",
             "</script>"
     })
-    int UpdatePwd(@Param(value = "Phone") String Phone,@Param(value = "newPwd")
-            String newPwd,@Param(value ="pwds" ) String mad5pwd);
+    int UpdatePwd(@Param(value = "Phone") String Phone, @Param(value = "newPwd")
+            String newPwd, @Param(value = "pwds") String mad5pwd);
 
     @Update({
             "<script>",
@@ -46,5 +54,5 @@ public interface AccountsMapper extends MyMapper<AccountsEntity> {
             "where account_id=(SELECT account_id FROM zcy_accounts_users_roles WHERE user_id=#{userid,jdbcType=BIGINT})",
             "</script>"
     })
-    int UpdatePassword(@Param(value = "userid") Long userid,@Param(value = "pwd") String pwd,@Param(value = "Md5Pwd") String Md5Pwd);
+    int UpdatePassword(@Param(value = "userid") Long userid, @Param(value = "pwd") String pwd, @Param(value = "Md5Pwd") String Md5Pwd);
 }

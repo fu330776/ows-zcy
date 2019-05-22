@@ -12,7 +12,7 @@ import java.util.List;
 public interface UsersMapper extends MyMapper<UsersEntity> {
     @Insert({
             "<script>",
-            "INSERT INTO zcy_accounts(",
+            "INSERT INTO zcy_users(",
             "<if test='userId !=null' >user_id,</if> ",
             "user_name,user_hospital,user_department,",
             "user_position,user_email,user_bank_card_number,user_cardholder_name,",
@@ -21,8 +21,8 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ") VALUES(",
             "<if test='userId !=null' >#{userId,jdbcType=BIGINT},</if> ",
             "#{userName,jdbcType=VARCHAR},#{userHospital,jdbcType=VARCHAR},",
-            "#{userDepartment,jdbcType=VARCHAR},#{userPosition,jdbcType=VARCHAR},",
-            "#{userEmail,jdbcType=VARCHAR},{userBankCardNumber,jdbcType=VARCHAR},",
+            "#{userDepartment,jdbcType=VARCHAR},#{userPosition,jdbcType=BIT},",
+            "#{userEmail,jdbcType=VARCHAR},#{userBankCardNumber,jdbcType=VARCHAR},",
             "#{userCardholderName,jdbcType=VARCHAR},#{userCardholderPhone,jdbcType=VARCHAR},",
             "#{userCardholderIdcard,jdbcType=VARCHAR},#{review,jdbcType=BIT},",
             "#{enable,jdbcType=BIT},#{code,jdbcType=VARCHAR},#{referrer,jdbcType=BIGINT},",
@@ -30,12 +30,13 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ")",
             "</script>"
     })
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyColumn = "user_id", keyProperty = "userId", before = false, resultType = Long.class)
     @Options(useGeneratedKeys = true, keyProperty = "userId", keyColumn = "user_id")
     Long PersonalInsert(UsersEntity usersEntity);
 
     @Insert({
             "<script>",
-            "INSERT INTO zcy_accounts(",
+            "INSERT INTO zcy_users(",
             "<if test='userId !=null' >user_id,</if> ",
             "company_name,company_code,review,enable,code,referrer,",
             "is_referrer,addtime,updatetime",
@@ -47,12 +48,13 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ")",
             "</script>"
     })
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyColumn = "user_id", keyProperty = "userId", before = false, resultType = Long.class)
     @Options(useGeneratedKeys = true, keyProperty = "userId", keyColumn = "user_id")
     Long CompanyInsert(UsersEntity usersEntity);
 
     @Insert({
             "<script>",
-            "INSERT INTO zcy_accounts(",
+            "INSERT INTO zcy_users(",
             "<if test='userId !=null' >user_id,</if> ",
             "organization_name,organization_code,review,enable,code,referrer,is_referrer,addtime,updatetime",
             ") VALUES(",
@@ -63,12 +65,13 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ")",
             "</script>"
     })
-    @Options(useGeneratedKeys = true, keyProperty = "userId", keyColumn = "user_id")
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyColumn = "user_id", keyProperty = "userId", before = false, resultType = Long.class)
+//    @Options(useGeneratedKeys = true, keyProperty = "userId", keyColumn = "user_id")
     Long MechanismInsert(UsersEntity usersEntity);
 
     @Insert({
             "<script>",
-            "INSERT INTO zcy_accounts(",
+            "INSERT INTO zcy_users(",
             "<if test='userId !=null' >user_id,</if> ",
             "user_name,user_hospital,user_department,",
             "user_position,user_email,user_bank_card_number,user_cardholder_name,",
@@ -77,8 +80,8 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ") VALUES(",
             "<if test='userId !=null' >#{userId,jdbcType=BIGINT},</if> ",
             "#{userName,jdbcType=VARCHAR},#{userHospital,jdbcType=VARCHAR},",
-            "#{userDepartment,jdbcType=VARCHAR},#{userPosition,jdbcType=VARCHAR},",
-            "#{userEmail,jdbcType=VARCHAR},{userBankCardNumber,jdbcType=VARCHAR},",
+            "#{userDepartment,jdbcType=VARCHAR},#{userPosition,jdbcType=BIT},",
+            "#{userEmail,jdbcType=VARCHAR},#{userBankCardNumber,jdbcType=VARCHAR},",
             "#{userCardholderName,jdbcType=VARCHAR},#{userCardholderPhone,jdbcType=VARCHAR},",
             "#{userCardholderIdcard,jdbcType=VARCHAR},#{companyName,jdbcType=VARCHAR},#{companyCode,jdbcType=VARCHAR},#{organizationName,jdbcType=VARCHAR},#{organizationCode,jdbcType=VARCHAR},#{review,jdbcType=BIT},",
             "#{enable,jdbcType=BIT},#{code,jdbcType=VARCHAR},#{referrer,jdbcType=BIGINT},",
@@ -87,6 +90,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "</script>"
     })
     @Options(useGeneratedKeys = true, keyProperty = "userId", keyColumn = "user_id")
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyColumn = "user_id", keyProperty = "userId", before = false, resultType = Long.class)
     Long Insert(UsersEntity usersEntity);
 
 

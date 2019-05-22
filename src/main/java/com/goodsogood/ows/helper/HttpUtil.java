@@ -18,6 +18,7 @@ public class HttpUtil {
     private HttpUtil() {
     }
 
+
     public static String postEncrypt(RestTemplate restTemplate, String url, Object body, HttpHeaders httpHeaders, TypeReference typeReference) throws Exception {
         httpHeaders.add("Content-Type", "text/plain");
         //生成hash

@@ -10,24 +10,24 @@ import java.util.List;
 
 @Repository
 @Mapper
-public interface RoleUserMapper extends  MyMapper<RoleUserEntity> {
+public interface RoleUserMapper extends MyMapper<RoleUserEntity> {
 
     @Select({
             "<script>",
-            "SELECT * FROM zcy_accounts_users_roles ",
-            "where account_id=(SELECT * FROM zcy_accounts ",
-            "WHERE phone=#{phone,jdbcType=VARCHAR} and pass_word=#{password,jdbcType=VARCHAR} and enable=1)",
+            "SELECT * FROM zcy_accounts_users_roles zr ",
+            "left JOIN zcy_users zu on zr.user_id=zu.user_id where zu.review=2 and `enable`=1 ",
+            "and  zr.account_id=#{id,jdbcType=BIGINT} ",
             "</script>",
 
     })
-    List<RoleUserEntity> GetList(@Param(value = "phone") String phone,@Param(value = "password") String password);
+    List<RoleUserEntity> GetList(@Param(value = "id") Long id);
 
     @Select({
             "<script>",
-            "SELECT * FROM zcy_accounts_users_roles ",
-            "where account_id=(SELECT * FROM zcy_accounts ",
-            "WHERE phone=#{phone,jdbcType=VARCHAR} and enable=1)",
+            "SELECT * FROM zcy_accounts_users_roles zr ",
+            "left JOIN zcy_users zu on zr.user_id=zu.user_id where zu.review=2 and `enable`=1 ",
+            "and  zr.account_id=#{id,jdbcType=BIGINT} ",
             "</script>",
     })
-    List<RoleUserEntity> GetLists(@Param(value = "phone") String phone);
+    List<RoleUserEntity> GetLists(@Param(value = "id") Long id);
 }

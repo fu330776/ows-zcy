@@ -1,7 +1,11 @@
 package com.goodsogood.ows.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.DemandsMapper;
 import com.goodsogood.ows.model.db.DemandsEntity;
+import com.goodsogood.ows.model.db.PageNumber;
+import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,22 +29,29 @@ public class DemandsService {
     /**
      * 根据用户，类型 ，是否联系，查询
      */
-    public List<DemandsEntity> Get(Long userid, Integer type, Integer isContact) {
-        return this.mapper.Get(userid, type, isContact);
+    public PageInfo<DemandsEntity> Get(Long userId, Integer type, Integer isContact,PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.Get(userId, type, isContact));
     }
 
     /**
      * 后台管理员查看 根据类型查看
      */
-    public List<DemandsEntity> GetTypeAll(Integer type) {
-        return this.mapper.GetTypeAll(type);
+    public PageInfo<DemandsEntity> GetTypeAll(Integer type, Integer isCount, PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetTypeAll(type, isCount));
     }
 
+
     /**
-     *  查询单个数据
-     * */
-    public  DemandsEntity GetByOne(Long demandId){
-        return  this.mapper.selectByPrimaryKey(demandId);
+     * 查询单个数据
+     */
+    public DemandsEntity GetByOne(Long demandId) {
+        return this.mapper.selectByPrimaryKey(demandId);
     }
 
     /**

@@ -4,32 +4,18 @@ import com.goodsogood.ows.validator.constraints.NotBlank4Channel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Pattern;
 
-
-/**
- * @author xuliduo
- * @date 06/03/2018
- * @description class LoginVo
- */
 @Data
 @ApiModel
-public class LoginVo {
-    /**
-     * 手机号
-     */
+public class CodeForm {
     @Pattern(regexp = "^1(3|4|5|7|8)\\d{9}$", message = "{Pattern.admin.mobile}")
-    @NotBlank4Channel(message = "{NotBlank.login.mobile}", include = "BANK")
+    @NotBlank4Channel(message = "{NotBlank.code.mobile}", include = "BANK")
     @ApiModelProperty(value = "手机号", required = true)
     public String mobile;
-    /**
-     * 短信验证码
-     */
-//    @NotEmpty
-    @ApiModelProperty(value = "短信验证码", required = true)
-    public String code;
 
+    @ApiModelProperty(value = "发送验证码类型 1：注册，2：修改密码")
+    public Integer Type;
 
 }

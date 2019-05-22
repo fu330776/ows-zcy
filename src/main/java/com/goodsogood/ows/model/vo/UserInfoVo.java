@@ -15,7 +15,7 @@ public class UserInfoVo {
     @Column(name = "user_id")
     public Long userId;
     @ApiModelProperty(value = "个人姓名")
-    @Column(name = "user_name")
+
     public String userName;
 
     @ApiModelProperty(value = "个人所属医院")

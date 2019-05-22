@@ -33,7 +33,7 @@ public class CodeService {
         }
         CodeEntity codeEntity=new CodeEntity();
         codeEntity.setCode_code(code);
-        this.mapper.insert(codeEntity);
+        this.mapper.Insert(codeEntity);
         return  code;
     }
 

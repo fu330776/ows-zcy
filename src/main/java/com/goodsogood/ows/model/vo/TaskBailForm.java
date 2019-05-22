@@ -8,10 +8,6 @@ import java.math.BigDecimal;
 @ApiModel
 public class TaskBailForm {
 
-    public  String url;
-
-    public BigDecimal money;
-
     public  Integer taskCompletionDays;
 
     public  Integer taskCompletedDays;

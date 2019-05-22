@@ -27,7 +27,7 @@ public interface ArticlesMapper extends MyMapper<ArticlesEntity> {
 
     @Select({
             "<script>",
-            "SELECT article_id,article_title,article_content,article_type,addtime",
+            "SELECT article_id as articleId,article_title as title,article_content as content,article_type as type,addtime",
             "FROM zcy_articles where article_type=#{type,jdbcType=BIT}",
             "</script>"
     })

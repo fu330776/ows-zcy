@@ -29,9 +29,9 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
             "demand_type,demand_name,demand_content,is_contact,user_id,addtime)",
             "Values (",
             "<if test='demandId !=null'> #{demandId,jdbcType=BIGINT},</if>",
-            "#{demandType,jdbcType=BIT},#{demandName,JdbcType=VARCHAR},",
-            "#{demandContent,JdbcType=VARCHAR},#{isContact,jdbcType=BIT},",
-            "#{userId,jdbcType=BIGINT}，#{addtime,JdbcType=TIMESTAMP}",
+            "#{demandType,jdbcType=BIT},#{demandName,jdbcType=VARCHAR},",
+            "#{demandContent,jdbcType=VARCHAR},#{isContact,jdbcType=BIT},",
+            "#{userId,jdbcType=BIGINT},#{addtime,jdbcType=TIMESTAMP}",
             ")",
             "</script>"
     })
@@ -61,8 +61,8 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
             "SELECT  demand_id as demandId, demand_type as demandType , demand_name as demandName,",
             "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime",
             "FROM zcy_demands WHERE  demand_type=#{demandType,jdbcType=BIT}",
-            "<if test='isContact !=0'> and is_contact=#{isContact,jdbcType=BIT}</if>",
+            "<if test='isContact !=null'> and is_contact=#{isContact,jdbcType=BIT}</if>",
             "</script>"
     })
-    List<DemandsEntity> GetTypeAll(@Param(value = "demandType") Integer demandType);
+    List<DemandsEntity> GetTypeAll(@Param(value = "demandType") Integer demandType,@Param(value = "isContact") Integer isContact);
 }

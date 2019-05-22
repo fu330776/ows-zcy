@@ -49,6 +49,4 @@ public class ArticlesService {
     public List<ArticlesEntity> GetByType(Integer type) {
         return this.mapper.Get(type);
     }
-
-    
 }

@@ -16,10 +16,10 @@ public interface AccountsUsersRolesMapper extends MyMapper<AccountsUsersRolesEnt
             "<script>",
             "INSERT INTO zcy_accounts_users_roles(",
             "<if test='AurId !=null' >aur_id,</if> ",
-            "account_id,user_id,role_id,role_name",
+            "account_id,user_id,role_id",
             ") VALUES(",
             "<if test='AurId !=null' >#{AurId,jdbcType=BIGINT},</if> ",
-            "#{AccountId,jdbcType=BIGINT},#{UserId,jdbcType=BIGINT}",
+            "#{AccountId,jdbcType=BIGINT},#{UserId,jdbcType=BIGINT},",
             "#{RoleId,jdbcType=BIGINT}",
             ")",
             "</script>"

@@ -19,7 +19,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
             ")VALUES(",
             "<if test='taskId !=null'>#{taskId,jdbcType=BIGINT},</if>",
             "#{taskName,jdbcType=VARCHAR},#{taskContent,jdbcType=VARCHAR},",
-            "#{taskFileUrl,jdbcType=VARCHAR},#{addtime,JdbcType=TIMESTAMP},",
+            "#{taskFileUrl,jdbcType=VARCHAR},#{addtime,jdbcType=TIMESTAMP},",
             "#{taskMoney,jdbcType=FLOAT},#{userId,jdbcType=BIGINT},",
             "#{is_fulfill,jdbcType=BIT},#{schedule,jdbcType=FLOAT},",
             "#{is_pay,jdbcType=BIT},#{taskCompletionDays,jdbcType=BIT},#{taskCompletedDays,jdbcType=BIT},",

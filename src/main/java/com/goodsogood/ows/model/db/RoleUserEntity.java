@@ -13,6 +13,7 @@ import javax.persistence.Table;
 public class RoleUserEntity extends  BaseEntity  {
     public Long userId;
     public Long roleId;
-    public Long roleName;
+    public String roleName;
+    public Integer isDel;
 
 }

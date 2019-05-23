@@ -91,7 +91,7 @@ public class ArticlesController {
      * @return
      */
     @ApiOperation(value = "查询（行业动态）文章")
-    @GetMapping("/getTrends")
+    @GetMapping("/getTrends/{page}")
     public ResponseEntity<Result<PageInfo<ArticlesEntity>>> getTrends(@ApiParam(value = "page", required = true)
                                                                       @PathVariable Integer page, Integer pageSize) {
         if (page == null) {
@@ -108,13 +108,13 @@ public class ArticlesController {
      * @return
      */
     @ApiOperation(value = "查询（新技术新产品）文章")
-    @GetMapping("/getProduct")
+    @GetMapping("/getProduct/{page}")
     public ResponseEntity<Result<PageInfo<ArticlesEntity>>> getProduct(@ApiParam(value = "page", required = true)
                                                                        @PathVariable Integer page, Integer pageSize) {
         if (page == null) {
             page = 1;
         }
-        PageInfo<ArticlesEntity> entities = this.service.GetByType(2,new PageNumber(page, pageSize));
+        PageInfo<ArticlesEntity> entities = this.service.GetByType(2, new PageNumber(page, pageSize));
         Result<PageInfo<ArticlesEntity>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

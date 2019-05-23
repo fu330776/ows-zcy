@@ -34,7 +34,7 @@ public class AccountsUsersRolesService {
      * @param pwd  md5密码
      * @return
      */
-    public String GetByFind(String phone, String pwd) {
+    public Long GetByFind(String phone, String pwd) {
         return this.mapper.GetAdminFind(phone, pwd);
     }
 }

@@ -51,10 +51,9 @@ public class UsersService {
     /**
      * 注册账号
      */
-    public Long AccountRegistration(AccountsEntity accountsEntity) {
-        return this.amapper.Insert(accountsEntity);
-    }
-
+//    public Long AccountRegistration(AccountsEntity accountsEntity) {
+//        return this.amapper.Insert(accountsEntity);
+//    }
     @Transactional
     public Boolean AdminRegister(UsersForm user) {
 
@@ -69,9 +68,11 @@ public class UsersService {
             entituy.setPhone(user.getPhone());
             entituy.setPassWordLaws(user.getPassword());
             entituy.setPassWord(MD5Utils.MD5(user.getPassword()));
-            AccountId = this.amapper.Insert(entituy);
+            entituy.setEnable(1);
+            this.amapper.Insert(entituy);
+            AccountId = entituy.getAccountId();
         }
-        if (AccountId <= 0L) {
+        if (AccountId == null) {
             return false;
         }
 
@@ -98,8 +99,8 @@ public class UsersService {
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
         Long userid = this.mapper.Insert(entity);
-
-        if (userid <= 0L) {
+        userid = entity.getUserId();
+        if (userid == null) {
             return false;
         }
         System.out.println("AccountId:" + AccountId + ",userid:" + userid);
@@ -109,7 +110,7 @@ public class UsersService {
         usersRolesEntity.setRoleId(user.getRoleId());
         usersRolesEntity.setUserId(userid);
         Long aurid = this.aurmapper.RewriteInsert(usersRolesEntity);
-        if (aurid <= 0L) {
+        if (aurid == null) {
             return false;
         }
         return true;
@@ -139,7 +140,7 @@ public class UsersService {
         this.smssMapper.Update(user.getPhone(), new Date());
         //查询账号是否已经注册
         AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
-        Long AccountId;
+        Long AccountId = null;
         if (entitys != null) {
             AccountId = entitys.getAccountId();
         } else {
@@ -149,8 +150,9 @@ public class UsersService {
             entitys.setPassWordLaws(user.getPassword());
             entitys.setPassWord(MD5Utils.MD5(user.getPassword()));
             AccountId = this.amapper.Insert(entitys);
+            AccountId = entitys.getAccountId();
         }
-        if (AccountId <= 0L) {
+        if (AccountId == null) {
             return false;
         }
         //注册资料
@@ -176,7 +178,8 @@ public class UsersService {
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
         Long userid = this.mapper.Insert(entity);
-        if (userid <= 0L) {
+        userid = entity.getUserId();
+        if (userid == null) {
             return false;
         }
         //添加关联
@@ -185,7 +188,7 @@ public class UsersService {
         UsersRolesEntity.setRoleId(user.getRoleId());
         UsersRolesEntity.setUserId(userid);
         Long aurid = this.aurmapper.RewriteInsert(UsersRolesEntity);
-        if (aurid <= 0L) {
+        if (aurid == null) {
             return false;
         }
         return true;
@@ -259,8 +262,23 @@ public class UsersService {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetByAll()) ;
+        return new PageInfo<>(this.mapper.GetByAll());
     }
+
+    /**
+     * 根据角色查询所有用户
+     *
+     * @param rId 角色唯一标识
+     * @param pageNumber
+     * @return
+     */
+    public PageInfo<UserInfoVo> GetByRole(Long rId, PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetByRoleAll(rId));
+    }
+
 
     /**
      * 查询单个用户信息

@@ -1,6 +1,7 @@
 package com.goodsogood.ows.mapper;
 
 import com.goodsogood.ows.model.db.FundsEntity;
+import com.goodsogood.ows.model.vo.FundsVo;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +18,7 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
             "user_id,title,introduction,identity,addtime",
             ")VALUES(",
             "<if test='fundId !=null'>#{fundId,jdbcType=BIGINT}, </if>",
-            "#{userId,jdbcType=BIGINT},#{title,jdbcType=VARCHAR},#{introduction,jdbcType=VARCHAR},#{identity,BIT},#{addtime,jdbcType=TIMESTAMP}",
+            "#{userId,jdbcType=BIGINT},#{title,jdbcType=VARCHAR},#{introduction,jdbcType=VARCHAR},#{identity,jdbcType=BIT},#{addtime,jdbcType=TIMESTAMP}",
             ")",
             "</script>"
 
@@ -40,11 +41,13 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "user_id,title,introduction,identity,addtime,fund_id ",
-            "FROM zcy_funds",
+            "user_id as userId,title,introduction,identity,addtime,fund_id as fundId,",
+            "(SELECT zu.user_name FROM zcy_users zu where zu.user_id=zf.user_id)userName",
+            "FROM zcy_funds zf ",
+            "<if test='type !=null'> where zf.identity=#{type,jdbcType=BIT} </if>",
             "</script>"
     })
-    List<FundsEntity> GetAll();
+    List<FundsVo> GetAll(@Param(value = "type") Integer type);
 
 
     @Update({

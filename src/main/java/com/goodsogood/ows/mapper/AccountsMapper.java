@@ -20,20 +20,22 @@ public interface AccountsMapper extends MyMapper<AccountsEntity> {
             "</script>"
     })
     @Options(useGeneratedKeys = true, keyProperty = "AccountId", keyColumn = "account_id")
-    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyColumn = "account_id", keyProperty = "AccountId", before = false, resultType = Long.class)
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyColumn = "account_id", keyProperty = "AccountId", before = false,resultType = Long.class)
     Long Insert(AccountsEntity accountsEntity);
 
     @Select({
             "<script>",
-            "SELECT  account_id,phone,pass_word FROM zcy_accounts WHERE phone=#{phone,jdbcType=VARCHAR}",
+            "SELECT  account_id as AccountId,phone,pass_word FROM zcy_accounts WHERE phone=#{phone,jdbcType=VARCHAR}",
             "</script>"
-
     })
     AccountsEntity GetByPhone(@Param(value = "phone") String phone);
 
     @Select({
             "<script>",
-            "SELECT * FROM zcy_accounts WHERE phone=#{phone,jdbcType=VARCHAR} and pass_word=#{password,jdbcType=VARCHAR} and enable=1",
+            "SELECT " ,
+            "account_id as AccountId,phone,pass_word as PassWord,",
+            "pass_word_laws as PassWordLaws,`enable` as Enable",
+            "FROM zcy_accounts WHERE phone=#{phone,jdbcType=VARCHAR} and pass_word=#{password,jdbcType=VARCHAR} and enable=1",
             "</script>"
     })
     AccountsEntity GetByUser(@Param(value = "phone") String phone, @Param(value = "password") String password);

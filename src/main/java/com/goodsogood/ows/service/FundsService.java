@@ -1,7 +1,12 @@
 package com.goodsogood.ows.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.FundsMapper;
 import com.goodsogood.ows.model.db.FundsEntity;
+import com.goodsogood.ows.model.db.PageNumber;
+import com.goodsogood.ows.model.vo.FundsVo;
+import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,24 +35,29 @@ public class FundsService {
      * 修改 医创梦计划基金
      */
     public Integer AlterFuns(FundsEntity fundsEntity) {
-        Integer result = this.mapper.Update(fundsEntity.fundId, fundsEntity.title, fundsEntity.introduction);
+        Integer result = this.mapper.Update(fundsEntity.getFundId(), fundsEntity.getTitle(), fundsEntity.getIntroduction());
         return result;
     }
 
     /**
      * 用户查询 医创梦计划基金
      */
-    public List<FundsEntity> GetByUserId(Long userId) {
-        List<FundsEntity> entity = this.mapper.Get(userId);
-        return entity;
+    public PageInfo<FundsEntity> GetByUserId(Long userId, PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.Get(userId));
+
     }
 
     /**
      * 管理员查询 医创梦计划基金
-     * */
-    public List<FundsEntity> GetByAdmin() {
-        List<FundsEntity> entity = this.mapper.GetAll();
-        return entity;
+     */
+    public PageInfo<FundsVo> GetByAdmin(Integer type,PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetAll(type));
     }
 
 }

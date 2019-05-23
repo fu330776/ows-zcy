@@ -1,26 +1,38 @@
 package com.goodsogood.ows.controller;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.goodsogood.log4j2cm.annotation.HttpMonitorLogger;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.CacheConfiguration;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
+import com.goodsogood.ows.helper.HttpRequestUtils;
 import com.goodsogood.ows.helper.MD5Utils;
 import com.goodsogood.ows.helper.SmsUtils;
 import com.goodsogood.ows.model.db.*;
 import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.*;
+import com.unboundid.util.json.JSONException;
+import com.unboundid.util.json.JSONObject;
+import com.unboundid.util.json.JSONObjectReader;
+import com.unboundid.util.json.JSONValue;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jackson.JsonObjectDeserializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.*;
 
 @RestController
@@ -98,18 +110,18 @@ public class LoginController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        if (user.Phone == null || user.Phone.isEmpty()) {
+        if (user.getPhone().isEmpty()) {
             throw new ApiException("账号不能为空或空字符串", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         List<RoleUserEntity> rlist = null;
-        if ((user.code == null || user.code.isEmpty()) && !user.Password.isEmpty()) {
-            rlist = this.loginService.getList(user.Phone, MD5Utils.MD5(user.Password));
+        if (user.code.isEmpty()) {
+            rlist = this.loginService.getList(user.getPhone(), MD5Utils.MD5(user.getPassword()));
             if (rlist == null) {
                 throw new ApiException("服务器繁忙，登录失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
             }
         }
-        if (!user.code.isEmpty() && user.Password.isEmpty()) {
-            rlist = this.loginService.getListPhone(user.Phone, user.code);
+        if (!user.code.isEmpty() && user.getPassword().isEmpty()) {
+            rlist = this.loginService.getListPhone(user.getPhone(), user.code);
             if (rlist == null) {
                 throw new ApiException("服务器繁忙，登录失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
             }
@@ -129,10 +141,10 @@ public class LoginController {
         }
         List<MenusEntity> entity = this.menusService.GetMenus(userid);
         UserMenusVo userMenusVo = new UserMenusVo();
-        userMenusVo.time = CacheConfiguration.GetDate(60 * 60 * 1000L);
-        userMenusVo.token = Md5Crypt.apr1Crypt(userid.toString()) + userMenusVo.time;
-        userMenusVo.userId = userid;
-        userMenusVo.entity = entity;
+        userMenusVo.setTime(CacheConfiguration.GetDate(60 * 60 * 1000L));
+        userMenusVo.setToken(MD5Utils.MD5(userid.toString() + CacheConfiguration.GetDate(60 * 60 * 1000L)));
+        userMenusVo.setUserId(userid);
+        userMenusVo.setEntity(entity);
         CacheConfiguration.cache.put(userMenusVo.token, userMenusVo);
         Result<UserMenusVo> result = new Result<>(userMenusVo, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -147,34 +159,58 @@ public class LoginController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        AccountsUsersRolesEntity accountsUsersRolesEntity = this.accountsUsersRolesService.Get(identityForm.Phone, identityForm.RoleId);
-        if (accountsUsersRolesEntity != null) {
-            throw new ApiException("该账号已存在，请重新选择", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        AccountsUsersRolesEntity accountsUsersRolesEntity = this.accountsUsersRolesService.Get(identityForm.getPhone(), identityForm.getRoleId());
+        Result<Boolean> result = new Result<>(false, errors);
+        if (accountsUsersRolesEntity == null) {
+            result = new Result<>(true, errors);
         }
-        Result<Boolean> result = new Result<>(true, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
 
     /**
-     *  管理员登录
+     * 管理员登录
+     *
      * @param form
      * @param bindingResult
      * @return
      */
-    @ApiOperation(value = "根据账号及权限ID 查询身份是否存在")
+    @ApiOperation(value = "管理员登录")
     @PostMapping("/adminlogin")
-    public ResponseEntity<Result<Boolean>> AdminLogin(@Valid @RequestBody AdminForm form, BindingResult bindingResult) {
+    public ResponseEntity<Result<AdminVo>> AdminLogin(@Valid @RequestBody AdminForm form, BindingResult bindingResult) throws Exception {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        if(form.phone.isEmpty() || form.pwd.isEmpty())
-        {
+        if (form.getPhone().isEmpty() || form.getPwd().isEmpty()) {
             throw new ApiException("账号或密码，不可为空", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean bool=this.accountsUsersRolesService.GetByFind(form.phone,MD5Utils.MD5(form.pwd));
-        Result<Boolean> result=new Result<>(bool,errors);
+        AdminVo vo = new AdminVo();
+        Long userid = this.accountsUsersRolesService.GetByFind(form.getPhone(), MD5Utils.MD5(form.getPwd()));
+        List<MenusEntity> entity = this.menusService.GetMenus(userid);
+        vo.setUserId(userid);
+        vo.setToken(MD5Utils.MD5(userid + "" + CacheConfiguration.GetDate(60 * 60 * 1000L)));
+        vo.setTime(CacheConfiguration.GetDate(60 * 60 * 1000L));
+        vo.setEntity(entity);
+        CacheConfiguration.cache.put(vo.getToken(), vo);
+        Result<AdminVo> result = new Result<>(vo, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     * 退出登录
+     *
+     * @param token         token
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "退出登录")
+    @PostMapping("/outLogin")
+    public ResponseEntity<Result<Boolean>> outLogin(@Valid @RequestBody String token, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        CacheConfiguration.cache.remove(token);
+        return new ResponseEntity<>(new Result<>(true, errors), HttpStatus.OK);
     }
 
 
@@ -232,6 +268,37 @@ public class LoginController {
         Date date = new Date(s);
         date.setTime(date.getTime() + 10 * 60 * 1000);
         return date;
+    }
+
+
+    /**
+     * 微信测试
+     */
+    private final String AppID = "";
+
+    public String wxLogin(HttpServletResponse response) throws IOException {
+        //这里是回调的url
+        String redirect_url = URLEncoder.encode("http://回调页面的路径", "UTF-8");
+        String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" +
+                "appid=APPID" +
+                "&redirect_uri=REDIRECT_URI" +
+                "&response_type=code" +
+                "&scope=SCOPE" +
+                "&state=123#wechat_redirect";
+        response.sendRedirect(url.replace("APPID", "你的APPID").replace("REDIRECT_URL", redirect_url).replace("SCOPE", "snsapi_userinfo"));
+        return url;
+    }
+
+    public void index(String code) throws JSONException {
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token";
+        String param = "appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code";
+        String OpenOne = HttpRequestUtils.sendGet(url, param.replace("APPID", "你的APPID").replace("SECRET", "你的SECRET")
+                .replace("CODE", code));
+        //第二次请求
+        url = "https://api.weixin.qq.com/sns/userinfo";
+        param = "access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
+        HttpRequestUtils.sendGet(url, param.replace("OPENID", "openid").replace("ACCESS_TOKEN", "access_token"));
+
     }
 
 

@@ -124,15 +124,39 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ",zu.user_cardholder_name as userCardholderName,zu.user_cardholder_phone as userCardholderPhone",
             ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
             ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
-            "zr.role_id as roleId,zr.role_name as roleName",
+            "zr.role_id as roleId,zr.role_name as roleName,",
+            "(select phone from zcy_accounts za where za.account_id=zaur.account_id and za.enable=1)phone",
             "FROM zcy_users zu ",
-            "LEFT JOIN zcy_accounts_users_roles zaur on zu.user_id=zu.user_id",
+            "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
             "</script>"
 
     })
         // "WHERE zu.review=2 and  zu.enable=2",
     List<UserInfoVo> GetByAll();
+
+
+    @Select({
+            "<script>",
+            "SELECT ",
+            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName",
+            ",zu.`enable`,zu.is_referrer as isReferrer,zu.organization_code as organizationCode,",
+            "zu.organization_name as organizationName,zu.referrer ,zu.review ,zu.updatetime,",
+            "zu.user_bank_card_number as userBankCardNumber,zu.user_cardholder_idcard as userCardholderIdcard",
+            ",zu.user_cardholder_name as userCardholderName,zu.user_cardholder_phone as userCardholderPhone",
+            ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
+            ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
+            "zr.role_id as roleId,zr.role_name as roleName,",
+            "(select phone from zcy_accounts za where za.account_id=zaur.account_id and za.enable=1)phone",
+            "FROM zcy_users zu ",
+            "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
+            "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id  where zr.role_id =#{roleId,jdbcType=BIGINT}",
+            "</script>"
+
+    })
+        // "WHERE zu.review=2 and  zu.enable=2",
+    List<UserInfoVo> GetByRoleAll(@Param(value = "roleId") Long roleId);
+
 
     @Update({
             "<script>",

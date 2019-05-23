@@ -38,13 +38,21 @@ public interface AccountsUsersRolesMapper extends MyMapper<AccountsUsersRolesEnt
 
     @Select({
             "<script>",
-            "SELECT zr.user_id as userid FROM zcy_accounts za ",
+            "SELECT zr.user_id as userId FROM zcy_accounts za ",
             "LEFT JOIN  zcy_accounts_users_roles zr  on za.account_id=zr.account_id",
             "LEFT JOIN zcy_users zu ON zr.user_id=zu.user_id",
             "WHERE za.phone=#{phone,jdbcType=VARCHAR} and za.pass_word=#{pwd,jdbcType=VARCHAR}",
             "and zr.role_id=1 and  zu.`enable`=1 and zu.review=2 and za.`enable`=1 ",
             "</script>"
     })
-    String GetAdminFind(@Param(value = "phone") String phone, @Param(value = "pwd") String pwd);
+    Long GetAdminFind(@Param(value = "phone") String phone, @Param(value = "pwd") String pwd);
+
+    @Select({
+            "<script>",
+            "SELECT account_id as AccountId,user_id as userId,aur_id as AurId, role_id as roleId  FROM zcy_accounts_users_roles",
+            "where user_id=#{userId,jdbcType=VARCHAR}",
+            "</script>"
+    })
+    AccountsUsersRolesEntity GetUserId(@Param(value = "userId") Long userId);
 
 }

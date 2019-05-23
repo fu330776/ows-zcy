@@ -1,11 +1,13 @@
 package com.goodsogood.ows.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.log4j2cm.annotation.HttpMonitorLogger;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.helper.HeaderHelper;
 import com.goodsogood.ows.helper.UploadUtils;
+import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.TasksEntity;
 import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.TasksService;
@@ -56,38 +58,29 @@ public class TasksController {
     @HttpMonitorLogger
     @ApiOperation(value = "添加任务")
     @PostMapping("/addTasks")
-    public ResponseEntity<Result<Boolean>> Add(@Valid @RequestBody TaskListForm vo, MultipartFile file, HttpServletRequest request, BindingResult bindingResult) {
+    public ResponseEntity<Result<Boolean>> Add(@Valid @RequestBody TaskAddForm vo, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        String url;
         TasksEntity entity = new TasksEntity();
-        try {
-            UploadUtils uploadUtils = new UploadUtils();
-            url = uploadUtils.importData(file, request);
-            if (url.isEmpty() || url == null) {
-                throw new ApiException("文件上传失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-            }
-            entity.setTaskFileUrl(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        entity.setTaskFileUrl(vo.getTaskFileUrl());
         entity.setIs_pay(1);
         entity.setIs_fulfill(1);
         entity.setSchedule(1);
-        entity.setTaskType(vo.taskType);
-        entity.setTaskCompletionDays(vo.taskCompletionDays);
-        entity.setTaskCompletedDays(vo.taskCompletedDays);
-        entity.setUserId(vo.userId);
-        entity.setTaskName(vo.taskName);
-        entity.setTaskMoney(vo.taskMoney);
-        entity.setTaskContent(vo.taskContent);
+        entity.setTaskType(vo.getTaskType());
+        entity.setTaskCompletionDays(vo.getTaskCompletionDays());
+        entity.setTaskCompletedDays(vo.getTaskCompletedDays());
+        entity.setUserId(vo.getUserId());
+        entity.setTaskName(vo.getTaskName());
+        entity.setTaskMoney(vo.getTaskMoney());
+        entity.setTaskContent(vo.getTaskContent());
         entity.setAddtime(new Date());
         this.service.Insert(entity);
         Result<Boolean> result = new Result<>(true, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
+
 
     /**
      * 添加委托书
@@ -111,11 +104,11 @@ public class TasksController {
         entity.setTaskType(vo.getTaskType());
         entity.setTaskCompletionDays(0);
         entity.setTaskCompletedDays(0);
-        entity.setUserId(vo.userId);
+        entity.setUserId(vo.getUserId());
         entity.setAddtime(new Date());
-        entity.setTaskContent(vo.taskContent);
+        entity.setTaskContent(vo.getTaskContent());
         entity.setTaskMoney(0);
-        entity.setTaskName(vo.taskName);
+        entity.setTaskName(vo.getTaskName());
         entity.setTaskFileUrl("");
         entity.setIs_fulfill(1);
         Boolean bool = this.service.Insert(entity);
@@ -137,7 +130,7 @@ public class TasksController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean bool = this.service.putByTaskId(task.taskId, task.taskCompletionDays, task.taskCompletedDays);
+        Boolean bool = this.service.putByTaskId(task.getTaskId(), task.getTaskCompletionDays(), task.getTaskCompletedDays());
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -146,28 +139,14 @@ public class TasksController {
     /***
      *  修改委托内容
      * @param entity
-     * @param file
-     * @param request
      * @param bindingResult
      * @return
      */
     @ApiOperation(value = "修改委托内容")
     @PostMapping("/Put")
-    public ResponseEntity<Result<Boolean>> PutUrl(@Valid @RequestBody TasksEntity entity, MultipartFile file, HttpServletRequest request, BindingResult bindingResult) {
+    public ResponseEntity<Result<Boolean>> PutUrl(@Valid @RequestBody TasksEntity entity, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
-        if (entity.getTaskFileUrl().isEmpty()) {
-            try {
-                UploadUtils uploadUtils = new UploadUtils();
-                String url = uploadUtils.importData(file, request);
-                if (url.isEmpty() || url == null) {
-                    throw new ApiException("文件上传失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-                }
-                entity.setTaskFileUrl(url);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         this.service.putByAdmin(entity);
         Result<Boolean> result = new Result<>(true, errors);
@@ -242,41 +221,34 @@ public class TasksController {
     /**
      * 根据用户查询
      *
-     * @param userId        登录用户唯一标识
+     * @param id    登录用户唯一标识
      * @param isPay
-     * @param bindingResult
      * @return
      */
     @ApiOperation(value = "根据用户查询")
-    @GetMapping("/get")
-    public ResponseEntity<Result<List<TasksEntity>>> Get(@ApiParam(value = "userId", required = true)
-                                                         @PathVariable Long userId,
-                                                         @ApiParam(value = "isPay", required = true) Integer isPay,
-                                                         BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
-        List<TasksEntity> entities = this.service.getByUser(userId, isPay);
-        Result<List<TasksEntity>> result = new Result<>(entities, errors);
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Result<PageInfo<TasksEntity>>> Get(@ApiParam(value = "userId", required = true)
+                                                             @PathVariable Long id,
+                                                             Integer isPay, Integer page, Integer pageSize) {
+
+        PageInfo<TasksEntity> entities = this.service.getByUser(id, isPay, new PageNumber(page, pageSize));
+        Result<PageInfo<TasksEntity>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     /**
      * 管理员根据类型查询
      *
-     * @param type          1：任务书，2：委托书
-     * @param bindingResult
+     * @param type 1：任务书，2：委托书
      * @return
      */
     @ApiOperation(value = "管理员根据类型查询")
-    @GetMapping("/getType")
-    public ResponseEntity<Result<List<TaskListForm>>> getType(@ApiParam(value = "type", required = true)
-                                                              @PathVariable Integer type, BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
-        List<TaskListForm> entities = this.service.getByType(type);
-        Result<List<TaskListForm>> result = new Result<>(entities, errors);
+    @GetMapping("/getType/{type}")
+    public ResponseEntity<Result<PageInfo<TaskListForm>>> getType(@ApiParam(value = "type", required = true)
+                                                                  @PathVariable Integer type, Integer page, Integer pageSize) {
+
+        PageInfo<TaskListForm> entities = this.service.getByType(type, new PageNumber(page, pageSize));
+        Result<PageInfo<TaskListForm>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

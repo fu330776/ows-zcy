@@ -56,6 +56,19 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
     int UpdateContent(@Param(value = "demandId") Long demandId, @Param(value = "demandName") String demandName,
                       @Param(value = "demandContent") String demandContent);
 
+    @Update({
+            "<script>",
+            "update zcy_demands set ",
+            "demand_name=#{demandName,jdbcType=VARCHAR},",
+            "demand_content=#{demandContent,jdbcType=VARCHAR},",
+            "is_contact=#{isContact,jdbcType=BIT}",
+            "where demand_id=#{demandId,jdbcType=BIGINT}",
+            "</script>"
+
+    })
+    int Update(@Param(value = "demandId") Long demandId, @Param(value = "demandName") String demandName,
+               @Param(value = "demandContent") String demandContent, @Param(value = "isContact") Integer isContact);
+
     @Select({
             "<script>",
             "SELECT  demand_id as demandId, demand_type as demandType , demand_name as demandName,",

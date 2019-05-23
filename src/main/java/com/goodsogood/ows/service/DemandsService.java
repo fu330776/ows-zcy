@@ -79,6 +79,20 @@ public class DemandsService {
     }
 
     /**
+     *  修改
+     * @param aid 唯一标识
+     * @param name  标题
+     * @param content 内容
+     * @param isContact 是否联系
+     * @return
+     */
+    public  Boolean Update(Long aid, String name, String content,Integer isContact)
+    {
+        int num=this.mapper.Update(aid,name,content,isContact);
+        return  IsBool(num);
+    }
+
+    /**
      * 判断 是否执行成功 成功返回true
      */
     private Boolean IsBool(Integer num) {

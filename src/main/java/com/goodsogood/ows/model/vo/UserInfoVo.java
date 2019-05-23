@@ -8,6 +8,7 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import java.util.Date;
+
 @Data
 @ApiModel
 public class UserInfoVo {
@@ -92,4 +93,7 @@ public class UserInfoVo {
     @ApiModelProperty(value = "角色名")
     @Column(name = "role_name")
     public String roleName;
+
+    @ApiModelProperty(value = "账号")
+    public String phone;
 }

@@ -7,9 +7,9 @@ import lombok.Data;
 @ApiModel
 public class LoginForm {
 
-    public  String Phone;
+    public  String phone;
 
-    public  String Password;
+    public  String password;
 
     public  String code;
 

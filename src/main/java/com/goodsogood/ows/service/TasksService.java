@@ -1,8 +1,11 @@
 package com.goodsogood.ows.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.*;
 import com.goodsogood.ows.model.db.*;
 import com.goodsogood.ows.model.vo.TaskListForm;
+import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,8 +51,11 @@ public class TasksService {
      * @param type
      * @return
      */
-    public List<TasksEntity> getAll(Integer isPay, Integer type) {
-        return this.mapper.GetByAll(isPay, type);
+    public PageInfo<TasksEntity> getAll(Integer isPay, Integer type, PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetByAll(isPay, type));
     }
 
     /**
@@ -59,8 +65,12 @@ public class TasksService {
      * @param isPay
      * @return
      */
-    public List<TasksEntity> getByUser(Long userId, Integer isPay) {
-        return this.mapper.GetByUserIdAll(isPay, userId);
+    public PageInfo<TasksEntity> getByUser(Long userId, Integer isPay, PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetByUserIdAll(isPay, userId));
+
     }
 
     /**
@@ -69,8 +79,11 @@ public class TasksService {
      * @param type 1:任务书 2：委托书
      * @return
      */
-    public List<TaskListForm> getByType(Integer type) {
-        return this.mapper.GetAll(type);
+    public PageInfo<TaskListForm> getByType(Integer type,PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>( this.mapper.GetAll(type));
     }
 
     /**

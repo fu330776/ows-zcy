@@ -20,7 +20,7 @@ import java.io.UnsupportedEncodingException;
 @RequestMapping("/v-UpLoad")
 @Log4j2
 @CrossOrigin(origins = "*", maxAge = 3600)
-@Api(value = "测试上传", tags = {" UpLoad manager"})
+@Api(value = "测试控制器", tags = {" UpLoad manager"})
 public class UpLoadController {
 
     private final String Url = "http://www.ztsms.cn/sendNSms.do";
@@ -41,6 +41,7 @@ public class UpLoadController {
         }
         return Url;
     }
+
     @HttpMonitorLogger
     @ApiOperation(value = "测试验证码发送")
     @PostMapping("/Sms")

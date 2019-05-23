@@ -7,6 +7,5 @@ import lombok.Data;
 public class AdminForm {
 
     public String phone;
-
     public String pwd;
 }

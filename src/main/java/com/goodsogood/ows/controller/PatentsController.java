@@ -49,16 +49,19 @@ public class PatentsController {
         PatentsEntity entity = new PatentsEntity();
         entity.setPatentType(1);
         entity.setPatentMoney(0);
-        entity.setIsNeedPay(2);
         entity.setAddtime(new Date());
+        entity.setIsNeedPay(2);
+        entity.setPatentTitle(patent.getTitle());
         entity.setIsPay(0);
-        entity.setPatentContent(patent.content);
-        entity.setPatentTitle(patent.title);
-        entity.setUserId(patent.userid);
-        Boolean bool = this.service.Insert(entity);
-        if (!bool) {
+        entity.setPatentContent(patent.getContent());
+        entity.setUserId(patent.getUserid());
+        Boolean bool = false;
+        bool = this.service.Insert(entity);
+
+        if (bool == false) {
             throw new ApiException("服务器繁忙，申请专利失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
+
         Result<Boolean> result = new Result<>(true, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

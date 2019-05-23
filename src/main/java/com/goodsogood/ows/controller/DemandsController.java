@@ -57,6 +57,13 @@ public class DemandsController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    /**
+     * 是否联系
+     *
+     * @param demandsForm
+     * @param bindingResult
+     * @return
+     */
     @ApiModelProperty(value = "修改 是否联系")
     @PostMapping("/EditContact")
     public ResponseEntity<Result<Boolean>> UpdateContact(@Valid @RequestBody DemandsForm demandsForm, BindingResult bindingResult) {
@@ -71,6 +78,13 @@ public class DemandsController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    /**
+     * 修改基本信息
+     *
+     * @param demandsForm
+     * @param bindingResult
+     * @return
+     */
     @ApiModelProperty(value = "修改 基本信息")
     @PostMapping("/EditBasic")
     public ResponseEntity<Result<Boolean>> UpdateBasic(@Valid @RequestBody DemandsForm demandsForm, BindingResult bindingResult) {
@@ -85,6 +99,36 @@ public class DemandsController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    /**
+     * 修改需求
+     *
+     * @param demandsForm
+     * @param bindingResult
+     * @return
+     */
+    @ApiModelProperty(value = "修改")
+    @PostMapping("/Edit")
+    public ResponseEntity<Result<Boolean>> Update(@Valid @RequestBody DemandsForm demandsForm, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if (demandsForm.getDemandName().isEmpty() || demandsForm.getDemandContent().isEmpty() || demandsForm.getIsContact() == null) {
+            throw new ApiException("参数错误,不能为空或空字符串", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean bool = this.service.Update(demandsForm.getDemandId(), demandsForm.getDemandName(), demandsForm.getDemandContent(), demandsForm.getIsContact());
+        Result<Boolean> result = new Result<>(bool, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     *  根据用户类型查询
+     * @param id
+     * @param type
+     * @param isContact
+     * @param page
+     * @param pageSize
+     * @return
+     */
     @ApiModelProperty(value = "用户根据类型查询")
     @GetMapping("/GetTypeById/{id}")
     public ResponseEntity<Result<PageInfo<DemandsEntity>>> GetTypeById(
@@ -108,7 +152,6 @@ public class DemandsController {
             @ApiParam(value = "type", required = true)
             @PathVariable
                     Integer type, Integer IsCount, Integer page, Integer pageSize
-
     ) {
         if (page == null) {
             page = 0;

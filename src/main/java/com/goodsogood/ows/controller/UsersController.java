@@ -282,14 +282,29 @@ public class UsersController {
      * @return
      */
     @ApiOperation(value = "获取所有账户信息")
-    @GetMapping("/getAll/{page}")
+    @GetMapping("/getAll")
     public ResponseEntity<Result<PageInfo<UserInfoVo>>> getByAll(@ApiParam(value = "page", required = true)
                                                                  @PathVariable Integer page, Integer pageSize) {
-
         if (page == null) {
             page = 0;
         }
         PageInfo<UserInfoVo> userInfoVos = this.usersService.GetAll(new PageNumber(page, pageSize));
+        Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /***
+     *  根据角色获取 用户信息
+     * @return
+     */
+    @ApiOperation(value = "根据角色获取 用户信息")
+    @GetMapping("/getByRole/{roleId}")
+    public ResponseEntity<Result<PageInfo<UserInfoVo>>> getByRoleAll(@ApiParam(value = "roleId", required = true)
+                                                                     @PathVariable Long roleId, Integer page, Integer pageSize) {
+        if (page == null) {
+            page = 0;
+        }
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId, new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

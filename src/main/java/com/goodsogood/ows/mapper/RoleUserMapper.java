@@ -14,9 +14,11 @@ public interface RoleUserMapper extends MyMapper<RoleUserEntity> {
 
     @Select({
             "<script>",
-            "SELECT * FROM zcy_accounts_users_roles zr ",
-            "left JOIN zcy_users zu on zr.user_id=zu.user_id where zu.review=2 and `enable`=1 ",
-            "and  zr.account_id=#{id,jdbcType=BIGINT} ",
+            "SELECT",
+            "zr.user_id as userId,zr.role_id as roleId,zu.role_name as roleName, (select z.`enable` FROM zcy_users z where z.user_id=zr.user_id) isDel",
+            "FROM zcy_accounts_users_roles zr ",
+            "left JOIN zcy_roles zu on zr.role_id=zu.role_id where  ",
+            " zr.account_id=#{id,jdbcType=BIGINT} ",
             "</script>",
 
     })

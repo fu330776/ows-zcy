@@ -97,4 +97,6 @@ public class UsersEntity extends BaseEntity {
     public Date addtime;
 
     public Date updatetime;
+
+    public String phone;
 }

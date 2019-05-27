@@ -3,14 +3,13 @@ package com.goodsogood.ows.model.vo;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
-/**
- * 专利申请
- */
-@Data
 @ApiModel
-public class PatentApplicationForm {
-    public Long userid;
+@Data
+public class IdeaForm {
+
     public String title;
     public String content;
-
+    public Long userId;
+    public float money;
+    public Integer isPay;
 }

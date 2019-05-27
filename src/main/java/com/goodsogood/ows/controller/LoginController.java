@@ -73,17 +73,23 @@ public class LoginController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        if (user.phoneCode.isEmpty()) {
-            throw new ApiException("验证码，不可为空！", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        Result<Boolean> result;
+        //验证码
+        if (user.getPhoneCode().isEmpty()) {
+            result = new Result<>(false, errors, "验证码不可为空");
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }
-        Result<Boolean> result = new Result<>(this.usersService.Register(user), errors);
+        //手机验证码判断
+
+
+        result = new Result<>(this.usersService.Register(user), errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
 
 
     /**
-     * 注册账号(管理员分享)
+     * 注册账号(管理员)
      */
     @ApiOperation(value = "注册账号")
     @PostMapping("/addAdmin")
@@ -93,11 +99,18 @@ public class LoginController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
+        Result<Boolean> result;
+        if (user.getPhoneCode().isEmpty()) {
+            result = new Result<>(false, errors);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
+
+
         Boolean bool = this.usersService.AdminRegister(user);
         if (!bool) {
             throw new ApiException("注册失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Result<Boolean> result = new Result<>(bool, errors);
+        result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -227,23 +240,23 @@ public class LoginController {
         Date time = new Date();
         getResArgs(entity.getMobile(), "");
         String code = map.get("code");
-        String Phone = map.get("phoneNum");
+        String Phone = map.get("phone");
         String content = "验证码：" + code + "，请不要把验证码泄露给他人，谢谢！【知创云】";
         SmssEntity smsEntity = new SmssEntity();
         smsEntity.setSmsPhone(Phone);
         smsEntity.setSmsCode(code);
         smsEntity.setSmsContent(content);
         smsEntity.setAddtime(time);
-        String sms = SmsUtils.postEncrypt(Url, username, pwd, Phone, content, productid);
+        String sms =SmsUtils.postEncrypt(Url, username, pwd, Phone, content, productid);
         Integer getCode = Integer.parseInt(sms.split(",")[0]);
         if (getCode == 1) {
 
             smsEntity.setSmsSendType(1); //短信发送类型 1、文字 2、语音
-            smsEntity.setSmsType(1); //短信类型 1、注册账号 2、修改密码
+            smsEntity.setSmsType(entity.getType()); //短信类型 1、注册账号 2、修改密码
             smsEntity.setSmsSendFrequency(1); //发送次数
             smsEntity.setSmsUse(1);
-            smsEntity.setSmsExpireDate(stampToDate(Long.parseLong(sms.split(",")[1])));    //失效时间
-            smsEntity = this.usersService.SmsInsert(smsEntity, 1);
+            smsEntity.setSmsExpireDate(stampToDate());    //失效时间
+            smsEntity = this.usersService.SmsInsert(smsEntity, entity.getType());
         }
         Result<SmssEntity> result = new Result<>(smsEntity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -264,8 +277,8 @@ public class LoginController {
     /*
      * 将时间戳转换为时间并加10分钟
      */
-    public Date stampToDate(Long s) {
-        Date date = new Date(s);
+    public Date stampToDate() {
+        Date date = new Date();
         date.setTime(date.getTime() + 10 * 60 * 1000);
         return date;
     }
@@ -274,25 +287,28 @@ public class LoginController {
     /**
      * 微信测试
      */
-    private final String AppID = "";
+    private final String AppID = "wx9baa227ef518b9cc";
 
+    @ApiOperation(value = "测试")
+    @GetMapping("/wxsq")
     public String wxLogin(HttpServletResponse response) throws IOException {
         //这里是回调的url
-        String redirect_url = URLEncoder.encode("http://回调页面的路径", "UTF-8");
+        String redirect_url = URLEncoder.encode("http://localhost:8080//v-login//wxindex", "UTF-8");
         String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" +
                 "appid=APPID" +
                 "&redirect_uri=REDIRECT_URI" +
                 "&response_type=code" +
                 "&scope=SCOPE" +
                 "&state=123#wechat_redirect";
-        response.sendRedirect(url.replace("APPID", "你的APPID").replace("REDIRECT_URL", redirect_url).replace("SCOPE", "snsapi_userinfo"));
+        response.sendRedirect(url.replace("APPID", AppID).replace("REDIRECT_URL", redirect_url).replace("SCOPE", "snsapi_userinfo"));
         return url;
     }
 
+    @GetMapping("/wxindex")
     public void index(String code) throws JSONException {
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token";
         String param = "appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code";
-        String OpenOne = HttpRequestUtils.sendGet(url, param.replace("APPID", "你的APPID").replace("SECRET", "你的SECRET")
+        String OpenOne = HttpRequestUtils.sendGet(url, param.replace("APPID", AppID).replace("SECRET", "05fbc01306bed7bdbdcb77635c035060")
                 .replace("CODE", code));
         //第二次请求
         url = "https://api.weixin.qq.com/sns/userinfo";

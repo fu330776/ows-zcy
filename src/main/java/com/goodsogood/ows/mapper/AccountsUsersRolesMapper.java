@@ -29,12 +29,16 @@ public interface AccountsUsersRolesMapper extends MyMapper<AccountsUsersRolesEnt
 
     @Select({
             "<script>",
-            "SELECT a.account_id,a.phone,a.pass_word,a.`enable`,a.` addtime`",
-            "FROM zcy_accounts a LEFT JOIN zcy_accounts_users_roles zr ON",
-            "a.account_id=zr.account_id WHERE a.phone=#{phone,jdbcType=VARCHAR} and zr.role_id=#{roleid,jdbcType=VARCHAR}",
+//            "SELECT a.account_id,a.phone,a.pass_word,a.`enable`,a.` addtime`",
+//            "FROM zcy_accounts a LEFT JOIN zcy_accounts_users_roles zr ON",
+//            "a.account_id=zr.account_id WHERE a.phone=#{phone,jdbcType=VARCHAR} and zr.role_id=#{roleid,jdbcType=VARCHAR}",
+
+            "select ",
+            " aur_id as AurId, account_id as AccountId ,user_id as UserId,role_id as RoleId",
+            "from zcy_accounts_users_roles where account_id=#{id,jdbcType=BIGINT} and role_id=#{rid,jdbcType=VARCHAR}",
             "</script>"
     })
-    AccountsUsersRolesEntity Get(@Param(value = "phone") String phone, @Param(value = "roleid") String roleid);
+    AccountsUsersRolesEntity Get(@Param(value = "id") Long id, @Param(value = "rid") Long rid);
 
     @Select({
             "<script>",

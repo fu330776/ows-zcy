@@ -25,7 +25,7 @@ public interface AccountsMapper extends MyMapper<AccountsEntity> {
 
     @Select({
             "<script>",
-            "SELECT  account_id as AccountId,phone,pass_word FROM zcy_accounts WHERE phone=#{phone,jdbcType=VARCHAR}",
+            "SELECT  account_id as AccountId,phone,pass_word as PassWord,pass_word_laws as PassWordLaws,`enable` as Enable FROM zcy_accounts WHERE phone=#{phone,jdbcType=VARCHAR}",
             "</script>"
     })
     AccountsEntity GetByPhone(@Param(value = "phone") String phone);
@@ -39,6 +39,7 @@ public interface AccountsMapper extends MyMapper<AccountsEntity> {
             "</script>"
     })
     AccountsEntity GetByUser(@Param(value = "phone") String phone, @Param(value = "password") String password);
+
 
     @Update({
             "<script>",

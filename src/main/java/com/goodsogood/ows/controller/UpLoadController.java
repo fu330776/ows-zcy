@@ -1,20 +1,25 @@
 package com.goodsogood.ows.controller;
 
 import com.goodsogood.log4j2cm.annotation.HttpMonitorLogger;
+import com.goodsogood.ows.helper.ExeclUtil;
 import com.goodsogood.ows.helper.SmsUtils;
 import com.goodsogood.ows.helper.UploadUtils;
+import com.goodsogood.ows.model.vo.UpLoadVo;
+import com.goodsogood.ows.model.vo.WithdrawsVo;
+import com.goodsogood.ows.service.WithdrawsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v-UpLoad")
@@ -22,6 +27,13 @@ import java.io.UnsupportedEncodingException;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Api(value = "测试控制器", tags = {" UpLoad manager"})
 public class UpLoadController {
+
+    private final WithdrawsService wservice;
+
+    public UpLoadController(WithdrawsService withdrawsService) {
+        this.wservice = withdrawsService;
+    }
+
 
     private final String Url = "http://www.ztsms.cn/sendNSms.do";
     private final String pwd = "zcyun2019GS";
@@ -31,15 +43,15 @@ public class UpLoadController {
     @HttpMonitorLogger
     @ApiOperation(value = "测试上传文件")
     @PostMapping("/Up")
-    public String Up(MultipartFile file, HttpServletRequest request) {
-        String Url = null;
+    public UpLoadVo Up(MultipartFile file, HttpServletRequest request) {
+        UpLoadVo vo = new UpLoadVo();
         try {
             UploadUtils uploadUtils = new UploadUtils();
-            Url = uploadUtils.importData(file, request);
+            vo = uploadUtils.importData(file, request);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return Url;
+        return vo;
     }
 
     @HttpMonitorLogger
@@ -57,4 +69,43 @@ public class UpLoadController {
 
         return sms;
     }
+
+    @HttpMonitorLogger
+    @ApiOperation(value = "时间加10分钟")
+    @PostMapping("/getDate")
+    public Date getDate() {
+        Date date = new Date();
+        date.setTime(date.getTime() + 10 * 60 * 1000);
+        return date;
+
+    }
+
+    @HttpMonitorLogger
+    @ApiOperation(value = "导出")
+    @PostMapping("/export")
+    public void exportSiteDeclareList(HttpServletResponse response) {
+        String[] headArray = {"提现流水号", "提现金额", "提现人", "是否提现", "添加时间", "打款时间"};
+        List<WithdrawsVo> vos = this.wservice.GetOut(1);
+        List<Object[]> contentList = new ArrayList<>();
+        if (vos.size() > 0) {
+            for (WithdrawsVo entity : vos) {
+                Object[] o = {
+                        entity.getWithdrawId(),//"运单号
+                        entity.getWithdrawMoney(),
+                        entity.getUserName(),
+                        entity.getIsWithdraw() == 1 ? "未提现" : "已提现",
+                        entity.getAddtime(),
+                        entity.getPaytime()
+                };
+                contentList.add(o);
+            }
+
+        }
+        try {
+            ExeclUtil.ExportExcel(response, headArray, contentList, "SubmenuList.xls");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -16,6 +16,6 @@ public class CodeForm {
     public String mobile;
 
     @ApiModelProperty(value = "发送验证码类型 1：注册，2：修改密码")
-    public Integer Type;
+    public Integer type;
 
 }

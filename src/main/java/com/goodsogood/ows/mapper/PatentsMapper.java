@@ -1,6 +1,7 @@
 package com.goodsogood.ows.mapper;
 
 import com.goodsogood.ows.model.db.PatentsEntity;
+import com.goodsogood.ows.model.vo.PatentsVo;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -31,28 +32,34 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
 
     @Select({
             "<script>",
-            "SELECT patent_id,patent_title,patent_content,user_id,patent_type,patent_money,patent_stamp,is_need_pay,is_pay,addtime,pay_time ",
-            "FROM zcy_patents where user_id=#{id,jdbcType=BIGINT} and patent_type=#{type,jdbcType=BIT}",
+            "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType, ",
+            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time,",
+            "(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
+            "FROM zcy_patents z where user_id=#{id,jdbcType=BIGINT} and patent_type=#{type,jdbcType=BIT}",
             "</script>"
     })
-    List<PatentsEntity> Get(@Param(value = "id") Long id, @Param(value = "type") Integer type);
+    List<PatentsVo> Get(@Param(value = "id") Long id, @Param(value = "type") Integer type);
 
 
     @Select({
 
             "<script>",
-            "SELECT patent_id,patent_title,patent_content,user_id,patent_type,patent_money,patent_stamp,is_need_pay,is_pay,addtime,pay_time ",
-            "FROM zcy_patents where patent_type=#{type,jdbcType=BIT}",
+            "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
+            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time ",
+            ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
+            "FROM zcy_patents z where patent_type=#{type,jdbcType=BIT}",
             "</script>"
     })
-    List<PatentsEntity> GetByType(@Param(value = "type") Integer type);
+    List<PatentsVo> GetByType(@Param(value = "type") Integer type);
 
     @Select({
             "<script>",
-            "SELECT patent_id,patent_title,patent_content,user_id,patent_type,patent_money,patent_stamp,is_need_pay,is_pay,addtime,pay_time ",
-            "FROM zcy_patents where patent_id=#{id,jdbcType=BIGINT}",
+            "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
+            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time",
+            ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
+            "FROM zcy_patents z where patent_id=#{id,jdbcType=BIGINT}",
             "</script>"
     })
-    PatentsEntity GetById(@Param(value = "id") Long id);
+    PatentsVo GetById(@Param(value = "id") Long id);
 
 }

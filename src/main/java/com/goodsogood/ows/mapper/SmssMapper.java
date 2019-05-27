@@ -31,7 +31,7 @@ public interface SmssMapper extends MyMapper<SmssEntity> {
             "and sms_use=1 and sms_type=#{smsType,jdbcType=BIT}",
             "</script>"
     })
-    SmssEntity GetByPhone(@Param(value = "sms_phone") String sms_phone, @Param(value = "sms_expire_date") Date sms_expire_date,@Param(value = "smsType") Integer smsType);
+    SmssEntity GetByPhone(@Param(value = "sms_phone") String sms_phone, @Param(value = "sms_expire_date") Date sms_expire_date, @Param(value = "smsType") Integer smsType);
 
     @Insert({
             "<script>",
@@ -44,7 +44,7 @@ public interface SmssMapper extends MyMapper<SmssEntity> {
             "#{smsPhone,jdbcType=VARCHAR},#{smsType,jdbcType=BIT},",
             "#{smsSendType,jdbcType=BIT},#{smsCode,jdbcType=VARCHAR},",
             "#{smsContent,jdbcType=VARCHAR},#{smsSendFrequency,jdbcType=BIT},",
-            "#{addtime,jdbcType=TIMESTAMP},#{smsExpireDate,jdbcType=TIMESTAMP},#{smsUse,BIT}",
+            "#{addtime,jdbcType=TIMESTAMP},#{smsExpireDate,jdbcType=TIMESTAMP},#{smsUse,jdbcType=BIT}",
             ")",
             "</script>"
     })

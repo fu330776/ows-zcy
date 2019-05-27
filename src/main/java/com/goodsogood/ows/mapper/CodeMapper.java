@@ -6,10 +6,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @Mapper
-public interface CodeMapper extends  MyMapper<CodeEntity> {
+public interface CodeMapper extends MyMapper<CodeEntity> {
 
     @Select(
-            {  "<script>", "SELECT code_id,code_code FROM zcy_code where code_code=#{code_code,jdbcType=VARCHAR}","</script>" }
+            {"<script>", "SELECT code_id,code_code FROM zcy_code where code_code=#{code_code,jdbcType=VARCHAR}", "</script>"}
     )
     CodeEntity Get(@Param(value = "code_code") String code_code);
 
@@ -19,7 +19,7 @@ public interface CodeMapper extends  MyMapper<CodeEntity> {
             "Insert into zcy_code(",
             "<if test='codeId !=null'>code_id, </if> code_code)",
             "VALUES(",
-            "<if test='codeId !=null'>#{codeId,jdbcType=BIGINT}, </if> #{code_code,jdbcType=VARCHAR} ",
+            "<if test='codeId !=null'>#{codeId,jdbcType=BIGINT}, </if> #{code_code,jdbcType=VARCHAR}) ",
             "</script>"
 
     })

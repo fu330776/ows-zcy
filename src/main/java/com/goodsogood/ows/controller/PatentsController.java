@@ -7,7 +7,9 @@ import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.PatentsEntity;
+import com.goodsogood.ows.model.vo.IdeaForm;
 import com.goodsogood.ows.model.vo.PatentApplicationForm;
+import com.goodsogood.ows.model.vo.PatentsVo;
 import com.goodsogood.ows.model.vo.Result;
 import com.goodsogood.ows.service.PatentsService;
 import io.swagger.annotations.Api;
@@ -92,6 +94,36 @@ public class PatentsController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    /**
+     * 添加确权认证
+     *
+     * @param form
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "idea确权添加")
+    @PostMapping(value = "/ideadd")
+    public ResponseEntity<Result<Boolean>> ideaAdd(@Valid @RequestBody IdeaForm form, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        PatentsEntity entity = new PatentsEntity();
+        entity.setAddtime(new Date());
+        entity.setIsNeedPay(1);
+        entity.setIsPay(form.getIsPay());
+        entity.setPatentContent(form.getContent());
+        entity.setPatentMoney(form.getMoney());
+        entity.setPatentTitle(form.getTitle());
+        entity.setPatentType(2);
+        entity.setUserId(form.getUserId());
+        Boolean bool = this.service.Insert(entity);
+        Result<Boolean> result = new Result<>(true, errors);
+        if (bool == false) {
+            result = new Result<>(false, errors);
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
     /**
      * 用户根据类型查询
@@ -104,13 +136,13 @@ public class PatentsController {
      */
     @ApiOperation(value = "用户根据类型查询")
     @GetMapping("/get/{type}")
-    public ResponseEntity<Result<PageInfo<PatentsEntity>>> get(@ApiParam(value = "type", required = true)
+    public ResponseEntity<Result<PageInfo<PatentsVo>>> get(@ApiParam(value = "type", required = true)
                                                                @PathVariable Integer type, Long userId, Integer page, Integer pageSize) {
         if (page == null) {
             page = 1;
         }
-        PageInfo<PatentsEntity> patentsEntityPageInfo = this.service.Get(userId, type, new PageNumber(page, pageSize));
-        Result<PageInfo<PatentsEntity>> result = new Result<>(patentsEntityPageInfo, errors);
+        PageInfo<PatentsVo> patentsEntityPageInfo = this.service.Get(userId, type, new PageNumber(page, pageSize));
+        Result<PageInfo<PatentsVo>> result = new Result<>(patentsEntityPageInfo, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -124,13 +156,13 @@ public class PatentsController {
      */
     @ApiOperation(value = "根据类型查询")
     @GetMapping("/getAll/{type}")
-    public ResponseEntity<Result<PageInfo<PatentsEntity>>> getByAll(@ApiParam(value = "type", required = true)
+    public ResponseEntity<Result<PageInfo<PatentsVo>>> getByAll(@ApiParam(value = "type", required = true)
                                                                     @PathVariable Integer type, Integer page, Integer pageSize) {
         if (page == null) {
             page = 1;
         }
-        PageInfo<PatentsEntity> pageInfo = this.service.GetAll(type, new PageNumber(page, pageSize));
-        Result<PageInfo<PatentsEntity>> result = new Result<>(pageInfo, errors);
+        PageInfo<PatentsVo> pageInfo = this.service.GetAll(type, new PageNumber(page, pageSize));
+        Result<PageInfo<PatentsVo>> result = new Result<>(pageInfo, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -142,10 +174,10 @@ public class PatentsController {
      */
     @ApiOperation(value = "唯一标识查询")
     @GetMapping("/getFind/{pid}")
-    public ResponseEntity<Result<PatentsEntity>> getFind(@ApiParam(value = "pid", required = true)
+    public ResponseEntity<Result<PatentsVo>> getFind(@ApiParam(value = "pid", required = true)
                                                          @PathVariable Long pid) {
-        PatentsEntity entity = this.service.GetFind(pid);
-        Result<PatentsEntity> result = new Result<>(entity, errors);
+        PatentsVo entity = this.service.GetFind(pid);
+        Result<PatentsVo> result = new Result<>(entity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

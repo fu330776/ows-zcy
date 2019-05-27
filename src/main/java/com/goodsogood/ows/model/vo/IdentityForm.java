@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @ApiModel
 public class IdentityForm {
-    public  String phone;
-    public  String roleId;
+    public String phone;
+    public Long roleId;
 }

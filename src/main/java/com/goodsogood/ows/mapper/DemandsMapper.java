@@ -16,7 +16,7 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
             "SELECT  demand_id as demandId, demand_type as demandType , demand_name as demandName,",
             "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime",
             "FROM zcy_demands WHERE user_id=#{userId,jdbcType=BIGINT} and demand_type=#{demandType,jdbcType=BIT}",
-            "<if test='isContact !=0'> and is_contact=#{isContact,jdbcType=BIT}</if>",
+            "<if test='isContact !=null'> and is_contact=#{isContact,jdbcType=BIT}</if>",
             "</script>"
     })
     List<DemandsEntity> Get(@Param(value = "userId") Long userId, @Param(value = "demandType") Integer demandType

@@ -121,8 +121,9 @@ public class DemandsController {
     }
 
     /**
-     *  根据用户类型查询
-     * @param id
+     * 根据用户类型查询
+     *
+     * @param id        用户id
      * @param type
      * @param isContact
      * @param page

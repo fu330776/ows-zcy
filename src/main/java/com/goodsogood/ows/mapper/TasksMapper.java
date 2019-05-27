@@ -41,7 +41,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
             "task_type=#{type,jdbcType=BIT}",
             "</script>"
     })
-    //<if test='is_pay !=null'></if>
+        //<if test='is_pay !=null'></if>
     List<TasksEntity> GetByAll(@Param(value = "is_pay") Integer is_pay, @Param(value = "type") Integer type);
 
     @Select({
@@ -50,7 +50,9 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
             "task_id as taskId,task_name as taskName,task_content as taskContent,",
             "task_file_url as taskFileUrl,task_money as taskMoney,",
             "is_fulfill,`schedule`,is_pay,addtime,user_id as userId,task_completion_days as taskCompletionDays,task_completed_days as taskCompletedDays,task_type as taskType",
-            " from zcy_tasks WHERE is_pay=#{is_pay,jdbcType=BIT} and user_id=#{userId,jdbcType=BIGINT} ",
+            " from zcy_tasks WHERE ",
+            "<if test='is_pay !=null'> is_pay=#{is_pay,jdbcType=BIT} and  </if>",
+            "user_id=#{userId,jdbcType=BIGINT} ",
             "</script>"
     })
     List<TasksEntity> GetByUserIdAll(@Param(value = "is_pay") Integer is_pay, @Param(value = "userId") Long userId);
@@ -94,13 +96,11 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
             "<script>",
             "UPDATE  zcy_tasks SET",
             "task_completion_days=#{taskCompletionDays,jdbcType=BIT},",
-            "task_completed_days= #{taskCompletedDays,jdbcType=BIT},",
+            "task_completed_days= #{taskCompletedDays,jdbcType=BIT}",
             "WHERE task_id=#{taskId,jdbcType=BIGINT}",
             "</script>"
     })
-
     int PutTaskUpdate(@Param(value = "taskId") Long taskId, @Param(value = "taskCompletionDays") Integer taskCompletionDays, @Param(value = "taskCompletedDays") Integer taskCompletedDays);
-
 
 
 }

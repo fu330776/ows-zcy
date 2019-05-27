@@ -57,6 +57,17 @@ public class UsersService {
     @Transactional
     public Boolean AdminRegister(UsersForm user) {
 
+        SmssEntity sms = this.smssMapper.GetByPhone(user.getPhone(), new Date(), 1);
+        if (sms == null) {
+            return false;
+        }
+        if (sms.getSmsCode() != user.getPhoneCode()) {
+            return false;
+        }
+        int num = this.smssMapper.Update(user.getPhone(), new Date());
+        if (num == 0) {
+            return false;
+        }
         //查询账号是否已经注册
         AccountsEntity entituy = this.amapper.GetByPhone(user.getPhone());
         Long AccountId;
@@ -98,12 +109,13 @@ public class UsersService {
         entity.setUserEmail(user.getUserEmail());
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
+        entity.setPhone(user.getPhone());
+
         Long userid = this.mapper.Insert(entity);
         userid = entity.getUserId();
         if (userid == null) {
             return false;
         }
-        System.out.println("AccountId:" + AccountId + ",userid:" + userid);
         //添加关联
         AccountsUsersRolesEntity usersRolesEntity = new AccountsUsersRolesEntity();
         usersRolesEntity.setAccountId(AccountId);
@@ -177,6 +189,7 @@ public class UsersService {
         entity.setUserEmail(user.getUserEmail());
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
+        entity.setPhone(user.getPhone());
         Long userid = this.mapper.Insert(entity);
         userid = entity.getUserId();
         if (userid == null) {
@@ -209,7 +222,7 @@ public class UsersService {
         }
         CodeEntity codeEntity = new CodeEntity();
         codeEntity.setCode_code(code);
-        this.cmapper.insert(codeEntity);
+        this.cmapper.Insert(codeEntity);
         return code;
     }
 
@@ -226,6 +239,9 @@ public class UsersService {
     public Integer UpdatePassWord(String Phone, String pwd, String code) {
 
         SmssEntity sms = this.smssMapper.GetByPhone(Phone, new Date(), 2);
+        if (sms == null) {
+            return -1;
+        }
         if (sms.getSmsCode() != code) {
             return -1;
         }
@@ -254,6 +270,18 @@ public class UsersService {
     }
 
     /**
+     * 查询
+     *
+     * @param phone
+     * @param type
+     * @return
+     */
+    public SmssEntity SmsGet(String phone, Integer type) {
+        SmssEntity sms = this.smssMapper.GetByPhone(phone, new Date(), type);
+        return sms;
+    }
+
+    /**
      * 管理员查询所有账户
      *
      * @return
@@ -268,7 +296,7 @@ public class UsersService {
     /**
      * 根据角色查询所有用户
      *
-     * @param rId 角色唯一标识
+     * @param rId        角色唯一标识
      * @param pageNumber
      * @return
      */

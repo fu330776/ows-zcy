@@ -50,8 +50,6 @@ public class TasksController {
      * 添加任务书
      *
      * @param vo
-     * @param file
-     * @param request
      * @param bindingResult
      * @return
      */
@@ -167,7 +165,8 @@ public class TasksController {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         if (taskId <= 0L) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+            Result<Boolean> result = new Result<>(false, errors);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }
         Boolean b = this.service.putIsFullfill(taskId);
         Result<Boolean> result = new Result<>(b, errors);

@@ -1,6 +1,8 @@
 package com.goodsogood.ows.service;
 
+import com.goodsogood.ows.mapper.AccountsMapper;
 import com.goodsogood.ows.mapper.AccountsUsersRolesMapper;
+import com.goodsogood.ows.model.db.AccountsEntity;
 import com.goodsogood.ows.model.db.AccountsUsersRolesEntity;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -9,8 +11,10 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class AccountsUsersRolesService {
     private AccountsUsersRolesMapper mapper;
+    private AccountsMapper amapper;
 
-    public AccountsUsersRolesService(AccountsUsersRolesMapper accountsUsersRolesMapper) {
+    public AccountsUsersRolesService(AccountsUsersRolesMapper accountsUsersRolesMapper, AccountsMapper accountsMapper) {
+        this.amapper = accountsMapper;
         this.mapper = accountsUsersRolesMapper;
     }
 
@@ -24,14 +28,20 @@ public class AccountsUsersRolesService {
     /**
      * 根据账号和角色查询
      **/
-    public AccountsUsersRolesEntity Get(String phone, String roleid) {
-        return this.mapper.Get(phone, roleid);
+    public AccountsUsersRolesEntity Get(String phone, Long roleid) {
+        AccountsEntity entity = this.amapper.GetByPhone(phone);
+        if (entity == null) {
+            return null;
+        }
+
+        return this.mapper.Get(entity.getAccountId(), roleid);
     }
 
     /**
-     *  管理员 验证
+     * 管理员 验证
+     *
      * @param phone 手机号
-     * @param pwd  md5密码
+     * @param pwd   md5密码
      * @return
      */
     public Long GetByFind(String phone, String pwd) {

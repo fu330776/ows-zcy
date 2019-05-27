@@ -18,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.models.auth.In;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.session.ResultContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -330,4 +331,49 @@ public class UsersController {
         Result<Boolean> result = new Result<>(true, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    /**
+     * 查询资金流水
+     *
+     * @param userId
+     * @param is
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @ApiOperation(value = "查询资金流水")
+    @PostMapping("/getcapital/{userId}")
+    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "userId", required = true)
+                                                                              @PathVariable Long userId, Integer is, Integer page, Integer pageSize) {
+        if (page == null) {
+            page = 1;
+        }
+        PageInfo<WithdrawsVo> entity = this.withdrawsService.Get(userId, is, new PageNumber(page, pageSize));
+        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+
+    }
+
+
+    /**
+     * 查询资金流水
+     *
+     * @param is
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @ApiOperation(value = "查询资金流水")
+    @PostMapping("/getcapitalflow/{is}")
+    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "userId", required = true)
+                                                                              @PathVariable Integer is, Integer page, Integer pageSize) {
+        if (page == null) {
+            page = 1;
+        }
+        PageInfo<WithdrawsVo> entity = this.withdrawsService.GetAdmin(is, new PageNumber(page, pageSize));
+        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+
+    }
+
 }

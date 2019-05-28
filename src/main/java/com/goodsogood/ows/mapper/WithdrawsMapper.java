@@ -1,7 +1,9 @@
 package com.goodsogood.ows.mapper;
 
 import com.goodsogood.ows.model.db.WithdrawsEntity;
+import com.goodsogood.ows.model.vo.WithdrawSumVo;
 import com.goodsogood.ows.model.vo.WithdrawsVo;
+import jdk.nashorn.internal.objects.annotations.Setter;
 import org.apache.ibatis.annotations.*;
 import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.stereotype.Repository;
@@ -37,6 +39,13 @@ public interface WithdrawsMapper extends MyMapper<WithdrawsEntity> {
     })
     int Update(@Param(value = "withdrawId") Long withdrawId);
 
+    @Update({
+            "<script>",
+            "UPDATE zcy_withdraws SET is_withdraw=2 where user_id=#{userId,jdbcType=BIGINT} and is_withdraw=1",
+            "</script>"
+    })
+    int UpdateList(@Param(value = "userId") Long userId);
+
 
     @Select({
             "<script>",
@@ -57,8 +66,8 @@ public interface WithdrawsMapper extends MyMapper<WithdrawsEntity> {
             "<script>",
             "SELECT withdraw_id as withdrawId,withdraw_number as withdrawNumber,",
             "withdraw_money as withdrawMoney,user_id as userId,is_withdraw as isWithdraw,addtime,paytime,",
-            "(SELECT zu.user_name as userName FROM zcy_users zu where zu.user_id =user_id)userName",
-            " FROM zcy_withdraws where user_id=#{userId,jdbcType=BIGINT}",
+            "(SELECT zu.user_name as userName FROM zcy_users zu where zu.user_id =zw.user_id)userName",
+            " FROM zcy_withdraws zw where user_id=#{userId,jdbcType=BIGINT}",
             "<if test='isw!=null'> and is_withdraw=#{isw,jdbcType=BIT} </if>",
             "</script>"
 
@@ -69,12 +78,24 @@ public interface WithdrawsMapper extends MyMapper<WithdrawsEntity> {
             "<script>",
             "SELECT withdraw_id as withdrawId,withdraw_number as withdrawNumber,",
             "withdraw_money as withdrawMoney,user_id as userId,is_withdraw as isWithdraw,addtime,paytime,",
-            "(SELECT zu.user_name as userName FROM zcy_users zu where zu.user_id =user_id)userName",
-            " FROM zcy_withdraws ",
+            "(SELECT zu.user_name as userName FROM zcy_users zu where zu.user_id =zw.user_id)userName",
+            " FROM zcy_withdraws zw",
             "<if test='isw!=null'> where is_withdraw=#{isw,jdbcType=BIT} </if>",
             "</script>"
-
     })
-    List<WithdrawsVo> GetAdmin( @Param(value = "isw") Integer isw);
+    List<WithdrawsVo> GetAdmin(@Param(value = "isw") Integer isw);
+
+
+    @Select({
+            "<script>",
+            "SELECT user_id as userId,",
+            "SUM(withdraw_money) as money,",
+            "is_withdraw as isPay,",
+            "(SELECT zu.user_name as userName FROM zcy_users zu where zu.user_id =zw.user_id)userName",
+            " FROM zcy_withdraws zw where is_withdraw=1 GROUP BY user_id",
+            "</script>"
+    })
+    List<WithdrawSumVo> GetSumAdmin();
+
 
 }

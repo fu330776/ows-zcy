@@ -7,5 +7,5 @@ import javax.persistence.Table;
 @Data
 @Table(name = "Token_Result")
 public class TokenResult {
-     public  Integer Code;
+     public  Integer code;
 }

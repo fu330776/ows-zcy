@@ -15,20 +15,16 @@ import java.util.UUID;
 
 public class UploadUtils {
 
-    @Value("${file.PDF}")
-    private String pdfUrl;
 
-
-    public UpLoadVo importData(MultipartFile file, HttpServletRequest req) throws IOException {
+    public UpLoadVo importData(MultipartFile file, HttpServletRequest req, String urls) throws IOException {
         UpLoadVo vo = new UpLoadVo();
         vo.setSuccess(false);
         vo.setCode(10001);
         vo.setMsg("文件上传失败");
-        String u=pdfUrl;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         String format = sdf.format(new Date());
 //    String realPath = req.getServletContext().getRealPath("/upload") + format;
-        String realPath = "D:\\file\\PDF\\" + format;
+        String realPath = urls + format;
         File folder = new File(realPath);
         if (!folder.exists()) {
             folder.mkdirs();
@@ -43,7 +39,8 @@ public class UploadUtils {
         if (hz.equals(".pdf")) {
             String newName = UUID.randomUUID().toString() + hz;
             file.transferTo(new File(folder, newName));
-            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/file/PDF/" + format + "/" + newName;
+//            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort()  + format + "/" + newName;
+            String url = realPath + "/" + newName;
             vo.setSuccess(true);
             vo.setMsg("上传成功");
             vo.setCode(200);

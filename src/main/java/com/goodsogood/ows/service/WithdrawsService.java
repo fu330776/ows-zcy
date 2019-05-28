@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.WithdrawsMapper;
 import com.goodsogood.ows.model.db.PageNumber;
+import com.goodsogood.ows.model.vo.WithdrawSumVo;
 import com.goodsogood.ows.model.vo.WithdrawsVo;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
@@ -98,6 +99,38 @@ public class WithdrawsService {
 
     public List<WithdrawsVo> GetOut(Integer is) {
         return this.mapper.GetAdmin(is);
+    }
+
+
+    /**
+     * 分组查询 每人需要提现多少钱
+     *
+     * @param pageNumber
+     * @return
+     */
+    public PageInfo<WithdrawSumVo> GetAdminSum(PageNumber pageNumber) {
+
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetSumAdmin());
+    }
+
+    /**
+     * 根据用户唯一标识 批量体现
+     *
+     * @param userId
+     * @return
+     */
+    public Boolean SetCash(Long userId) {
+        Integer num = this.mapper.UpdateList(userId);
+        if (num == null) {
+            return false;
+        } else if (num == 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 

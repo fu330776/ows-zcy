@@ -10,6 +10,7 @@ import com.goodsogood.ows.service.WithdrawsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +26,7 @@ import java.util.List;
 @RequestMapping("/v-UpLoad")
 @Log4j2
 @CrossOrigin(origins = "*", maxAge = 3600)
-@Api(value = "测试控制器", tags = {" UpLoad manager"})
+@Api(value = "工具控制器", tags = {" UpLoad manager"})
 public class UpLoadController {
 
     private final WithdrawsService wservice;
@@ -34,20 +35,21 @@ public class UpLoadController {
         this.wservice = withdrawsService;
     }
 
-
+    @Value("${file.pdf}")
+    private String PDF;
     private final String Url = "http://www.ztsms.cn/sendNSms.do";
     private final String pwd = "zcyun2019GS";
     private final String productid = "95533";
     private final String username = "zcyun";
 
     @HttpMonitorLogger
-    @ApiOperation(value = "测试上传文件")
-    @PostMapping("/Up")
+    @ApiOperation(value = "上传文件")
+    @PostMapping("/upLoadPdf")
     public UpLoadVo Up(MultipartFile file, HttpServletRequest request) {
         UpLoadVo vo = new UpLoadVo();
         try {
             UploadUtils uploadUtils = new UploadUtils();
-            vo = uploadUtils.importData(file, request);
+            vo = uploadUtils.importData(file, request, PDF);
         } catch (IOException e) {
             e.printStackTrace();
         }

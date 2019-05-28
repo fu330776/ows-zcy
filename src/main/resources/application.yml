@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8089
 
 spring:
   application:
@@ -8,11 +8,12 @@ spring:
   #  #mysql
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    username: root
-    #url: jdbc:log4jdbc:mysql://172.16.30.145:3306/demo?useSSL=false&useUnicode=true&zeroDateTimeBehavior=convertToNull
-    url: jdbc:log4jdbc:mysql://192.168.0.103:3306/zcydb?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf-8
-    #url: jdbc:log4jdbc:mysql://localhost:3306/party_building_index?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf-8
-    password: 123456
+    #username: root
+    username: zcy
+    url: log4jdbc:mysql://39.97.230.69:3306/zcydb?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf-8
+    #url: jdbc:log4jdbc:mysql://192.168.0.103:3306/zcydb?useSSL=false&amp;useUnicode=true&amp;characterEncoding=utf-8
+    #password: 123456
+    password: zcy!@#$1234
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     hikari:
       connection-test-query: SELECT 1 FROM DUAL
@@ -80,4 +81,5 @@ management:
 
 
 file:
-  PDF: D:\file\PDF
+  #pdf: D:/file/PDF
+  pdf: /root/app/fileTemplates

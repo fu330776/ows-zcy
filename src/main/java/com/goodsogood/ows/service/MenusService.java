@@ -34,7 +34,6 @@ public class MenusService {
     public List<MenusEntity> GetMenus(Long userid) throws Exception {
         AccountsUsersRolesEntity entitys = this.accountsUsersRolesMapper.GetUserId(userid);
         List<MenusEntity> entity = this.mapper.GetLogin(entitys.getRoleId());
-
         return entity;
     }
 

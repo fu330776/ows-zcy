@@ -17,21 +17,14 @@ import java.util.List;
 @Log4j2
 public class TasksService {
     private TasksMapper mapper;
-    private TasksSchedulesMapper TsMapper;
     private TasksOrdersMapper ToMapper;
-    private TaskOrderMapper taskOrderMapper;
     private WithdrawsMapper withdrawsMapper;
-    private UsersMapper usersMapper;
 
-    public TasksService(TasksMapper tasksMapper, TasksSchedulesMapper tasksSchedulesMapper
-            , TasksOrdersMapper tasksOrdersMapper, TaskOrderMapper taskOrderMapper, WithdrawsMapper withdrawsMapper,
-                        UsersMapper usersMapper) {
+
+    public TasksService(TasksMapper tasksMapper, TasksOrdersMapper tasksOrdersMapper, WithdrawsMapper withdrawsMapper) {
         this.mapper = tasksMapper;
-        this.TsMapper = tasksSchedulesMapper;
         this.ToMapper = tasksOrdersMapper;
-        this.taskOrderMapper = taskOrderMapper;
         this.withdrawsMapper = withdrawsMapper;
-        this.usersMapper = usersMapper;
     }
 
 
@@ -79,11 +72,11 @@ public class TasksService {
      * @param type 1:任务书 2：委托书
      * @return
      */
-    public PageInfo<TaskListForm> getByType(Integer type,PageNumber pageNumber) {
+    public PageInfo<TaskListForm> getByType(Integer type, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>( this.mapper.GetAll(type));
+        return new PageInfo<>(this.mapper.GetAll(type));
     }
 
     /**
@@ -93,7 +86,6 @@ public class TasksService {
      * @return
      */
     public Boolean putByTask(TasksEntity tasksEntity) {
-
         return this.mapper.updateByPrimaryKey(tasksEntity) > 0;
     }
 
@@ -161,19 +153,26 @@ public class TasksService {
         Boolean bool = false;
         TasksEntity entity = this.mapper.GetByTaskId(taskId);
         if (entity.getTaskType() == 1) {
+            /**
+             *  领取任务奖励
+             */
             TasksOrdersEntity orderEntity = new TasksOrdersEntity();
             orderEntity.setAddtime(new Date());
             orderEntity.setTaskId(entity.getTaskId());
             orderEntity.setTaskMoney(entity.getTaskMoney());
             orderEntity.setUserId(entity.getUserId());
             bool = this.ToMapper.insert(orderEntity) > 0;
+
+            /**
+             *  未提现金额
+             */
             WithdrawsEntity withdrawsEntity = new WithdrawsEntity();
             withdrawsEntity.setAddtime(new Date());
             withdrawsEntity.setIsWithdraw(1);
             withdrawsEntity.setUserId(entity.getUserId());
             withdrawsEntity.setWithdrawMoney(entity.getTaskMoney());
             withdrawsEntity.setWithdrawNumber(new Date().toString());
-            withdrawsEntity.setPaytime(null);
+            withdrawsEntity.setPaytime(new Date());
             bool = this.withdrawsMapper.Insert(withdrawsEntity) > 0;
         }
         return bool;

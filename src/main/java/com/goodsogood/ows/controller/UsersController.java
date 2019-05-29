@@ -252,8 +252,8 @@ public class UsersController {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         UserMoneyVo vo = new UserMoneyVo();
-        vo.noMoney = this.withdrawsService.getSum(userId);
-        vo.tooMoney = this.withdrawsService.getSumToo(userId);
+        vo.setNoMoney(this.withdrawsService.getSum(userId));
+        vo.setTooMoney(this.withdrawsService.getSumToo(userId));
         Result<UserMoneyVo> result = new Result<>(vo, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -323,11 +323,11 @@ public class UsersController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        UserInfoVo vo = this.usersService.GetByUser(user.userid);
-        if (vo == null) {
-            throw new ApiException("用户不存在或该账号已被封禁", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
-        this.usersService.sealByUser(user.userid, user.isdel);
+//        UserInfoVo vo = this.usersService.GetByUser(user.getUserid());
+//        if (vo == null) {
+//            throw new ApiException("用户不存在或该账号已被封禁", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+//        }
+        this.usersService.sealByUser(user.getUserid(), user.getIsdel());
         Result<Boolean> result = new Result<>(true, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -365,7 +365,7 @@ public class UsersController {
      */
     @ApiOperation(value = "查询资金流水")
     @PostMapping("/getcapitalflow/{is}")
-    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "userId", required = true)
+    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "is", required = true)
                                                                               @PathVariable Integer is, Integer page, Integer pageSize) {
         if (page == null) {
             page = 1;
@@ -375,5 +375,25 @@ public class UsersController {
         return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
+
+    /**
+     *  账号审核
+     * @param form
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "账号审核")
+    @PostMapping("/toExamine")
+    public ResponseEntity<Result<Boolean>> ToExamine(@Valid @RequestBody ExamineForm form, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean b = this.usersService.ExamineService(form.getUserId(),form.getIsDel());
+        if (b) {
+            return new ResponseEntity<>(new Result<>(true, errors), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new Result<>(false, errors), HttpStatus.OK);
+    }
+
 
 }

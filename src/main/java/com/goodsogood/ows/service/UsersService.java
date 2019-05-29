@@ -328,4 +328,32 @@ public class UsersService {
         return this.mapper.UpdateForbidden(userId, seal) > 0;
     }
 
+    /**
+     * 账号通过审核
+     *
+     * @param userId
+     * @return
+     */
+    public Boolean ExamineService(Long userId, Integer isdel) {
+        Integer num = this.mapper.Examine(userId, isdel);
+        if (num == null || num <= 0) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     *  查询该账号是否存在状态
+     * @param userid
+     * @return
+     */
+    public boolean GetCount(Long userid) {
+        int num = this.mapper.GetCount(userid);
+        if (num == 0) {
+            return false;
+        }
+        return true;
+
+    }
+
 }

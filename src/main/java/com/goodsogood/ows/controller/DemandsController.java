@@ -73,7 +73,7 @@ public class DemandsController {
         if (demandsForm.isContact != 1 || demandsForm.isContact != 2) {
             throw new ApiException("服务器繁忙,状态码出错", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean bool = this.service.UpdateContact(demandsForm.demandId, demandsForm.isContact);
+        Boolean bool = this.service.UpdateContact(demandsForm.getDemandId(), demandsForm.getIsContact());
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

@@ -134,7 +134,7 @@ public class LoginController {
             }
         }
         if (!user.code.isEmpty() && user.getPassword().isEmpty()) {
-            rlist = this.loginService.getListPhone(user.getPhone(), user.code);
+            rlist = this.loginService.getListPhone(user.getPhone(), user.getCode());
             if (rlist == null) {
                 throw new ApiException("服务器繁忙，登录失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
             }
@@ -151,6 +151,11 @@ public class LoginController {
     public ResponseEntity<Result<UserMenusVo>> Login(@Valid @RequestBody Long userid, BindingResult bindingResult) throws Exception {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        boolean vo = this.usersService.GetCount(userid);
+        if (vo == false) {
+            Result<UserMenusVo> result = new Result<>(null, errors, "已封号,请联系管理员");
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }
         List<MenusEntity> entity = this.menusService.GetMenus(userid);
         UserMenusVo userMenusVo = new UserMenusVo();
@@ -247,7 +252,7 @@ public class LoginController {
         smsEntity.setSmsCode(code);
         smsEntity.setSmsContent(content);
         smsEntity.setAddtime(time);
-        String sms =SmsUtils.postEncrypt(Url, username, pwd, Phone, content, productid);
+        String sms = SmsUtils.postEncrypt(Url, username, pwd, Phone, content, productid);
         Integer getCode = Integer.parseInt(sms.split(",")[0]);
         if (getCode == 1) {
 

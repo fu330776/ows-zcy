@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
-//@Configuration
-//@WebFilter
+@Configuration
+@WebFilter
 public class TokenFilterConfiguration extends OncePerRequestFilter {
 
     private List<String> urls = new ArrayList<String>() {{
@@ -34,6 +34,7 @@ public class TokenFilterConfiguration extends OncePerRequestFilter {
         add("/v-patents/");
         add("/v-task/");
         add("/v-users/");
+        add("/v-cash/");
     }};
 
     @Override
@@ -49,10 +50,12 @@ public class TokenFilterConfiguration extends OncePerRequestFilter {
             }
         }
         String method = httpServletRequest.getMethod();
+        //过滤与请求头
         if("OPTIONS".equals(method))
         {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         }
+
         if (bl) {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } else {

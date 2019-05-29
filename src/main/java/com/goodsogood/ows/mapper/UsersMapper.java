@@ -166,4 +166,18 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
     })
     int UpdateForbidden(@Param(value = "userId") Long userId, @Param(value = "seal") Integer seal);
 
+
+    @Update({
+            "<script>",
+            "UPDATE zcy_users SET review=#{isDel,jdbcType=BIT} WHERE user_id=#{userId,jdbcType=BIGINT} and review=1",
+            "</script>"
+    })
+    int Examine(@Param(value = "userId") Long userId,@Param(value = "isDel") Integer isDel);
+
+    @Select({
+            "<script>",
+            " Select Count(0) from  zcy_users where user_id=#{userId,jdbcType=BIGINT}  and review=2 and  enable=1",
+            "</script>"
+    })
+    int GetCount(@Param(value = "userId") Long userId);
 }

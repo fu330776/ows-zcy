@@ -139,8 +139,9 @@ public class DemandsController {
             Integer type,
             Integer isContact, Integer page, Integer pageSize
     ) {
-        if (page == null) {
-            page = 0;
+        if (page == null||pageSize==null) {
+            page = 1;
+            pageSize=10;
         }
         PageInfo<DemandsEntity> demandsEntityList = this.service.Get(id, type, isContact, new PageNumber(page, pageSize));
         Result<PageInfo<DemandsEntity>> result = new Result<>(demandsEntityList, errors);
@@ -154,8 +155,9 @@ public class DemandsController {
             @PathVariable
                     Integer type, Integer IsCount, Integer page, Integer pageSize
     ) {
-        if (page == null) {
-            page = 0;
+        if (page == null||pageSize==null) {
+            page = 1;
+            pageSize=10;
         }
         PageInfo<DemandsEntity> demandsEntityList = this.service.GetTypeAll(type, IsCount, new PageNumber(page, pageSize));
         Result<PageInfo<DemandsEntity>> result = new Result<>(demandsEntityList, errors);

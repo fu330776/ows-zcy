@@ -229,7 +229,10 @@ public class TasksController {
     public ResponseEntity<Result<PageInfo<TasksEntity>>> Get(@ApiParam(value = "userId", required = true)
                                                              @PathVariable Long id,
                                                              Integer isPay, Integer page, Integer pageSize) {
-
+        if (page == null||pageSize==null) {
+            page = 1;
+            pageSize=10;
+        }
         PageInfo<TasksEntity> entities = this.service.getByUser(id, isPay, new PageNumber(page, pageSize));
         Result<PageInfo<TasksEntity>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -245,7 +248,10 @@ public class TasksController {
     @GetMapping("/getType/{type}")
     public ResponseEntity<Result<PageInfo<TaskListForm>>> getType(@ApiParam(value = "type", required = true)
                                                                   @PathVariable Integer type, Integer page, Integer pageSize) {
-
+        if (page == null||pageSize==null) {
+            page = 1;
+            pageSize=10;
+        }
         PageInfo<TaskListForm> entities = this.service.getByType(type, new PageNumber(page, pageSize));
         Result<PageInfo<TaskListForm>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);

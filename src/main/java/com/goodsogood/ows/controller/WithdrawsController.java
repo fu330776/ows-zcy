@@ -44,11 +44,12 @@ public class WithdrawsController {
      * @return
      */
     @ApiOperation(value = "查询分组信息")
-    @GetMapping("/getSumUser")
+    @GetMapping("/getSumUser/{page}")
     public ResponseEntity<Result<PageInfo<WithdrawSumVo>>> GetSumAdmin(@ApiParam(value = "page", required = true)
                                                                        @PathVariable Integer page, Integer pageSize) {
-        if (page == null) {
-            page = 0;
+        if (page == null||pageSize==null) {
+            page = 1;
+            pageSize=10;
         }
         PageInfo<WithdrawSumVo> entity = this.service.GetAdminSum(new PageNumber(page, pageSize));
 

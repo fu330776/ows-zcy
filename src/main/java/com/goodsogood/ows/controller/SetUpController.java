@@ -75,8 +75,9 @@ public class SetUpController {
     @GetMapping(value = "/get/{page}")
     public ResponseEntity<Result<PageInfo<MoneyEntity>>> Get(@ApiParam(value = "page", required = true)
                                                              @PathVariable Integer page, Integer pageSize) {
-        if (page == null) {
+        if (page == null||pageSize==null) {
             page = 1;
+            pageSize=10;
         }
         PageInfo<MoneyEntity> entityPageInfo = this.service.Get(new PageNumber(page, pageSize));
         Result<PageInfo<MoneyEntity>> result = new Result<>(entityPageInfo, errors);

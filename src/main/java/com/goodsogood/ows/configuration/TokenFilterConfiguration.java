@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
-@Configuration
-@WebFilter
+//@Configuration
+//@WebFilter
 public class TokenFilterConfiguration extends OncePerRequestFilter {
 
     private List<String> urls = new ArrayList<String>() {{

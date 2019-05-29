@@ -106,8 +106,9 @@ public class FundsController {
     @GetMapping(value = "/getById/{id}")
     public ResponseEntity<Result<PageInfo<FundsEntity>>> getUser(@ApiParam(value = "id", required = true)
                                                                  @PathVariable Long id, Integer page, Integer pageSize) {
-        if (page == null) {
+        if (page == null||pageSize==null) {
             page = 1;
+            pageSize=10;
         }
         PageInfo<FundsEntity> entity = this.service.GetByUserId(id, new PageNumber(page, pageSize));
         Result<PageInfo<FundsEntity>> result = new Result<>(entity, errors);
@@ -126,8 +127,9 @@ public class FundsController {
     @GetMapping(value = "/getByType/{type}")
     public ResponseEntity<Result<PageInfo<FundsVo>>> getByAdmin(@ApiParam(value = "type", required = true)
                                                                 @PathVariable Integer type, Integer page, Integer pageSize) {
-        if (page == null) {
+        if (page == null||pageSize==null) {
             page = 1;
+            pageSize=10;
         }
         PageInfo<FundsVo> entity = this.service.GetByAdmin(type, new PageNumber(page, pageSize));
         Result<PageInfo<FundsVo>> result = new Result<>(entity, errors);

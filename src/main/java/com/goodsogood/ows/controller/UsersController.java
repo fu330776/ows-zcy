@@ -283,11 +283,12 @@ public class UsersController {
      * @return
      */
     @ApiOperation(value = "获取所有账户信息")
-    @GetMapping("/getAll")
+    @GetMapping("/getAll/{page}")
     public ResponseEntity<Result<PageInfo<UserInfoVo>>> getByAll(@ApiParam(value = "page", required = true)
                                                                  @PathVariable Integer page, Integer pageSize) {
-        if (page == null) {
-            page = 0;
+        if (page == null||pageSize==null) {
+            page = 1;
+            pageSize=10;
         }
         PageInfo<UserInfoVo> userInfoVos = this.usersService.GetAll(new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
@@ -302,8 +303,9 @@ public class UsersController {
     @GetMapping("/getByRole/{roleId}")
     public ResponseEntity<Result<PageInfo<UserInfoVo>>> getByRoleAll(@ApiParam(value = "roleId", required = true)
                                                                      @PathVariable Long roleId, Integer page, Integer pageSize) {
-        if (page == null) {
-            page = 0;
+        if (page == null||pageSize==null) {
+            page = 1;
+            pageSize=10;
         }
         PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId, new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
@@ -342,11 +344,12 @@ public class UsersController {
      * @return
      */
     @ApiOperation(value = "查询资金流水")
-    @PostMapping("/getcapital/{userId}")
+    @GetMapping("/getcapital/{userId}")
     public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "userId", required = true)
                                                                               @PathVariable Long userId, Integer is, Integer page, Integer pageSize) {
-        if (page == null) {
+        if (page == null||pageSize==null) {
             page = 1;
+            pageSize=10;
         }
         PageInfo<WithdrawsVo> entity = this.withdrawsService.Get(userId, is, new PageNumber(page, pageSize));
         Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
@@ -364,11 +367,12 @@ public class UsersController {
      * @return
      */
     @ApiOperation(value = "查询资金流水")
-    @PostMapping("/getcapitalflow/{is}")
+    @GetMapping("/getcapitalflow/{is}")
     public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "is", required = true)
                                                                               @PathVariable Integer is, Integer page, Integer pageSize) {
-        if (page == null) {
+        if (page == null||pageSize==null) {
             page = 1;
+            pageSize=10;
         }
         PageInfo<WithdrawsVo> entity = this.withdrawsService.GetAdmin(is, new PageNumber(page, pageSize));
         Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);

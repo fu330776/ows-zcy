@@ -74,7 +74,7 @@ public class UpLoadController {
 
     @HttpMonitorLogger
     @ApiOperation(value = "时间加10分钟")
-    @PostMapping("/getDate")
+    @GetMapping("/getDate")
     public Date getDate() {
         Date date = new Date();
         date.setTime(date.getTime() + 10 * 60 * 1000);

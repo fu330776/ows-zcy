@@ -138,8 +138,9 @@ public class PatentsController {
     @GetMapping("/get/{type}")
     public ResponseEntity<Result<PageInfo<PatentsVo>>> get(@ApiParam(value = "type", required = true)
                                                                @PathVariable Integer type, Long userId, Integer page, Integer pageSize) {
-        if (page == null) {
+        if (page == null||pageSize==null) {
             page = 1;
+            pageSize=10;
         }
         PageInfo<PatentsVo> patentsEntityPageInfo = this.service.Get(userId, type, new PageNumber(page, pageSize));
         Result<PageInfo<PatentsVo>> result = new Result<>(patentsEntityPageInfo, errors);
@@ -158,8 +159,9 @@ public class PatentsController {
     @GetMapping("/getAll/{type}")
     public ResponseEntity<Result<PageInfo<PatentsVo>>> getByAll(@ApiParam(value = "type", required = true)
                                                                     @PathVariable Integer type, Integer page, Integer pageSize) {
-        if (page == null) {
+        if (page == null||pageSize==null) {
             page = 1;
+            pageSize=10;
         }
         PageInfo<PatentsVo> pageInfo = this.service.GetAll(type, new PageNumber(page, pageSize));
         Result<PageInfo<PatentsVo>> result = new Result<>(pageInfo, errors);

@@ -55,9 +55,9 @@ public interface DataMapper extends MyMapper<DataEntity> {
     @Select({
             "<script>",
             "SELECT",
-            "id,type_name as typeName,type_type as typeType,total,day_count as dayCount,current_times as currentTime,add_time as addTime ",
+            "id,type_name as typeName,type_type as typeType,total,(CASE when DATE_FORMAT(current_times,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d') then day_count else 0 END) as dayCount,current_times as currentTime,add_time as addTime ",
             "FROM zcy_data",
-            "where DATE_FORMAT(current_times,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d')",
+            //"",
             "</script>"
     })
     List<DataEntity> GetAll();

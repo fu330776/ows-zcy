@@ -60,7 +60,7 @@ public class PatentsController {
         entity.setIsPay(0);
         entity.setPatentContent(patent.getContent());
         entity.setUserId(patent.getUserid());
-        Boolean bool = false;
+        Boolean bool;
         bool = this.service.Insert(entity);
 
         if (bool == false) {

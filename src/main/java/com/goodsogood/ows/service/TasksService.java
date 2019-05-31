@@ -2,9 +2,11 @@ package com.goodsogood.ows.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.goodsogood.ows.helper.OrderGeneratorUtils;
 import com.goodsogood.ows.mapper.*;
 import com.goodsogood.ows.model.db.*;
 import com.goodsogood.ows.model.vo.TaskListForm;
+import com.goodsogood.ows.model.vo.TaskOrderVo;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class TasksService {
         this.mapper = tasksMapper;
         this.ToMapper = tasksOrdersMapper;
         this.withdrawsMapper = withdrawsMapper;
+
     }
 
 
@@ -72,11 +75,11 @@ public class TasksService {
      * @param type 1:任务书 2：委托书
      * @return
      */
-    public PageInfo<TaskListForm> getByType(Integer type, PageNumber pageNumber) {
+    public PageInfo<TaskListForm> getByType(Integer type,String name, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetAll(type));
+        return new PageInfo<>(this.mapper.GetAll(type,name));
     }
 
     /**
@@ -122,7 +125,6 @@ public class TasksService {
         Boolean bool = false;
         TasksEntity entity = this.mapper.GetByTaskId(taskId);
         entity.setIs_fulfill(2); //完成
-
         bool = this.mapper.updateByPrimaryKey(entity) > 0;
         return bool;
     }
@@ -133,11 +135,24 @@ public class TasksService {
      * @param taskId
      * @return
      */
+    @Transactional
     public Boolean putIsPay(Long taskId) {
         Boolean bool = false;
         TasksEntity entity = this.mapper.GetByTaskId(taskId);
         entity.setIs_pay(2);
         bool = this.mapper.updateByPrimaryKey(entity) > 0;
+        if (entity.getTaskType() == 1) {
+            /**
+             *  领取任务奖励
+             */
+            TasksOrdersEntity orderEntity = new TasksOrdersEntity();
+            orderEntity.setAddtime(new Date());
+            orderEntity.setTaskId(entity.getTaskId());
+            orderEntity.setTaskMoney(entity.getTaskMoney());
+            orderEntity.setUserId(entity.getUserId());
+            orderEntity.setIsReceive(1);
+            bool = this.ToMapper.Insert(orderEntity) > 0;
+        }
         return bool;
     }
 
@@ -150,19 +165,14 @@ public class TasksService {
      */
     @Transactional
     public Boolean PutReceive(Long taskId) {
-        Boolean bool = false;
+        Boolean bool = true;
         TasksEntity entity = this.mapper.GetByTaskId(taskId);
-        if (entity.getTaskType() == 1) {
-            /**
-             *  领取任务奖励
-             */
-            TasksOrdersEntity orderEntity = new TasksOrdersEntity();
-            orderEntity.setAddtime(new Date());
-            orderEntity.setTaskId(entity.getTaskId());
-            orderEntity.setTaskMoney(entity.getTaskMoney());
-            orderEntity.setUserId(entity.getUserId());
-            bool = this.ToMapper.insert(orderEntity) > 0;
 
+        if (entity.getTaskType() == 1) {
+            Integer num = this.ToMapper.Update(taskId);
+            if (num == null || num <= 0) {
+                return false;
+            }
             /**
              *  未提现金额
              */
@@ -173,12 +183,25 @@ public class TasksService {
             withdrawsEntity.setWithdrawMoney(entity.getTaskMoney());
             withdrawsEntity.setWithdrawNumber(new Date().toString());
             withdrawsEntity.setPaytime(new Date());
+            withdrawsEntity.setWithdrawNumber(OrderGeneratorUtils.getOrderIdByUUId());
             bool = this.withdrawsMapper.Insert(withdrawsEntity) > 0;
         }
         return bool;
     }
 
-
+    /**
+     * 查询科研经费
+     *
+     * @param userId
+     * @param pageNumber
+     * @return
+     */
+    public PageInfo<TaskOrderVo> GetWater(Long userId, Integer type, PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.ToMapper.Get(userId, type));
+    }
 //    /**
 //     * 添加任务，并制定周期与人
 //     */

@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.DemandsMapper;
 import com.goodsogood.ows.model.db.DemandsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
+import com.goodsogood.ows.model.vo.DemandsVo;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,21 +30,21 @@ public class DemandsService {
     /**
      * 根据用户，类型 ，是否联系，查询
      */
-    public PageInfo<DemandsEntity> Get(Long userId, Integer type, Integer isContact,PageNumber pageNumber) {
+    public PageInfo<DemandsVo> Get(Long userId, Integer type, Integer isContact,String name,PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.Get(userId, type, isContact));
+        return new PageInfo<>(this.mapper.Get(userId, type, isContact,name));
     }
 
     /**
      * 后台管理员查看 根据类型查看
      */
-    public PageInfo<DemandsEntity> GetTypeAll(Integer type, Integer isCount, PageNumber pageNumber) {
+    public PageInfo<DemandsVo> GetTypeAll(Integer type, Integer isCount, String name, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetTypeAll(type, isCount));
+        return new PageInfo<>(this.mapper.GetTypeAll(type, isCount,name));
     }
 
 

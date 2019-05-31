@@ -4,6 +4,7 @@ import com.goodsogood.ows.model.db.RolesEntity;
 import com.goodsogood.ows.model.db.UsersEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -96,4 +97,7 @@ public class UserInfoVo {
 
     @ApiModelProperty(value = "账号")
     public String phone;
+
+    @ApiModelProperty(value = "账号唯一标识")
+    public Long accountId;
 }

@@ -121,7 +121,7 @@ public class UsersController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Integer isNum = this.usersService.UpdatePassWord(pwd.userId, pwd.NewPwd);
+        Integer isNum = this.usersService.UpdatePassWord(pwd.getUserId(), pwd.getPwd());
         if (isNum <= 0) {
             throw new ApiException("服务器繁忙，修改失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
@@ -286,9 +286,9 @@ public class UsersController {
     @GetMapping("/getAll/{page}")
     public ResponseEntity<Result<PageInfo<UserInfoVo>>> getByAll(@ApiParam(value = "page", required = true)
                                                                  @PathVariable Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
         PageInfo<UserInfoVo> userInfoVos = this.usersService.GetAll(new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
@@ -302,12 +302,12 @@ public class UsersController {
     @ApiOperation(value = "根据角色获取 用户信息")
     @GetMapping("/getByRole/{roleId}")
     public ResponseEntity<Result<PageInfo<UserInfoVo>>> getByRoleAll(@ApiParam(value = "roleId", required = true)
-                                                                     @PathVariable Long roleId, Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+                                                                     @PathVariable Long roleId, String name, Integer page, Integer pageSize) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 11;
         }
-        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId, new PageNumber(page, pageSize));
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId,name ,new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -347,14 +347,13 @@ public class UsersController {
     @GetMapping("/getcapital/{userId}")
     public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "userId", required = true)
                                                                               @PathVariable Long userId, Integer is, Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 11;
         }
         PageInfo<WithdrawsVo> entity = this.withdrawsService.Get(userId, is, new PageNumber(page, pageSize));
         Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
-
     }
 
 
@@ -368,11 +367,15 @@ public class UsersController {
      */
     @ApiOperation(value = "查询资金流水")
     @GetMapping("/getcapitalflow/{is}")
-    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "is", required = true)
-                                                                              @PathVariable Integer is, Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(
+            @ApiParam(value = "is", required = true)
+            @PathVariable Integer is,
+            Integer page,
+            Integer pageSize
+    ) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
         PageInfo<WithdrawsVo> entity = this.withdrawsService.GetAdmin(is, new PageNumber(page, pageSize));
         Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
@@ -381,7 +384,8 @@ public class UsersController {
     }
 
     /**
-     *  账号审核
+     * 账号审核
+     *
      * @param form
      * @param bindingResult
      * @return
@@ -392,12 +396,32 @@ public class UsersController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean b = this.usersService.ExamineService(form.getUserId(),form.getIsDel());
+        Boolean b = this.usersService.ExamineService(form.getUserId(), form.getIsDel());
         if (b) {
             return new ResponseEntity<>(new Result<>(true, errors), HttpStatus.OK);
         }
         return new ResponseEntity<>(new Result<>(false, errors), HttpStatus.OK);
     }
 
-
+    /**
+     * 初始化密码 默认密码为 123456
+     *
+     * @param userId        账号唯一标识
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "初始化密码")
+    @PostMapping("/InitPwd")
+    public ResponseEntity<Result<Boolean>> Initialization(@Valid @RequestBody Long userId, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Integer isb = this.usersService.UpdatePassWord(userId, "123456");
+        Boolean b = true;
+        if (isb == 0 || isb == null) {
+            b = false;
+        }
+        Result<Boolean> result = new Result<>(b, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

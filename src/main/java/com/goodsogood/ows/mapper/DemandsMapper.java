@@ -1,6 +1,7 @@
 package com.goodsogood.ows.mapper;
 
 import com.goodsogood.ows.model.db.DemandsEntity;
+import com.goodsogood.ows.model.vo.DemandsVo;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -14,13 +15,16 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
     @Select({
             "<script>",
             "SELECT  demand_id as demandId, demand_type as demandType , demand_name as demandName,",
-            "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime",
-            "FROM zcy_demands WHERE user_id=#{userId,jdbcType=BIGINT} and demand_type=#{demandType,jdbcType=BIT}",
+            "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime,",
+            "(SELECT zu.phone from zcy_users zu where zu.user_id=zd.user_id)phone,",
+            "(SELECT zu.user_name from zcy_users zu where zu.user_id=zd.user_id)userName",
+            "FROM zcy_demands zd WHERE user_id=#{userId,jdbcType=BIGINT} and demand_type=#{demandType,jdbcType=BIT}",
             "<if test='isContact !=null'> and is_contact=#{isContact,jdbcType=BIT}</if>",
+            "<if test='name !=null'>and demand_name LIKE concat(CONCAT('%',#{name,jdbcType=VARCHAR},'%'))</if>",
             "</script>"
     })
-    List<DemandsEntity> Get(@Param(value = "userId") Long userId, @Param(value = "demandType") Integer demandType
-            , @Param(value = "isContact") Integer isContact);
+    List<DemandsVo> Get(@Param(value = "userId") Long userId, @Param(value = "demandType") Integer demandType
+            , @Param(value = "isContact") Integer isContact, @Param(value = "name") String name);
 
     @Insert({
             "<script>",
@@ -72,10 +76,13 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
     @Select({
             "<script>",
             "SELECT  demand_id as demandId, demand_type as demandType , demand_name as demandName,",
-            "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime",
-            "FROM zcy_demands WHERE  demand_type=#{demandType,jdbcType=BIT}",
+            "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime,",
+            "(SELECT zu.phone from zcy_users zu where zu.user_id=zd.user_id)phone,",
+            "(SELECT zu.user_name from zcy_users zu where zu.user_id=zd.user_id)userName",
+            "FROM zcy_demands zd WHERE  demand_type=#{demandType,jdbcType=BIT}",
             "<if test='isContact !=null'> and is_contact=#{isContact,jdbcType=BIT}</if>",
+            "<if test='name !=null'> and demand_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
             "</script>"
     })
-    List<DemandsEntity> GetTypeAll(@Param(value = "demandType") Integer demandType,@Param(value = "isContact") Integer isContact);
+    List<DemandsVo> GetTypeAll(@Param(value = "demandType") Integer demandType, @Param(value = "isContact") Integer isContact,@Param(value = "name") String name);
 }

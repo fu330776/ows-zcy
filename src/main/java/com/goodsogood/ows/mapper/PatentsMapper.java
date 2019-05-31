@@ -35,10 +35,12 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
             "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType, ",
             "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time,",
             "(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
+            ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
             "FROM zcy_patents z where user_id=#{id,jdbcType=BIGINT} and patent_type=#{type,jdbcType=BIT}",
+            "<if test='title !=null'> and patent_title LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%')) </if>",
             "</script>"
     })
-    List<PatentsVo> Get(@Param(value = "id") Long id, @Param(value = "type") Integer type);
+    List<PatentsVo> Get(@Param(value = "id") Long id, @Param(value = "type") Integer type, @Param(value = "title") String title);
 
 
     @Select({
@@ -47,16 +49,32 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
             "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
             "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time ",
             ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
+            ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
             "FROM zcy_patents z where patent_type=#{type,jdbcType=BIT}",
+            "<if test='title !=null'> and patent_title LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%')) </if>",
             "</script>"
     })
-    List<PatentsVo> GetByType(@Param(value = "type") Integer type);
+    List<PatentsVo> GetByType(@Param(value = "type") Integer type, @Param(value = "title") String title);
+
+    @Select({
+            "<script>",
+            "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
+            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time ",
+            ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
+            ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
+            "FROM zcy_patents z where patent_type=#{type,jdbcType=BIT} and is_need_pay=1 and is_pay=#{isPay,jdbcType=BIT}",
+            "<if test='title !=null'> and patent_title LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%')) </if>",
+            "</script>"
+    })
+    List<PatentsVo> GetIdea(@Param(value = "type") Integer type, @Param(value = "isPay") Integer isPay, @Param(value = "title") String title);
+
 
     @Select({
             "<script>",
             "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
             "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time",
             ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
+            ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
             "FROM zcy_patents z where patent_id=#{id,jdbcType=BIGINT}",
             "</script>"
     })

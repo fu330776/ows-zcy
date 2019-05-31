@@ -4,8 +4,11 @@ import com.goodsogood.ows.mapper.AccountsMapper;
 import com.goodsogood.ows.mapper.AccountsUsersRolesMapper;
 import com.goodsogood.ows.model.db.AccountsEntity;
 import com.goodsogood.ows.model.db.AccountsUsersRolesEntity;
+import com.goodsogood.ows.model.vo.AccountUsersVo;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Log4j2
@@ -46,5 +49,16 @@ public class AccountsUsersRolesService {
      */
     public Long GetByFind(String phone, String pwd) {
         return this.mapper.GetAdminFind(phone, pwd);
+    }
+
+
+    /**
+     * 查询需统计数据
+     *
+     * @return
+     */
+    public List<AccountUsersVo> GetCount() {
+        return this.mapper.GetCount();
+
     }
 }

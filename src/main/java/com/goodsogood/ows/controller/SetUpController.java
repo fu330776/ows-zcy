@@ -75,9 +75,9 @@ public class SetUpController {
     @GetMapping(value = "/get/{page}")
     public ResponseEntity<Result<PageInfo<MoneyEntity>>> Get(@ApiParam(value = "page", required = true)
                                                              @PathVariable Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
         PageInfo<MoneyEntity> entityPageInfo = this.service.Get(new PageNumber(page, pageSize));
         Result<PageInfo<MoneyEntity>> result = new Result<>(entityPageInfo, errors);
@@ -87,7 +87,8 @@ public class SetUpController {
     @ApiOperation(value = "idea 经费查询")
     @PostMapping("/getByIdea")
     public ResponseEntity<Result<MoneyEntity>> GetByIdea() {
-        return new ResponseEntity<>(new Result<>(this.service.GetFind("idea"), errors), HttpStatus.OK);
+        MoneyEntity entity = this.service.GetFind("idea");
+        return new ResponseEntity<>(new Result<>(entity, errors), HttpStatus.OK);
     }
 
 }

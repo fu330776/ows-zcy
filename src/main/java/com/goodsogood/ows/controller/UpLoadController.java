@@ -37,15 +37,17 @@ public class UpLoadController {
 
     @Value("${file.pdf}")
     private String PDF;
+    @Value("${file.pdfs}")
+    private String PDFs;
     private final String Url = "http://www.ztsms.cn/sendNSms.do";
     private final String pwd = "zcyun2019GS";
     private final String productid = "95533";
     private final String username = "zcyun";
 
     @HttpMonitorLogger
-    @ApiOperation(value = "上传文件")
+    @ApiOperation(value = "上传PDF文件")
     @PostMapping("/upLoadPdf")
-    public UpLoadVo Up(MultipartFile file, HttpServletRequest request) {
+    public UpLoadVo Ups(MultipartFile file, HttpServletRequest request) {
         UpLoadVo vo = new UpLoadVo();
         try {
             UploadUtils uploadUtils = new UploadUtils();
@@ -55,6 +57,21 @@ public class UpLoadController {
         }
         return vo;
     }
+
+    @HttpMonitorLogger
+    @ApiOperation(value = "上传PDF文件 新技术 使用")
+    @PostMapping("/upLoad")
+    public UpLoadVo Up(MultipartFile file, HttpServletRequest request) {
+        UpLoadVo vo = new UpLoadVo();
+        try {
+            UploadUtils uploadUtils = new UploadUtils();
+            vo = uploadUtils.importData(file, request, PDFs);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return vo;
+    }
+
 
     @HttpMonitorLogger
     @ApiOperation(value = "测试验证码发送")

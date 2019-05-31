@@ -91,12 +91,12 @@ public class ArticlesController {
      * @return
      */
     @ApiOperation(value = "查询（行业动态）文章")
-    @GetMapping("/getTrends/{page}")
+    @GetMapping("/getTrends")
     public ResponseEntity<Result<PageInfo<ArticlesEntity>>> getTrends(@ApiParam(value = "page", required = true)
-                                                                      @PathVariable Integer page, Integer pageSize) {
+                                                                      @RequestParam(required = false) Integer page, Integer pageSize) {
         if (page == null||pageSize==null) {
             page = 1;
-            pageSize=10;
+            pageSize=11;
         }
         PageInfo<ArticlesEntity> entities = this.service.GetByType(1, new PageNumber(page, pageSize));
         Result<PageInfo<ArticlesEntity>> result = new Result<>(entities, errors);
@@ -109,12 +109,33 @@ public class ArticlesController {
      * @return
      */
     @ApiOperation(value = "查询（新技术新产品）文章")
-    @GetMapping("/getProduct/{page}")
+    @GetMapping("/getProduct")
     public ResponseEntity<Result<PageInfo<ArticlesEntity>>> getProduct(@ApiParam(value = "page", required = true)
-                                                                       @PathVariable Integer page, Integer pageSize) {
+                                                                           @RequestParam(required = false) Integer page, Integer pageSize) {
         if (page == null||pageSize==null) {
             page = 1;
             pageSize=10;
+        }
+        PageInfo<ArticlesEntity> entities = this.service.GetByType(2, new PageNumber(page, pageSize));
+        Result<PageInfo<ArticlesEntity>> result = new Result<>(entities, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /***
+     *   根据类型查询
+     * @param type 1:查询（行业动态）文章 2:查询（新技术新产品）文章
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @ApiOperation(value = "根据类型查询")
+    @GetMapping("/get/{type}")
+    public  ResponseEntity<Result<PageInfo<ArticlesEntity>>> Get(@ApiParam(value = "type",required = false)
+                                                                 @PathVariable Integer type,Integer page,Integer pageSize)
+    {
+        if (page == null||pageSize==null) {
+            page = 1;
+            pageSize=12;
         }
         PageInfo<ArticlesEntity> entities = this.service.GetByType(2, new PageNumber(page, pageSize));
         Result<PageInfo<ArticlesEntity>> result = new Result<>(entities, errors);

@@ -77,9 +77,10 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
             "(SELECT zu.user_name FROM zcy_users zu where zu.user_id = zt.user_id) as userName",
             " from zcy_tasks zt WHERE",
             "task_type=#{type,jdbcType=BIT}",
+            "<if test='name !=null'> and task_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
             "</script>"
     })
-    List<TaskListForm> GetAll(@Param(value = "type") Integer type);
+    List<TaskListForm> GetAll(@Param(value = "type") Integer type,@Param(value = "name")String name);
 
 
     @Update({

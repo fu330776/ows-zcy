@@ -15,11 +15,11 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
             "<script>",
             "INSERT INTO zcy_funds(",
             "<if test='fundId !=null'>fund_id, </if>",
-            "user_id,title,introduction,identity,addtime",
+            "user_id,title,introduction,identity,addtime,is_success",
             ")VALUES(",
             "<if test='fundId !=null'>#{fundId,jdbcType=BIGINT}, </if>",
             "#{userId,jdbcType=BIGINT},#{title,jdbcType=VARCHAR},#{introduction,jdbcType=VARCHAR},#{identity,jdbcType=BIT},#{addtime,jdbcType=TIMESTAMP}",
-            ")",
+            ",#{success,jdbcType=BIT})",
             "</script>"
 
     })
@@ -30,7 +30,7 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "user_id,title,introduction,identity,addtime,fund_id ",
+            "user_id,title,introduction,identity,addtime,fund_id,is_success as success",
             "FROM zcy_funds",
             "WHERE user_id=#{userId,jdbcType=BIGINT}",
             "</script>"
@@ -42,22 +42,28 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
             "<script>",
             "SELECT ",
             "user_id as userId,title,introduction,identity,addtime,fund_id as fundId,",
-            "(SELECT zu.user_name FROM zcy_users zu where zu.user_id=zf.user_id)userName",
+            "(SELECT zu.user_name FROM zcy_users zu where zu.user_id=zf.user_id)userName,is_success as success",
             "FROM zcy_funds zf ",
-            "<if test='type !=null'> where zf.identity=#{type,jdbcType=BIT} </if>",
+            "where zf.identity=#{type,jdbcType=BIT}",
+            "<if test='name !=null'> and title like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
             "</script>"
     })
-    List<FundsVo> GetAll(@Param(value = "type") Integer type);
+    List<FundsVo> GetAll(@Param(value = "type") Integer type,@Param(value = "name") String name);
 
 
     @Update({
 
             "<script>",
             "UPDATE zcy_funds SET ",
-            "title=#{title,jdbcType=VARCHAR},introduction=#{introduction,jdbcType=VARCHAR}",
-            "WHERE fund_id=#{fundId,jdbcType=BIGINT}",
+            "<if test='title !=null'>title=#{title,jdbcType=VARCHAR},</if> ",
+            "<if test='introduction !=null'>introduction=#{introduction,jdbcType=VARCHAR},</if> ",
+            "<if test='success !=null'>is_success=#{success,jdbcType=BIT}</if>",
+            "WHERE fund_id=#{funId,jdbcType=BIGINT}",
             "</script>"
 
     })
-    int Update(@Param(value = "funId") Long funid, @Param(value = "title") String title, @Param(value = "introduction") String introduction);
+    int Update(@Param(value = "funId") Long funId,
+               @Param(value = "title") String title,
+               @Param(value = "introduction") String introduction,
+               @Param(value = "success") int success );
 }

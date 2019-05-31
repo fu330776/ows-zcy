@@ -4,16 +4,20 @@ import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
+import com.goodsogood.ows.model.db.DataEntity;
 import com.goodsogood.ows.model.db.DemandsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.vo.DemandAddForm;
 import com.goodsogood.ows.model.vo.DemandsForm;
+import com.goodsogood.ows.model.vo.DemandsVo;
 import com.goodsogood.ows.model.vo.Result;
+import com.goodsogood.ows.service.DataService;
 import com.goodsogood.ows.service.DemandsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,10 +36,12 @@ import java.util.*;
 public class DemandsController {
     private final DemandsService service;
     private final Errors errors;
+    private final DataService dataService;
 
     @Autowired
-    public DemandsController(DemandsService demandsService, Errors error) {
+    public DemandsController(DemandsService demandsService, DataService dataService, Errors error) {
         this.service = demandsService;
+        this.dataService = dataService;
         this.errors = error;
     }
 
@@ -53,9 +59,43 @@ public class DemandsController {
         entity.setIsContact(addForm.getIsContact());
         entity.setUserId(addForm.getUserId());
         Boolean bool = this.service.Insert(entity);
+
+        /**
+         * 统计代码
+         */
+        if (bool) {
+            Statistics(addForm.getDemandType());
+        }
+
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    /**
+     * 统计代码
+     * 统计 创新与百宝箱
+     *
+     * @param DemandType
+     */
+    private void Statistics(Integer DemandType) {
+        Integer type;
+        switch (DemandType) {
+            case 1: //创新量
+                type = 1;
+                break;
+            case 2:
+            case 3:
+                type = 2;
+                break;
+            default:
+                type = null;
+                break;
+        }
+        if (type != null) {
+            this.dataService.Update(type);
+        }
+    }
+
 
     /**
      * 是否联系
@@ -70,9 +110,9 @@ public class DemandsController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        if (demandsForm.isContact != 1 || demandsForm.isContact != 2) {
-            throw new ApiException("服务器繁忙,状态码出错", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
+//        if (demandsForm.getIsContact() != 1 || demandsForm.getIsContact() != 2) {
+//            throw new ApiException("服务器繁忙,状态码出错", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+//        }
         Boolean bool = this.service.UpdateContact(demandsForm.getDemandId(), demandsForm.getIsContact());
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -123,44 +163,45 @@ public class DemandsController {
     /**
      * 根据用户类型查询
      *
-     * @param id        用户id
-     * @param type
-     * @param isContact
+     * @param id        用户唯一标识
+     * @param type      类型
+     * @param isContact 是否联系 1：已联系
+     * @param name      标题名称
      * @param page
      * @param pageSize
      * @return
      */
     @ApiModelProperty(value = "用户根据类型查询")
     @GetMapping("/GetTypeById/{id}")
-    public ResponseEntity<Result<PageInfo<DemandsEntity>>> GetTypeById(
+    public ResponseEntity<Result<PageInfo<DemandsVo>>> GetTypeById(
             @ApiParam(value = "id", required = true)
             @PathVariable
                     Long id,
             Integer type,
-            Integer isContact, Integer page, Integer pageSize
+            Integer isContact, String name, Integer page, Integer pageSize
     ) {
-        if (page == null||pageSize==null) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 11;
         }
-        PageInfo<DemandsEntity> demandsEntityList = this.service.Get(id, type, isContact, new PageNumber(page, pageSize));
-        Result<PageInfo<DemandsEntity>> result = new Result<>(demandsEntityList, errors);
+        PageInfo<DemandsVo> demandsEntityList = this.service.Get(id, type, isContact, name, new PageNumber(page, pageSize));
+        Result<PageInfo<DemandsVo>> result = new Result<>(demandsEntityList, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @ApiModelProperty(value = "管理员根据类型查询所有")
     @GetMapping("/GetAdminType/{type}")
-    public ResponseEntity<Result<PageInfo<DemandsEntity>>> GetAdminByType(
+    public ResponseEntity<Result<PageInfo<DemandsVo>>> GetAdminByType(
             @ApiParam(value = "type", required = true)
             @PathVariable
-                    Integer type, Integer IsCount, Integer page, Integer pageSize
+                    Integer type, Integer IsCount, String name, Integer page, Integer pageSize
     ) {
-        if (page == null||pageSize==null) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
-        PageInfo<DemandsEntity> demandsEntityList = this.service.GetTypeAll(type, IsCount, new PageNumber(page, pageSize));
-        Result<PageInfo<DemandsEntity>> result = new Result<>(demandsEntityList, errors);
+        PageInfo<DemandsVo> demandsEntityList = this.service.GetTypeAll(type, IsCount, name, new PageNumber(page, pageSize));
+        Result<PageInfo<DemandsVo>> result = new Result<>(demandsEntityList, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

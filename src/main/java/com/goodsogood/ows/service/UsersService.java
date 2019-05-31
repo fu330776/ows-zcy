@@ -51,39 +51,36 @@ public class UsersService {
     /**
      * 注册账号
      */
-//    public Long AccountRegistration(AccountsEntity accountsEntity) {
-//        return this.amapper.Insert(accountsEntity);
-//    }
     @Transactional
     public Boolean AdminRegister(UsersForm user) {
 
-        SmssEntity sms = this.smssMapper.GetByPhone(user.getPhone(), new Date(), 1);
-        if (sms == null) {
-            return false;
-        }
-        if (sms.getSmsCode() != user.getPhoneCode()) {
-            return false;
-        }
-        int num = this.smssMapper.Update(user.getPhone(), new Date());
-        if (num == 0) {
-            return false;
-        }
+//        SmssEntity sms = this.smssMapper.GetByPhone(user.getPhone(), new Date(), 1);
+//        if (sms == null) {
+//            return false;
+//        }
+//        if (sms.getSmsCode() != user.getPhoneCode()) {
+//            return false;
+//        }
+//        int num = this.smssMapper.Update(user.getPhone(), new Date());
+//        if (num == 0) {
+//            return false;
+//        }
         //查询账号是否已经注册
-        AccountsEntity entituy = this.amapper.GetByPhone(user.getPhone());
-        Long AccountId;
-        if (entituy != null) {
-            AccountId = entituy.getAccountId();
+        AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
+        Long accountId;
+        if (entitys != null) {
+            accountId = entitys.getAccountId();
         } else {
-            entituy = new AccountsEntity();
-            entituy.setAddtime(new Date());
-            entituy.setPhone(user.getPhone());
-            entituy.setPassWordLaws(user.getPassword());
-            entituy.setPassWord(MD5Utils.MD5(user.getPassword()));
-            entituy.setEnable(1);
-            this.amapper.Insert(entituy);
-            AccountId = entituy.getAccountId();
+            entitys = new AccountsEntity();
+            entitys.setAddtime(new Date());
+            entitys.setPhone(user.getPhone());
+            entitys.setPassWordLaws(user.getPassword());
+            entitys.setPassWord(MD5Utils.MD5(user.getPassword()));
+            entitys.setEnable(1);
+            this.amapper.Insert(entitys);
+            accountId = entitys.getAccountId();
         }
-        if (AccountId == null) {
+        if (accountId == null) {
             return false;
         }
 
@@ -95,7 +92,7 @@ public class UsersService {
         entity.setCompanyCode(user.getCompanyCode());
         entity.setCompanyName(user.getCompanyName());
         entity.setEnable(1);
-        entity.setIsReferrer(user.getIsReferrer());
+        entity.setIsReferrer(1);
         entity.setOrganizationCode(user.getOrganizationCode());
         entity.setOrganizationName(user.getOrganizationName());
         entity.setReferrer(user.getReferrer());
@@ -110,7 +107,6 @@ public class UsersService {
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
         entity.setPhone(user.getPhone());
-
         Long userid = this.mapper.Insert(entity);
         userid = entity.getUserId();
         if (userid == null) {
@@ -118,11 +114,11 @@ public class UsersService {
         }
         //添加关联
         AccountsUsersRolesEntity usersRolesEntity = new AccountsUsersRolesEntity();
-        usersRolesEntity.setAccountId(AccountId);
+        usersRolesEntity.setAccountId(accountId);
         usersRolesEntity.setRoleId(user.getRoleId());
         usersRolesEntity.setUserId(userid);
-        Long aurid = this.aurmapper.RewriteInsert(usersRolesEntity);
-        if (aurid == null) {
+        Long aurId = this.aurmapper.RewriteInsert(usersRolesEntity);
+        if (aurId == null) {
             return false;
         }
         return true;
@@ -300,11 +296,11 @@ public class UsersService {
      * @param pageNumber
      * @return
      */
-    public PageInfo<UserInfoVo> GetByRole(Long rId, PageNumber pageNumber) {
+    public PageInfo<UserInfoVo> GetByRole(Long rId,String name ,PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetByRoleAll(rId));
+        return new PageInfo<>(this.mapper.GetByRoleAll(rId,name));
     }
 
 
@@ -343,7 +339,8 @@ public class UsersService {
     }
 
     /**
-     *  查询该账号是否存在状态
+     * 查询该账号是否存在状态
+     *
      * @param userid
      * @return
      */

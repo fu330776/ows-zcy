@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.persistence.Column;
+
 @ApiModel
 @Data
 public class FundsAddForm {
@@ -16,7 +18,6 @@ public class FundsAddForm {
     public String introduction;
     @ApiModelProperty(value = "身份：1、个人 2、医疗结构")
     public Integer identity;
-
 }
 
 

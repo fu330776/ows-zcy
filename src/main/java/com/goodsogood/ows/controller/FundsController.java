@@ -10,6 +10,7 @@ import com.goodsogood.ows.model.vo.FundsAddForm;
 import com.goodsogood.ows.model.vo.FundsPutForm;
 import com.goodsogood.ows.model.vo.FundsVo;
 import com.goodsogood.ows.model.vo.Result;
+import com.goodsogood.ows.service.DataService;
 import com.goodsogood.ows.service.FundsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,11 +35,13 @@ public class FundsController {
 
     private final Errors errors;
     private final FundsService service;
+    private final DataService dataService;
 
     @Autowired
-    public FundsController(Errors errors, FundsService fundsService) {
+    public FundsController(Errors errors, FundsService fundsService, DataService dataService) {
         this.errors = errors;
         this.service = fundsService;
+        this.dataService = dataService;
     }
 
     /**
@@ -61,12 +64,22 @@ public class FundsController {
         entity.setIntroduction(form.getIntroduction());
         entity.setTitle(form.getTitle());
         entity.setUserId(form.getUserId());
+        entity.setSuccess(1);
         Integer num = this.service.AddFuns(entity);
         Result<Boolean> result = new Result<>(true, errors);
         if (num == null || num == 0) {
             result = new Result<>(false, errors);
+        } else {
+            Statistics();
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     * 统计医创梦计划
+     */
+    private void Statistics() {
+        this.dataService.Update(3);
     }
 
     /**
@@ -86,6 +99,7 @@ public class FundsController {
         entity.setTitle(form.getTitle());
         entity.setIntroduction(form.getIntroduction());
         entity.setFundId(form.getFundId());
+        entity.setSuccess(form.getSuccess());
         Integer num = this.service.AlterFuns(entity);
         Result<Boolean> result = new Result<>(false, errors);
         if (num > 0) {
@@ -93,6 +107,7 @@ public class FundsController {
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
 
     /**
      * 用户查询
@@ -106,9 +121,9 @@ public class FundsController {
     @GetMapping(value = "/getById/{id}")
     public ResponseEntity<Result<PageInfo<FundsEntity>>> getUser(@ApiParam(value = "id", required = true)
                                                                  @PathVariable Long id, Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
         PageInfo<FundsEntity> entity = this.service.GetByUserId(id, new PageNumber(page, pageSize));
         Result<PageInfo<FundsEntity>> result = new Result<>(entity, errors);
@@ -126,12 +141,12 @@ public class FundsController {
     @ApiOperation(value = "管理员查询")
     @GetMapping(value = "/getByType/{type}")
     public ResponseEntity<Result<PageInfo<FundsVo>>> getByAdmin(@ApiParam(value = "type", required = true)
-                                                                @PathVariable Integer type, Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+                                                                @PathVariable Integer type, String name, Integer page, Integer pageSize) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
-        PageInfo<FundsVo> entity = this.service.GetByAdmin(type, new PageNumber(page, pageSize));
+        PageInfo<FundsVo> entity = this.service.GetByAdmin(type, name, new PageNumber(page, pageSize));
         Result<PageInfo<FundsVo>> result = new Result<>(entity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

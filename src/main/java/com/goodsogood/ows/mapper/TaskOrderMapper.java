@@ -20,9 +20,9 @@ public interface TaskOrderMapper extends MyMapper<TaskOrderEntity> {
             "zt.task_content as taskContent,zt.task_file_url as taskFileUrl,",
             "zt.task_money as taskMoney, zt.user_id as userId,zt.is_fulfill,",
             "zt.`schedule`,zt.is_pay,zto.task_order_id as taskOrderId",
-            "from zcy_tasks_orders  zto ",
-            "LEFT JOIN zcy_tasks zt on zto.task_id=zt.task_id",
-            "WHERE zto.user_id=#{userid,jdbcType=BIGINT} and is_fulfill=2 ",
+            "from  zcy_tasks zt ",
+            "LEFT JOIN zcy_tasks_orders zto  on zto.task_id=zt.task_id",
+            "WHERE zto.user_id=#{userid,jdbcType=BIGINT} and is_fulfill=2  and is_pay=2",
             "</script>"
     })
     List<TaskOrderEntity> Get(@Param(value = "userId") Long userId);

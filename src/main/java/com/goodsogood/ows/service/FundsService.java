@@ -35,7 +35,7 @@ public class FundsService {
      * 修改 医创梦计划基金
      */
     public Integer AlterFuns(FundsEntity fundsEntity) {
-        Integer result = this.mapper.Update(fundsEntity.getFundId(), fundsEntity.getTitle(), fundsEntity.getIntroduction());
+        Integer result = this.mapper.Update(fundsEntity.getFundId(), fundsEntity.getTitle(), fundsEntity.getIntroduction(),fundsEntity.getSuccess());
         return result;
     }
 
@@ -53,11 +53,11 @@ public class FundsService {
     /**
      * 管理员查询 医创梦计划基金
      */
-    public PageInfo<FundsVo> GetByAdmin(Integer type,PageNumber pageNumber) {
+    public PageInfo<FundsVo> GetByAdmin(Integer type,String name,PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetAll(type));
+        return new PageInfo<>(this.mapper.GetAll(type,name));
     }
 
 }

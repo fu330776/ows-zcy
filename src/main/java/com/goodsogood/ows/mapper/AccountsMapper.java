@@ -3,6 +3,7 @@ package com.goodsogood.ows.mapper;
 import com.goodsogood.ows.model.db.AccountsEntity;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Repository
 @Mapper
@@ -58,4 +59,7 @@ public interface AccountsMapper extends MyMapper<AccountsEntity> {
             "</script>"
     })
     int UpdatePassword(@Param(value = "userid") Long userid, @Param(value = "pwd") String pwd, @Param(value = "Md5Pwd") String Md5Pwd);
+
+
+
 }

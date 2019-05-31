@@ -3,6 +3,7 @@ package com.goodsogood.ows.mapper;
 import com.goodsogood.ows.model.db.AccountsEntity;
 import com.goodsogood.ows.model.db.AccountsUsersRolesEntity;
 import com.goodsogood.ows.model.db.MenusEntity;
+import com.goodsogood.ows.model.vo.AccountUsersVo;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -59,4 +60,15 @@ public interface AccountsUsersRolesMapper extends MyMapper<AccountsUsersRolesEnt
     })
     AccountsUsersRolesEntity GetUserId(@Param(value = "userId") Long userId);
 
+    @Select({
+            "<script>",
+            "SELECT COUNT(*) as count,",
+             "(SELECT  COUNT(*) as oneCount FROM (SELECT zaur.role_id from zcy_accounts_users_roles zaur left join zcy_users zu on zaur.user_id=zu.user_id WHERE zu.`enable`=1 and zu.review=2 and zaur.role_id=2) as c )oneCount,",
+            "(SELECT  COUNT(*) as oneCount FROM (SELECT zaur.role_id from zcy_accounts_users_roles zaur left join zcy_users zu on zaur.user_id=zu.user_id WHERE zu.`enable`=1 and zu.review=2 and zaur.role_id=3) as c )twoCount,",
+            "(SELECT  COUNT(*) as oneCount FROM (SELECT zaur.role_id from zcy_accounts_users_roles zaur left join zcy_users zu on zaur.user_id=zu.user_id WHERE zu.`enable`=1 and zu.review=2 and zaur.role_id=4) as c )threeCount",
+            "from zcy_accounts_users_roles zaur left join zcy_users zu on zaur.user_id=zu.user_id",
+            "WHERE zu.`enable`=1 and zu.review=2 and zaur.role_id>1",
+            "</script>"
+    })
+    List<AccountUsersVo> GetCount();
 }

@@ -39,11 +39,11 @@ public class PatentsService {
      * @param pageNumber
      * @return
      */
-    public PageInfo<PatentsVo> Get(Long userId, Integer type, PageNumber pageNumber) {
+    public PageInfo<PatentsVo> Get(Long userId, Integer type, String title, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.Get(userId, type));
+        return new PageInfo<>(this.mapper.Get(userId, type, title));
     }
 
     /**
@@ -53,12 +53,29 @@ public class PatentsService {
      * @param pageNumber
      * @return
      */
-    public PageInfo<PatentsVo> GetAll(Integer type, PageNumber pageNumber) {
+    public PageInfo<PatentsVo> GetAll(Integer type, String title, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetByType(type));
+        return new PageInfo<>(this.mapper.GetByType(type, title));
     }
+
+
+    /**
+     *  分页查询idea 委托
+     * @param type
+     * @param isPay
+     * @param title
+     * @param pageNumber
+     * @return
+     */
+    public PageInfo<PatentsVo> GetIdeaALL(Integer type, Integer isPay, String title, PageNumber pageNumber) {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetIdea(type, isPay, title));
+    }
+
 
     /**
      * 根据唯一标识查询

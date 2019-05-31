@@ -41,5 +41,8 @@ public class TasksOrdersEntity extends BaseEntity {
 
     public Date addtime;
 
+    @ApiModelProperty(value = "是否领取 1：未领取 2：已领取")
+    @Column(name = "is_receive")
+    public  Integer isReceive;
 
 }

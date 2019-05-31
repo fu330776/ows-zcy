@@ -44,4 +44,8 @@ public class FundsEntity extends BaseEntity {
     @ApiModelProperty(value = "添加时间")
     public Date addtime;
 
+    @ApiModelProperty(value = "1:未审核 2:通过")
+    @Column(name = "is_success")
+    public  int success;
+
 }

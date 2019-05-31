@@ -147,16 +147,17 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
             ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
             "zr.role_id as roleId,zr.role_name as roleName,",
-            "zu.phone",
-//            "(select phone from zcy_accounts za where za.account_id=zaur.account_id and za.enable=1)phone",
+            "zu.phone,zaur.account_id as accountId",
+//          "(select phone from zcy_accounts za where za.account_id=zaur.account_id and za.enable=1)phone",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id  where zr.role_id =#{roleId,jdbcType=BIGINT}",
+            "<if test='name !=null'> and zu.user_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
             "</script>"
 
     })
         // "WHERE zu.review=2 and  zu.enable=2",
-    List<UserInfoVo> GetByRoleAll(@Param(value = "roleId") Long roleId);
+    List<UserInfoVo> GetByRoleAll(@Param(value = "roleId") Long roleId,@Param(value = "name") String name);
 
 
     @Update({

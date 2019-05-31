@@ -8,6 +8,7 @@ import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.helper.HttpRequestUtils;
 import com.goodsogood.ows.helper.MD5Utils;
+import com.goodsogood.ows.helper.OrderGeneratorUtils;
 import com.goodsogood.ows.helper.SmsUtils;
 import com.goodsogood.ows.model.db.*;
 import com.goodsogood.ows.model.vo.*;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.*;
 
 @RestController
@@ -100,10 +102,10 @@ public class LoginController {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         Result<Boolean> result;
-        if (user.getPhoneCode().isEmpty()) {
-            result = new Result<>(false, errors);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        }
+//        if (user.getPhoneCode().isEmpty()) {
+//            result = new Result<>(false, errors);
+//            return new ResponseEntity<>(result, HttpStatus.OK);
+//        }
 
 
         Boolean bool = this.usersService.AdminRegister(user);
@@ -129,7 +131,7 @@ public class LoginController {
         List<RoleUserEntity> rlist = null;
         if (user.code.isEmpty()) {
             rlist = this.loginService.getList(user.getPhone(), MD5Utils.MD5(user.getPassword()));
-            if (rlist == null) {
+            if (rlist == null || rlist.size() == 0) {
                 throw new ApiException("服务器繁忙，登录失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
             }
         }
@@ -183,7 +185,6 @@ public class LoginController {
             result = new Result<>(true, errors);
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
-
     }
 
     /**
@@ -288,6 +289,14 @@ public class LoginController {
         return date;
     }
 
+    @GetMapping("/GetOrderNumber")
+    public String GetOrderNumber() {
+        String uuIds = OrderGeneratorUtils.getOrderIdByUUId();
+        String times = OrderGeneratorUtils.getOrderIdByTime(new Random().nextLong());
+
+        return "uuIds:" + uuIds + "/n" + "times:" + times;
+    }
+
 
     /**
      * 微信测试
@@ -298,7 +307,7 @@ public class LoginController {
     @GetMapping("/wxsq")
     public String wxLogin(HttpServletResponse response) throws IOException {
         //这里是回调的url
-        String redirect_url = URLEncoder.encode("http://localhost:8080//v-login//wxindex", "UTF-8");
+        String redirect_url = URLEncoder.encode("http://192.168.0.101:8080//v-login//wxindex", "UTF-8");
         String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" +
                 "appid=APPID" +
                 "&redirect_uri=REDIRECT_URI" +
@@ -306,6 +315,7 @@ public class LoginController {
                 "&scope=SCOPE" +
                 "&state=123#wechat_redirect";
         response.sendRedirect(url.replace("APPID", AppID).replace("REDIRECT_URL", redirect_url).replace("SCOPE", "snsapi_userinfo"));
+        url = url.replace("APPID", AppID).replace("REDIRECT_URL", redirect_url).replace("SCOPE", "snsapi_userinfo");
         return url;
     }
 
@@ -320,6 +330,16 @@ public class LoginController {
         param = "access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN";
         HttpRequestUtils.sendGet(url, param.replace("OPENID", "openid").replace("ACCESS_TOKEN", "access_token"));
 
+    }
+    @GetMapping("/getCode")
+    public String getCode() throws UnsupportedEncodingException {
+        String Url = "https://open.weixin.qq.com/connect/oauth2/authorize";
+        String redirect_uri = URLEncoder.encode("http://192.168.0.101:8080/v-login/wxindex", "UTF-8"); //回调地址
+        String scope = "snsapi_userinfo"; //应用授权作用域，snsapi_base （不弹出授权页面，直接跳转，只能获取用户openid），snsapi_userinfo （弹出授权页面，可通过openid拿到昵称、性别、所在地。并且， 即使在未关注的情况下，只要用户授权，也能获取其信息 ）
+        String Param = MessageFormat.format("appid={0}&redirect_uri={1}&response_type=code&scope={2}&state=123#wechat_redirect", AppID, redirect_uri, scope);
+        HttpRequestUtils.sendGet(Url, Param);
+
+        return  Url+"?"+Param;
     }
 
 

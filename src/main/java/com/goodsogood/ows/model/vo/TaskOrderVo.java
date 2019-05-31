@@ -1,23 +1,17 @@
-package com.goodsogood.ows.model.db;
+package com.goodsogood.ows.model.vo;
 
-import com.goodsogood.ows.model.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
-import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.Date;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel
-@Table(name = "zcy_TaskOrder")
-public class TaskOrderEntity extends BaseEntity {
-
+public class TaskOrderVo {
     @Column(name = "task_id")
     public Long taskId;
 
@@ -55,6 +49,6 @@ public class TaskOrderEntity extends BaseEntity {
     @Column(name = "task_order_id")
     public Long taskOrderId;
 
-
-
+    @Column(name = "is_receive")
+    public Integer isReceive;
 }

@@ -174,7 +174,7 @@ public class TasksController {
     }
 
     /**
-     * 领取任务奖励
+     * 任务奖励
      *
      * @param taskId
      * @param bindingResult
@@ -229,9 +229,9 @@ public class TasksController {
     public ResponseEntity<Result<PageInfo<TasksEntity>>> Get(@ApiParam(value = "userId", required = true)
                                                              @PathVariable Long id,
                                                              Integer isPay, Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
         PageInfo<TasksEntity> entities = this.service.getByUser(id, isPay, new PageNumber(page, pageSize));
         Result<PageInfo<TasksEntity>> result = new Result<>(entities, errors);
@@ -247,13 +247,38 @@ public class TasksController {
     @ApiOperation(value = "管理员根据类型查询")
     @GetMapping("/getType/{type}")
     public ResponseEntity<Result<PageInfo<TaskListForm>>> getType(@ApiParam(value = "type", required = true)
-                                                                  @PathVariable Integer type, Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+                                                                  @PathVariable Integer type,String name, Integer page, Integer pageSize) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
-        PageInfo<TaskListForm> entities = this.service.getByType(type, new PageNumber(page, pageSize));
+        PageInfo<TaskListForm> entities = this.service.getByType(type, name,new PageNumber(page, pageSize));
         Result<PageInfo<TaskListForm>> result = new Result<>(entities, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    /**
+     * 科研流水查询
+     *
+     * @param type     1：任务书，2：委托书
+     * @param userId   用户编号
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @ApiOperation(value = "科研流水查询")
+    @GetMapping("/getWater/{type}")
+    public ResponseEntity<Result<PageInfo<TaskOrderVo>>> GetWater(@ApiParam(value = "type", required = true)
+                                                                  @PathVariable int type,
+                                                                  @RequestParam(required = false) Long userId,
+                                                                  Integer page, Integer pageSize) {
+        if (page == null || pageSize == null) {
+            page = 1;
+            pageSize = 11;
+        }
+        PageInfo<TaskOrderVo> entities = this.service.GetWater(userId, type, new PageNumber(page, pageSize));
+        Result<PageInfo<TaskOrderVo>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

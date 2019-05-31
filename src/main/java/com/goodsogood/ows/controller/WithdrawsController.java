@@ -7,6 +7,7 @@ import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.vo.Result;
 import com.goodsogood.ows.model.vo.WithdrawSumVo;
+import com.goodsogood.ows.model.vo.WithdrawsVo;
 import com.goodsogood.ows.service.WithdrawsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,9 +48,9 @@ public class WithdrawsController {
     @GetMapping("/getSumUser/{page}")
     public ResponseEntity<Result<PageInfo<WithdrawSumVo>>> GetSumAdmin(@ApiParam(value = "page", required = true)
                                                                        @PathVariable Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+        if (page == null || pageSize == null) {
             page = 1;
-            pageSize=10;
+            pageSize = 10;
         }
         PageInfo<WithdrawSumVo> entity = this.service.GetAdminSum(new PageNumber(page, pageSize));
 
@@ -60,8 +61,9 @@ public class WithdrawsController {
     }
 
     /**
-     *   根据用户唯一标识修改
-     * @param userId 用户唯一标识
+     * 根据用户唯一标识修改
+     *
+     * @param userId        用户唯一标识
      * @param bindingResult
      * @return
      */
@@ -82,5 +84,20 @@ public class WithdrawsController {
 
     }
 
+    @ApiOperation(value = "查询所有未提现的流水")
+    @GetMapping("/get/{userId}")
+    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> Get(
+            @ApiParam(value = "userId", required = true)
+            @PathVariable Long userId, Integer is,
+            Integer page, Integer pageSize) {
+        if (page == null || pageSize == null) {
+            page = 1;
+            pageSize = 12;
+        }
+        PageInfo<WithdrawsVo> entity = this.service.Get(userId, is, new PageNumber(page, pageSize));
+        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+
+    }
 
 }

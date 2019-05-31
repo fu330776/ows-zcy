@@ -29,4 +29,7 @@ public class FundsVo {
     public Date addtime;
 
     public String userName;
+
+    @ApiModelProperty(value = "是否审核")
+    public int success;
 }

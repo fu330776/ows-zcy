@@ -52,4 +52,6 @@ public class PatentsVo {
 
     public String phone;
 
+    public String userName;
+
 }

@@ -159,7 +159,7 @@ public class LoginController {
             Result<UserMenusVo> result = new Result<>(null, errors, "已封号,请联系管理员");
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
-        List<MenusEntity> entity = this.menusService.GetMenus(userid);
+        List<MenusResult> entity = this.menusService.GetMenus(userid);
         UserMenusVo userMenusVo = new UserMenusVo();
         userMenusVo.setTime(CacheConfiguration.GetDate(60 * 60 * 1000L));
         userMenusVo.setToken(MD5Utils.MD5(userid.toString() + CacheConfiguration.GetDate(60 * 60 * 1000L)));
@@ -205,7 +205,7 @@ public class LoginController {
         }
         AdminVo vo = new AdminVo();
         Long userid = this.accountsUsersRolesService.GetByFind(form.getPhone(), MD5Utils.MD5(form.getPwd()));
-        List<MenusEntity> entity = this.menusService.GetMenus(userid);
+        List<MenusResult> entity = this.menusService.GetMenus(userid);
         vo.setUserId(userid);
         vo.setToken(MD5Utils.MD5(userid + "" + CacheConfiguration.GetDate(60 * 60 * 1000L)));
         vo.setTime(CacheConfiguration.GetDate(60 * 60 * 1000L));
@@ -331,6 +331,7 @@ public class LoginController {
         HttpRequestUtils.sendGet(url, param.replace("OPENID", "openid").replace("ACCESS_TOKEN", "access_token"));
 
     }
+
     @GetMapping("/getCode")
     public String getCode() throws UnsupportedEncodingException {
         String Url = "https://open.weixin.qq.com/connect/oauth2/authorize";
@@ -339,7 +340,7 @@ public class LoginController {
         String Param = MessageFormat.format("appid={0}&redirect_uri={1}&response_type=code&scope={2}&state=123#wechat_redirect", AppID, redirect_uri, scope);
         HttpRequestUtils.sendGet(Url, Param);
 
-        return  Url+"?"+Param;
+        return Url + "?" + Param;
     }
 
 

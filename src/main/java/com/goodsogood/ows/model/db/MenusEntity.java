@@ -25,19 +25,23 @@ public class MenusEntity extends BaseEntity {
     @Column(name = "menu_id")
     @GeneratedValue(generator = "JDBC")
     @Id
-    public  Long menuId;
+    public Long menuId;
 
     @ApiModelProperty(value = "菜单名称")
     @Column(name = "menu_name")
-    public  String menuName;
+    public String menuName;
 
     @ApiModelProperty(value = "菜单跳转地址")
     @Column(name = "menu_url")
-    public  String menuUrl;
+    public String menuUrl;
 
     @ApiModelProperty(value = "菜单图标")
     @Column(name = "menu_icon")
-    public  String menuIcon;
+    public String menuIcon;
+
+    @ApiModelProperty(value = "菜单大小")
+    @Column(name = "menu_size")
+    public Integer menuSize;
 
     @ApiModelProperty(value = "父级菜单ID")
     @Column(name = "parent_id")

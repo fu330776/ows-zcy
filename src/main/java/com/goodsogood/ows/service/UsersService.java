@@ -7,10 +7,12 @@ import com.goodsogood.ows.helper.MD5Utils;
 import com.goodsogood.ows.helper.RandomUtils;
 import com.goodsogood.ows.mapper.*;
 import com.goodsogood.ows.model.db.*;
+import com.goodsogood.ows.model.vo.SonUserForm;
 import com.goodsogood.ows.model.vo.UserInfoVo;
 import com.goodsogood.ows.model.vo.UsersForm;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,22 +51,106 @@ public class UsersService {
     }
 
     /**
+     *  注册子账户
+     * @param user
+     * @return
+     */
+    @Transactional
+    public  Boolean SonAdminRegister(SonUserForm user)
+    {
+        int nums =  this.mapper.GetByPhone(user.getPhone());
+        if(nums >0)
+        {
+            return  false;
+        }
+        Boolean isb=false;
+       AccountsEntity entity =  this.Get(user.getPhone());
+        UsersEntity users=this.mapper.selectByPrimaryKey(user.getUserId());
+       if(entity==null)
+       {
+           entity = new AccountsEntity();
+           entity.setAddtime(new Date());
+           entity.setPhone(user.getPhone());
+           entity.setPassWordLaws(user.getPassword());
+           entity.setPassWord(MD5Utils.MD5(user.getPassword()));
+           entity.setEnable(1);
+           this.amapper.Insert(entity);
+           Long  accountId = entity.getAccountId();
+           if (accountId == null) {
+               return false;
+           }  //注册资料
+
+
+           UsersEntity entitys = new UsersEntity();
+           entitys.setUserName(user.getUserName());
+           entitys.setAddtime(new Date());
+           entitys.setCode(GetCode());
+           entitys.setCompanyCode(users.getCompanyCode());
+           entitys.setCompanyName(users.getCompanyName());
+           entitys.setProvinces(user.getProvinces());
+           entitys.setMunicipalities(user.getMunicipalities());
+           entitys.setDistricts(user.getDistricts());
+           entitys.setGrade(user.getGrade());
+           entitys.setNature(user.getNature());
+           entitys.setTitle(user.getTitle());
+           entitys.setEnable(1);
+           entitys.setIsReferrer(1);
+           entitys.setOrganizationCode("");
+           entitys.setOrganizationName("");
+           entitys.setReferrer(user.getReferrer());
+           entitys.setReview(2);
+           entitys.setUpdatetime(new Date());
+           entitys.setUserEmail(user.getUserEmail());
+           entitys.setUserHospital(user.getUserHospital());
+           entitys.setUserPosition(user.getUserPosition());
+           entitys.setUserBankCardNumber(user.getUserBankCardNumber());
+           entitys.setUserCardholderIdcard(user.getUserCardholderIdCard());
+           entitys.setUserCardholderName(user.getUserCardholderName());
+           entitys.setUserCardholderPhone(user.getUserCardholderPhone());
+           entitys.setUserDepartment(user.getUserDepartment());
+           entitys.setPhone(user.getPhone());
+           entitys.setIssub(user.getIssub());
+           Long userid = this.mapper.Insert(entitys);
+           userid = entitys.getUserId ();
+           if (userid == null) {
+               return false;
+           }
+
+           //添加关联
+           AccountsUsersRolesEntity Entitys = new AccountsUsersRolesEntity();
+           Entitys.setAccountId(accountId);
+           Entitys.setRoleId(user.getRoleId());
+           Entitys.setUserId(userid);
+           Long aurId = this.aurmapper.RewriteInsert(Entitys);
+           if (aurId == null) {
+               return false;
+           }
+           return true;
+
+       }
+
+        Long userId=this.aurmapper.GetAdminFind(entity.getPhone(),entity.getPassWord());
+        UsersEntity usersEntity = this.mapper.selectByPrimaryKey(userId);
+        usersEntity.setCompanyCode(users.getCompanyCode());
+        usersEntity.setCompanyName(users.getCompanyName());
+        int num= this.mapper.updateByPrimaryKey(usersEntity);
+        if(num>0) {
+            isb=true;
+        }
+        return  isb;
+    }
+
+
+    /**
      * 注册账号
      */
     @Transactional
     public Boolean AdminRegister(UsersForm user) {
-
-//        SmssEntity sms = this.smssMapper.GetByPhone(user.getPhone(), new Date(), 1);
-//        if (sms == null) {
-//            return false;
-//        }
-//        if (sms.getSmsCode() != user.getPhoneCode()) {
-//            return false;
-//        }
-//        int num = this.smssMapper.Update(user.getPhone(), new Date());
-//        if (num == 0) {
-//            return false;
-//        }
+        int nums =  this.mapper.GetByPhone(user.getPhone());
+        if(nums >0)
+        {
+            return  false;
+        }
         //查询账号是否已经注册
         AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
         Long accountId;
@@ -72,41 +158,50 @@ public class UsersService {
             accountId = entitys.getAccountId();
         } else {
             entitys = new AccountsEntity();
-            entitys.setAddtime(new Date());
-            entitys.setPhone(user.getPhone());
             entitys.setPassWordLaws(user.getPassword());
             entitys.setPassWord(MD5Utils.MD5(user.getPassword()));
             entitys.setEnable(1);
+            entitys.setAddtime(new Date());
+            entitys.setPhone(user.getPhone());
             this.amapper.Insert(entitys);
             accountId = entitys.getAccountId();
         }
         if (accountId == null) {
             return false;
         }
-
         //注册资料
         UsersEntity entity = new UsersEntity();
-        entity.setUserName(user.getUserName());
-        entity.setAddtime(new Date());
-        entity.setCode(GetCode());
         entity.setCompanyCode(user.getCompanyCode());
         entity.setCompanyName(user.getCompanyName());
         entity.setEnable(1);
         entity.setIsReferrer(1);
+        entity.setUserName(user.getUserName());
+        entity.setAddtime(new Date());
+        entity.setCode(GetCode());
+
         entity.setOrganizationCode(user.getOrganizationCode());
         entity.setOrganizationName(user.getOrganizationName());
         entity.setReferrer(user.getReferrer());
         entity.setReview(2);
+        entity.setUserDepartment(user.getUserDepartment());
         entity.setUpdatetime(new Date());
-        entity.setUserBankCardNumber(user.getUserBankCardNumber());
-        entity.setUserCardholderIdcard(user.getUserCardholderIdCard());
         entity.setUserCardholderName(user.getUserCardholderName());
         entity.setUserCardholderPhone(user.getUserCardholderPhone());
-        entity.setUserDepartment(user.getUserDepartment());
-        entity.setUserEmail(user.getUserEmail());
-        entity.setUserHospital(user.getUserHospital());
+        entity.setUserBankCardNumber(user.getUserBankCardNumber());
+        entity.setUserCardholderIdcard(user.getUserCardholderIdCard());
         entity.setUserPosition(user.getUserPosition());
         entity.setPhone(user.getPhone());
+        entity.setProvinces(user.getProvinces());
+        entity.setUserEmail(user.getUserEmail());
+        entity.setUserHospital(user.getUserHospital());
+        entity.setMunicipalities(user.getMunicipalities());
+        entity.setDistricts(user.getDistricts());
+        entity.setGrade(user.getGrade());
+        entity.setNature(user.getNature());
+        entity.setTitle(user.getTitle());
+        entity.setIssub(user.getIssub());
+
+
         Long userid = this.mapper.Insert(entity);
         userid = entity.getUserId();
         if (userid == null) {
@@ -137,6 +232,11 @@ public class UsersService {
      */
     @Transactional
     public Boolean Register(UsersForm user) {
+       int num=  this.mapper.GetByPhone(user.getPhone());
+        if(num >0)
+        {
+            return  false;
+        }
         //校验手机验证码
         SmssEntity sms = this.smssMapper.GetByPhone(user.getPhone(), new Date(), 1);
         if (sms == null) {
@@ -157,11 +257,8 @@ public class UsersService {
             entitys.setPhone(user.getPhone());
             entitys.setPassWordLaws(user.getPassword());
             entitys.setPassWord(MD5Utils.MD5(user.getPassword()));
-            AccountId = this.amapper.Insert(entitys);
+            this.amapper.Insert(entitys);
             AccountId = entitys.getAccountId();
-        }
-        if (AccountId == null) {
-            return false;
         }
         //注册资料
         UsersEntity entity = new UsersEntity();
@@ -186,11 +283,16 @@ public class UsersService {
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
         entity.setPhone(user.getPhone());
-        Long userid = this.mapper.Insert(entity);
-        userid = entity.getUserId();
-        if (userid == null) {
-            return false;
-        }
+        entity.setIssub(user.getIssub());
+        entity.setProvinces(user.getProvinces());
+        entity.setMunicipalities(user.getMunicipalities());
+        entity.setDistricts(user.getDistricts());
+        entity.setGrade(user.getGrade());
+        entity.setNature(user.getNature());
+        entity.setTitle(user.getTitle());
+        this.mapper.Insert(entity);
+        Long  userid = entity.getUserId();
+
         //添加关联
         AccountsUsersRolesEntity UsersRolesEntity = new AccountsUsersRolesEntity();
         UsersRolesEntity.setAccountId(AccountId);
@@ -296,13 +398,32 @@ public class UsersService {
      * @param pageNumber
      * @return
      */
-    public PageInfo<UserInfoVo> GetByRole(Long rId,String name ,PageNumber pageNumber) {
+    public PageInfo<UserInfoVo> GetByRole(Long rId, String name,String provinces,String municipalities,String districts,String grade,String nature,String Keyword, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetByRoleAll(rId,name));
+        return new PageInfo<>(this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword));
     }
 
+    /**
+     *  子管理查询本科院
+     * @param provinces
+     * @param municipalities
+     * @param districts
+     * @param grade
+     * @param nature
+     * @param Keyword
+     * @param pageNumber
+     * @return
+     */
+    public  PageInfo<UserInfoVo> GetByIssue(Long userId,String provinces,String municipalities,String districts,String grade,String nature,String Keyword,PageNumber pageNumber)
+    {
+        UserInfoVo vo=  this.mapper.GetUserById(userId);
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return new PageInfo<>(this.mapper.GetByIssue(vo.getCompanyCode(),provinces,municipalities,districts,grade,nature,Keyword));
+    }
 
     /**
      * 查询单个用户信息
@@ -313,6 +434,8 @@ public class UsersService {
     public UserInfoVo GetByUser(Long userId) {
         return this.mapper.GetUserById(userId);
     }
+
+
 
     /**
      * 封禁账号(2)or 解封账号(1)

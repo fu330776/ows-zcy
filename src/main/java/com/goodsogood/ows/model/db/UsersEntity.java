@@ -39,9 +39,9 @@ public class UsersEntity extends BaseEntity {
     @Column(name = "user_department")
     public String userDepartment;
 
-    @ApiModelProperty(value = "个人职位：1、医生 2、护士")
+    @ApiModelProperty(value = "个人职位")
     @Column(name = "user_position")
-    public Integer userPosition;
+    public String userPosition;
 
     @ApiModelProperty(value = "个人邮箱")
     @Column(name = "user_email")
@@ -99,4 +99,22 @@ public class UsersEntity extends BaseEntity {
     public Date updatetime;
 
     public String phone;
+
+    @ApiModelProperty(value = "是否子管理 是:1 否:2")
+    public Integer Issub;
+
+    @ApiModelProperty(value = "省")
+    public  String provinces;
+
+    @ApiModelProperty(value = "市")
+    public  String municipalities;
+    @ApiModelProperty(value = "区")
+    public  String districts;
+    @ApiModelProperty(value = "等级")
+    public  String grade;
+    @ApiModelProperty(value = "性质")
+    public  String nature;
+    @ApiModelProperty(value = "职称")
+    public String title;
+
 }

@@ -6,8 +6,7 @@ import lombok.Data;
 
 @Data
 @ApiModel
-public class UsersForm {
-
+public class SonUserForm {
     @ApiModelProperty(value = "电话")
     public String phone;
 
@@ -40,18 +39,10 @@ public class UsersForm {
 
     @ApiModelProperty(value = "个人持卡人身份证")
     public String userCardholderIdCard;
+    @ApiModelProperty(value = "ID")
+    public String userId;
 
-    @ApiModelProperty(value = "企业名称")
-    public String companyName;
 
-    @ApiModelProperty(value = "企业代码")
-    public String companyCode;
-
-    @ApiModelProperty(value = "机构名称")
-    public String organizationName;
-
-    @ApiModelProperty(value = "机构代码")
-    public String organizationCode;
     @ApiModelProperty(value = "是否审核 1、未审核 2、已审核")
     public Integer review;
 
@@ -68,12 +59,9 @@ public class UsersForm {
     public Integer isReferrer;
 
     public Long roleId;
-
     @ApiModelProperty(value = "角色名")
     public String roleName;
 
-    @ApiModelProperty(value = "验证码")
-    public String phoneCode;
     @ApiModelProperty(value = "是否子管理 是:1 否:2")
     public Integer Issub;
     @ApiModelProperty(value = "省")
@@ -88,5 +76,4 @@ public class UsersForm {
     public  String nature;
     @ApiModelProperty(value = "职称")
     public String title;
-
 }

@@ -70,20 +70,20 @@ public class UsersController {
         entity.setCompanyCode(user.getCompanyCode());
         entity.setCompanyName(user.getCompanyName());
         entity.setEnable(user.getEnable());
-        entity.setIsReferrer(user.getIsReferrer());
-        entity.setOrganizationCode(user.getOrganizationCode());
-        entity.setOrganizationName(user.getOrganizationName());
-        entity.setReferrer(user.getReferrer());
-        entity.setReview(user.getReview());
-        entity.setUpdatetime(new Date());
-        entity.setUserBankCardNumber(user.getUserBankCardNumber());
         entity.setUserCardholderIdcard(user.getUserCardholderIdcard());
         entity.setUserCardholderName(user.getUserCardholderName());
         entity.setUserCardholderPhone(user.getUserCardholderPhone());
+        entity.setIsReferrer(user.getIsReferrer());
+        entity.setReferrer(user.getReferrer());
+        entity.setReview(user.getReview());
+        entity.setOrganizationCode(user.getOrganizationCode());
+        entity.setOrganizationName(user.getOrganizationName());
+        entity.setUpdatetime(new Date());
+        entity.setUserBankCardNumber(user.getUserBankCardNumber());
         entity.setUserDepartment(user.getUserDepartment());
-        entity.setUserEmail(user.getUserEmail());
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
+        entity.setUserEmail(user.getUserEmail());
         entity.setCode(user.getCode());
         entity.setUserId(user.getUserId());
         Integer num = this.usersService.Update(entity);
@@ -109,7 +109,6 @@ public class UsersController {
         }
         Result<Boolean> result = new Result<>(true, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
-
     }
 
     /**
@@ -167,7 +166,6 @@ public class UsersController {
         Result<SmssEntity> result = new Result<>(smsEntities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
 
     public Map<String, Object> getResArgs(String phoneNum, String code) throws Exception {
         //生成6位数验证码
@@ -302,15 +300,32 @@ public class UsersController {
     @ApiOperation(value = "根据角色获取 用户信息")
     @GetMapping("/getByRole/{roleId}")
     public ResponseEntity<Result<PageInfo<UserInfoVo>>> getByRoleAll(@ApiParam(value = "roleId", required = true)
-                                                                     @PathVariable Long roleId, String name, Integer page, Integer pageSize) {
+                                                                     @PathVariable Long roleId, UserRoleForm user, Integer page, Integer pageSize) {
         if (page == null || pageSize == null) {
             page = 1;
             pageSize = 11;
         }
-        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId,name ,new PageNumber(page, pageSize));
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId,user.getName(),user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword() ,new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+    @ApiOperation(value = "子管理 获取本医院下的用户信息")
+    @GetMapping("/getIssue/{uid}")
+    public ResponseEntity<Result<PageInfo<UserInfoVo>>> GetIssue(
+            @ApiParam(value = "uid", required = true)
+            @PathVariable Long uid
+            , UserRoleForm user
+            , Integer page
+            , Integer pageSize) {
+        if (page == null || pageSize == null) {
+            page = 1;
+            pageSize = 12;
+        }
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByIssue(uid,user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword() ,new PageNumber(page, pageSize));
+        Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
     /**
      * 封禁账号（isdel=2） 解封账号 （isdel=1）

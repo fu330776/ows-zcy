@@ -71,7 +71,6 @@ public class LoginController {
     @HttpMonitorLogger
     @PostMapping("/add")
     public ResponseEntity<Result<Boolean>> addUser(@Valid @RequestBody UsersForm user, BindingResult bindingResult) {
-
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
@@ -82,8 +81,6 @@ public class LoginController {
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         //手机验证码判断
-
-
         result = new Result<>(this.usersService.Register(user), errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
@@ -115,6 +112,25 @@ public class LoginController {
         result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @ApiOperation(value = "注册子账号")
+    @PostMapping("/addSonAdmin")
+    public ResponseEntity<Result<Boolean>> AddSonAdminUser(@Valid @RequestBody SonUserForm sonUser,BindingResult bindingResult)
+    {
+        log.debug("bindingResult->{}", bindingResult);
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean bool =  this.usersService.SonAdminRegister(sonUser);
+        if (!bool) {
+            throw new ApiException("注册失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Result<Boolean>  result = new Result<>(bool, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+
 
     /**
      * 登录校验是否存在多个身份

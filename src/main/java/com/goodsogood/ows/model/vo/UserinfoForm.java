@@ -30,7 +30,7 @@ public class UserinfoForm {
 
     @ApiModelProperty(value = "个人职位：1、医生 2、护士")
 
-    public Integer userPosition;
+    public String userPosition;
 
     @ApiModelProperty(value = "个人邮箱")
 

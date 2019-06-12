@@ -10,6 +10,14 @@ import com.goodsogood.ows.service.WithdrawsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v-UpLoad")
@@ -126,5 +135,78 @@ public class UpLoadController {
             e.printStackTrace();
         }
     }
+
+    @HttpMonitorLogger
+    @ApiOperation(value = "导入")
+    @PostMapping("/importStore")
+    public void importStore(MultipartFile file)throws IOException{
+        String fileName = file.getOriginalFilename();
+        //文件名后缀
+        String suffix = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length());
+
+        if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
+            throw new RuntimeException("文件格式不正确");
+        }
+        //如果文件名后缀为xls
+        if(suffix.equals("xls")){
+            //创建HSSFWorkbook对象
+            HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(file.getInputStream()));
+            //获取有多少个sheet
+            int sheetNum = workbook.getNumberOfSheets();
+
+            for (int i = 0; i < sheetNum; i++) {
+                //
+                HSSFSheet sheet = workbook.getSheetAt(i);
+                //获取sheet中一共有多少行
+                int rowNum = sheet.getPhysicalNumberOfRows();
+                for (int j = 0; j < rowNum; j++) {
+                    //获取行对象
+                    HSSFRow row = sheet.getRow(j);
+                    //第一行是表头，跳过
+                    if(j == 0){
+                        continue;
+                    }
+                    //获取值，后续省略
+                    row.getCell(0).getStringCellValue();
+
+					//获取行对象的单元格数量
+					int cellNum = row.getPhysicalNumberOfCells();
+					for (int k = 0; k < cellNum; k++) {
+						HSSFCell cell = row.getCell(k);
+						System.out.println("----------"+cell);
+
+					}
+                }
+            }
+        }
+        //如果文件名后缀为xlsx
+        if(suffix.equals("xlsx")){
+            System.out.println("come on");
+
+            //创建XSSFWorkbook对象
+            XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+            //获取sheet页数
+            int sheetNum = workbook.getNumberOfSheets();
+            for (int i = 0; i < sheetNum; i++) {
+                //获取XSSFSheet对象
+                XSSFSheet sheet = workbook.getSheetAt(i);
+                //获取sheet中一共有多少行
+                int rowNum = sheet.getPhysicalNumberOfRows();
+
+                for (int j = 0; j < rowNum; j++) {
+                    //获取行对象
+                    XSSFRow row = sheet.getRow(j);
+                    if(j == 0){
+                        continue;
+                    }
+                    //获取值，后续省略
+                    row.getCell(0).getStringCellValue();
+                }
+            }
+
+        }
+
+    }
+
 
 }

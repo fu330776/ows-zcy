@@ -96,7 +96,7 @@ public class ArticlesController {
                                                                       @RequestParam(required = false) Integer page, Integer pageSize) {
         if (page == null||pageSize==null) {
             page = 1;
-            pageSize=11;
+            pageSize=12;
         }
         PageInfo<ArticlesEntity> entities = this.service.GetByType(1, new PageNumber(page, pageSize));
         Result<PageInfo<ArticlesEntity>> result = new Result<>(entities, errors);
@@ -112,9 +112,9 @@ public class ArticlesController {
     @GetMapping("/getProduct")
     public ResponseEntity<Result<PageInfo<ArticlesEntity>>> getProduct(@ApiParam(value = "page", required = true)
                                                                            @RequestParam(required = false) Integer page, Integer pageSize) {
-        if (page == null||pageSize==null) {
+        if (page == null|| pageSize==null) {
             page = 1;
-            pageSize=10;
+            pageSize=11;
         }
         PageInfo<ArticlesEntity> entities = this.service.GetByType(2, new PageNumber(page, pageSize));
         Result<PageInfo<ArticlesEntity>> result = new Result<>(entities, errors);
@@ -135,7 +135,7 @@ public class ArticlesController {
     {
         if (page == null||pageSize==null) {
             page = 1;
-            pageSize=12;
+            pageSize=10;
         }
         PageInfo<ArticlesEntity> entities = this.service.GetByType(2, new PageNumber(page, pageSize));
         Result<PageInfo<ArticlesEntity>> result = new Result<>(entities, errors);

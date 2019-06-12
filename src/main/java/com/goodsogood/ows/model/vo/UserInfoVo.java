@@ -100,4 +100,20 @@ public class UserInfoVo {
 
     @ApiModelProperty(value = "账号唯一标识")
     public Long accountId;
+    @ApiModelProperty(value = "是否子管理 是:1 否:2")
+    public Integer Issub;
+    @ApiModelProperty(value = "省")
+    public  String provinces;
+    @ApiModelProperty(value = "市")
+    public  String municipalities;
+    @ApiModelProperty(value = "区")
+    public  String districts;
+    @ApiModelProperty(value = "等级")
+    public  String grade;
+    @ApiModelProperty(value = "性质")
+    public  String nature;
+    @ApiModelProperty(value = "职称")
+    public String title;
+
+
 }

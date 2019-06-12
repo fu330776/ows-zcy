@@ -2,6 +2,7 @@ package com.goodsogood.ows.service;
 
 import com.goodsogood.ows.mapper.AccountsMapper;
 import com.goodsogood.ows.mapper.AccountsUsersRolesMapper;
+import com.goodsogood.ows.mapper.UsersMapper;
 import com.goodsogood.ows.model.db.AccountsEntity;
 import com.goodsogood.ows.model.db.AccountsUsersRolesEntity;
 import com.goodsogood.ows.model.vo.AccountUsersVo;
@@ -15,10 +16,12 @@ import java.util.List;
 public class AccountsUsersRolesService {
     private AccountsUsersRolesMapper mapper;
     private AccountsMapper amapper;
+    private UsersMapper usersMapper;
 
-    public AccountsUsersRolesService(AccountsUsersRolesMapper accountsUsersRolesMapper, AccountsMapper accountsMapper) {
+    public AccountsUsersRolesService(AccountsUsersRolesMapper accountsUsersRolesMapper, AccountsMapper accountsMapper,UsersMapper usersMapper) {
         this.amapper = accountsMapper;
         this.mapper = accountsUsersRolesMapper;
+        this.usersMapper=usersMapper;
     }
 
     /**
@@ -36,7 +39,6 @@ public class AccountsUsersRolesService {
         if (entity == null) {
             return null;
         }
-
         return this.mapper.Get(entity.getAccountId(), roleid);
     }
 

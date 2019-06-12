@@ -30,7 +30,7 @@ public class UploadUtils {
         String oldName = file.getOriginalFilename();
         //获取文件大小
         Long size = file.getSize();
-        if (size > 1024 * 1024 * 4) {
+        if (size > 1024 * 1024 * 5) {
             vo.setCode(10002);
             vo.setMsg("文件大小不能大于4M");
         }

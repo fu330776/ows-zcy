@@ -76,7 +76,8 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "user_name,user_hospital,user_department,",
             "user_position,user_email,user_bank_card_number,user_cardholder_name,",
             "user_cardholder_phone,user_cardholder_idcard,company_name,company_code,organization_name,organization_code,review,enable,code,referrer,",
-            "is_referrer,addtime,updatetime,phone",
+            "is_referrer,addtime,updatetime,phone,",
+            "Issub,provinces,municipalities,districts,grade,nature,title",
             ") VALUES(",
             "<if test='userId !=null' >#{userId,jdbcType=BIGINT},</if> ",
             "#{userName,jdbcType=VARCHAR},#{userHospital,jdbcType=VARCHAR},",
@@ -86,13 +87,14 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "#{userCardholderIdcard,jdbcType=VARCHAR},#{companyName,jdbcType=VARCHAR},#{companyCode,jdbcType=VARCHAR},#{organizationName,jdbcType=VARCHAR},#{organizationCode,jdbcType=VARCHAR},#{review,jdbcType=BIT},",
             "#{enable,jdbcType=BIT},#{code,jdbcType=VARCHAR},#{referrer,jdbcType=BIGINT},",
             "#{isReferrer,jdbcType=BIT},#{addtime,jdbcType=TIMESTAMP},#{updatetime,jdbcType=TIMESTAMP},",
-            "#{phone,jdbcType=VARCHAR})",
+            "#{phone,jdbcType=VARCHAR},#{Issub,jdbcType=BIT},#{provinces,jdbcType=VARCHAR},#{municipalities,jdbcType=VARCHAR}",
+            ",#{districts,jdbcType=VARCHAR},#{grade,jdbcType=VARCHAR},#{nature,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR})",
             "</script>"
+
     })
     @Options(useGeneratedKeys = true, keyProperty = "userId", keyColumn = "user_id")
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyColumn = "user_id", keyProperty = "userId", before = false, resultType = Long.class)
     Long Insert(UsersEntity usersEntity);
-
 
     @Select({
             "<script>",
@@ -105,14 +107,14 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
             ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
             "zr.role_id as roleId,zr.role_name as roleName,zu.phone",
+            "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
             "FROM zcy_users zu ",
-            "LEFT JOIN zcy_accounts_users_roles zaur on zu.user_id=zu.user_id",
+            "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
             "WHERE zu.user_id=#{userId,jdbcType=BIGINT} and zu.review=2 and  zu.enable=1",
             "</script>"
     })
     UserInfoVo GetUserById(@Param(value = "userId") Long userId);
-
 
     @Select({
             "<script>",
@@ -125,14 +127,14 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
             ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
             "zr.role_id as roleId,zr.role_name as roleName,",
-            "zu.phone",
+            "zu.phone,",
+            "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
             "</script>"
 
     })
-        // "WHERE zu.review=2 and  zu.enable=2",
     List<UserInfoVo> GetByAll();
 
 
@@ -147,18 +149,73 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
             ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
             "zr.role_id as roleId,zr.role_name as roleName,",
-            "zu.phone,zaur.account_id as accountId",
-//          "(select phone from zcy_accounts za where za.account_id=zaur.account_id and za.enable=1)phone",
+            "zu.phone,zaur.account_id as accountId,",
+            "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id  where zr.role_id =#{roleId,jdbcType=BIGINT}",
             "<if test='name !=null'> and zu.user_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
+            "<if test='provinces !=null'> and provinces=#{provinces,jdbcType=VARCHAR} </if>",
+            "<if test='municipalities !=null'> and  municipalities=#{municipalities,jdbcType=VARCHAR}</if>",
+            "<if test='districts !=null'> and  districts=#{districts,jdbcType=VARCHAR}</if>",
+            "<if test='grade !=null'> and  grade=#{grade,jdbcType=VARCHAR}</if>",
+            "<if test='nature !=null'> and  nature=#{nature,jdbcType=VARCHAR}</if>",
+            "<if test='Keyword !=null'> and (provinces like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or municipalities like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or  districts like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or grade like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or nature like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%'))</if>",
             "</script>"
 
     })
         // "WHERE zu.review=2 and  zu.enable=2",
-    List<UserInfoVo> GetByRoleAll(@Param(value = "roleId") Long roleId,@Param(value = "name") String name);
+    List<UserInfoVo> GetByRoleAll(@Param(value = "roleId") Long roleId
+            ,@Param(value = "name") String name
+            ,@Param(value = "provinces") String provinces
+            ,@Param(value = "municipalities") String municipalities
+            ,@Param(value = "districts") String districts
+            ,@Param(value = "grade") String grade
+            ,@Param(value = "nature") String nature
+            ,@Param(value = "Keyword") String Keyword);
 
+
+    @Select({
+            "<script>",
+            "SELECT ",
+            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName",
+            ",zu.`enable`,zu.is_referrer as isReferrer,zu.organization_code as organizationCode,",
+            "zu.organization_name as organizationName,zu.referrer ,zu.review ,zu.updatetime,",
+            "zu.user_bank_card_number as userBankCardNumber,zu.user_cardholder_idcard as userCardholderIdcard",
+            ",zu.user_cardholder_name as userCardholderName,zu.user_cardholder_phone as userCardholderPhone",
+            ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
+            ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
+            "zr.role_id as roleId,zr.role_name as roleName,",
+            "zu.phone,",
+            "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
+            "FROM zcy_users zu ",
+            "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
+            "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
+            "where zu.company_code=#{code,jdbcType=VARCHAR}",
+            "<if test='provinces !=null'> and provinces=#{provinces,jdbcType=VARCHAR} </if>",
+            "<if test='municipalities !=null'> and  municipalities=#{municipalities,jdbcType=VARCHAR}</if>",
+            "<if test='districts !=null'> and  districts=#{districts,jdbcType=VARCHAR}</if>",
+            "<if test='grade !=null'> and  grade=#{grade,jdbcType=VARCHAR}</if>",
+            "<if test='nature !=null'> and  nature=#{nature,jdbcType=VARCHAR}</if>",
+            "<if test='Keyword !=null'> and (provinces like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or municipalities like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or  districts like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or grade like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or nature like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%'))</if>",
+            "</script>"
+
+    })
+    List<UserInfoVo> GetByIssue(@Param(value = "code") String code
+            ,@Param(value = "provinces") String provinces
+            ,@Param(value = "municipalities") String municipalities
+            ,@Param(value = "districts") String districts
+            ,@Param(value = "grade") String grade
+            ,@Param(value = "nature") String nature
+            ,@Param(value = "Keyword") String Keyword);
 
     @Update({
             "<script>",
@@ -181,4 +238,11 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "</script>"
     })
     int GetCount(@Param(value = "userId") Long userId);
+
+    @Select({
+            "<script>",
+            "select Count(0) from zcy_users where phone=#{phone,jdbcType=VARCHAR}  and review=2 and  enable=1 and Issue",
+            "</script>"
+    })
+    int GetByPhone(@Param(value = "phone") String phone);
 }

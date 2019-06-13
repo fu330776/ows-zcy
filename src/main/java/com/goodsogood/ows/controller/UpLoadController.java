@@ -4,13 +4,12 @@ import com.goodsogood.log4j2cm.annotation.HttpMonitorLogger;
 import com.goodsogood.ows.helper.ExeclUtil;
 import com.goodsogood.ows.helper.SmsUtils;
 import com.goodsogood.ows.helper.UploadUtils;
-import com.goodsogood.ows.model.vo.UpLoadVo;
-import com.goodsogood.ows.model.vo.WithdrawsVo;
+import com.goodsogood.ows.model.vo.*;
+import com.goodsogood.ows.service.UsersService;
 import com.goodsogood.ows.service.WithdrawsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -29,7 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/v-UpLoad")
@@ -39,9 +38,10 @@ import java.util.Map;
 public class UpLoadController {
 
     private final WithdrawsService wservice;
+    private  final UsersService service;
 
-    public UpLoadController(WithdrawsService withdrawsService) {
-        this.wservice = withdrawsService;
+    public UpLoadController(WithdrawsService withdrawsService,UsersService service) {
+        this.wservice = withdrawsService;this.service=service;
     }
 
     @Value("${file.pdf}")
@@ -90,11 +90,9 @@ public class UpLoadController {
         String content = "验证码：" + 123456 + "，请不要把验证码泄露给他人，谢谢！【知创云】";
         try {
             sms = SmsUtils.postEncrypt(Url, username, pwd, "17783374871", content, productid);
-
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
         return sms;
     }
 
@@ -136,10 +134,131 @@ public class UpLoadController {
         }
     }
 
+
+
     @HttpMonitorLogger
-    @ApiOperation(value = "导入")
+    @ApiOperation(value = "用户导出")
+    @PostMapping("/exportStore")
+    public  void exportStore (HttpServletResponse response,Long roleId, UserRoleForm user)
+    {
+        String [] headArray={};
+        List<Object[]> contentList=new ArrayList<>();
+        String[] headArraygr = {"名称", "医院", "科室", "职位", "职称", "电话","邮箱","等级","性质","银行卡号","持卡人姓名","持卡人身份证","省","市","区"};
+        String [] headArrayqy ={"姓名","账号","企业名称","企业代码","联系人","联系电话"}; // 医院 企业
+        String [] headArrayjg={"账号名称","账号","机构名称","机构代码","联系人","联系电话","详细地址"};
+        List<UserInfoVo> entitys=this.service.GetByExport(roleId,user.getName(),user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword());
+      int rid=roleId.intValue();
+        switch (rid)
+        {
+            case  2 :
+                headArray=headArraygr;
+                contentList=GetAssemble(entitys);
+                break;
+            case  3 :
+                headArray=headArrayqy;
+                contentList=GetAssembleyy(entitys);
+                break;
+            case  4 :
+                headArray=headArrayjg;
+                contentList=GetAssemblejg(entitys);
+                break;
+        }
+        try {
+            ExeclUtil.ExportExcel(response, headArray, contentList, "user.xls");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     *  个人
+     * @param entitys
+     * @return
+     */
+    private   List<Object[]> GetAssemble( List<UserInfoVo> entitys)
+    {
+        List<Object[]> contentList =new ArrayList<>();
+        if (entitys.size() > 0) {
+            for (UserInfoVo entity : entitys) {
+                Object[] o = {
+                        entity.getUserName(),//名称
+                        entity.getUserHospital(),//医院
+                        entity.getUserDepartment(),//科室
+                        entity.getUserPosition()  ,//职位
+                        entity.getTitle(), //职称
+                        entity.getPhone(), //电话
+                        entity.getUserEmail(), //邮箱
+                        entity.getGrade(), //等级
+                        entity.getNature(), //性质
+                        entity.getUserBankCardNumber(), //银行卡号
+                        entity.getUserCardholderName(), //持卡人姓名
+                        entity.getUserCardholderIdcard(),//持卡人身份证
+                        entity.getProvinces(), //省
+                        entity.getMunicipalities(),//市
+                        entity.getDistricts() //区
+                };
+                contentList.add(o);
+            }
+        }
+            return  contentList;
+
+    }
+
+    /**
+     *  医院
+     * @param entitys
+     * @return
+     */
+    private  List<Object[]> GetAssembleyy(List<UserInfoVo> entitys)
+    {
+        List<Object[]> contentList =new ArrayList<>();
+        if (entitys.size() > 0) {
+            for (UserInfoVo entity : entitys) {
+                Object[] o = {
+                        entity.getUserName(),//名称
+                        entity.getPhone(), //账号
+                        entity.getCompanyName(), //企业名称
+                        entity.getCompanyCode(), //企业代码
+                        entity.getContacts(), //联系人
+                        entity.getContact_phone() //联系电话
+                };
+                contentList.add(o);
+            }
+        }
+        return  contentList;
+    }
+
+    /**
+     *  医疗机构
+     * @param entitys
+     * @return
+     */
+    private  List<Object[]> GetAssemblejg(List<UserInfoVo> entitys)
+    {
+        List<Object[]> contentList =new ArrayList<>();
+        if (entitys.size() > 0) {
+            for (UserInfoVo entity : entitys) {
+                Object[] o = {
+                        entity.getUserName(),//名称
+                        entity.getPhone(), //账号
+                        entity.getOrganizationName(), //企业名称
+                        entity.getOrganizationCode(), //企业代码
+                        entity.getContacts(), //联系人
+                        entity.getContact_phone(), //联系电话
+                        entity.getDetailed_address() //详细地址
+                };
+                String [] headArrayjg={"账号名称","账号","机构名称","机构代码","联系人","联系电话","详细地址"};
+                contentList.add(o);
+            }
+        }
+        return  contentList;
+    }
+
+    @HttpMonitorLogger
+    @ApiOperation(value = "用户导入")
     @PostMapping("/importStore")
-    public void importStore(MultipartFile file)throws IOException{
+    public  Boolean importStore(int type,MultipartFile file)throws IOException{
         String fileName = file.getOriginalFilename();
         //文件名后缀
         String suffix = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length());
@@ -147,6 +266,8 @@ public class UpLoadController {
         if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
             throw new RuntimeException("文件格式不正确");
         }
+        List<UsersForm>  entities=new ArrayList<>();
+
         //如果文件名后缀为xls
         if(suffix.equals("xls")){
             //创建HSSFWorkbook对象
@@ -166,23 +287,24 @@ public class UpLoadController {
                     if(j == 0){
                         continue;
                     }
-                    //获取值，后续省略
-                    row.getCell(0).getStringCellValue();
+                    switch (type){
+                        case  1:
+                            //获取值，后续省略
+                            entities.add(GetHSSFCell(row));
+                            break;
+                        case 2: //医院
+                            entities.add(GetHospitalHSSFCell(row));
+                            break;
+                        case 3: //医疗机构
+                            entities.add(GetMedicalHSSFCell(row));
+                            break;
+                    }
 
-					//获取行对象的单元格数量
-					int cellNum = row.getPhysicalNumberOfCells();
-					for (int k = 0; k < cellNum; k++) {
-						HSSFCell cell = row.getCell(k);
-						System.out.println("----------"+cell);
-
-					}
                 }
             }
         }
         //如果文件名后缀为xlsx
         if(suffix.equals("xlsx")){
-            System.out.println("come on");
-
             //创建XSSFWorkbook对象
             XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
             //获取sheet页数
@@ -192,21 +314,175 @@ public class UpLoadController {
                 XSSFSheet sheet = workbook.getSheetAt(i);
                 //获取sheet中一共有多少行
                 int rowNum = sheet.getPhysicalNumberOfRows();
-
                 for (int j = 0; j < rowNum; j++) {
                     //获取行对象
                     XSSFRow row = sheet.getRow(j);
                     if(j == 0){
                         continue;
                     }
-                    //获取值，后续省略
-                    row.getCell(0).getStringCellValue();
-                }
+                    switch (type){
+                        case  1:
+                            //获取值，后续省略
+                            entities.add(GetXSSFCell(row));
+                            break;
+                        case 2: //医院
+                            entities.add(GetHospitalXSSFCell(row));
+                            break;
+                        case 3: //医疗机构
+                            entities.add(GetMedicalXSSFCell(row));
+                            break;
+                    }
+               }
             }
-
         }
 
+        Boolean bool= this.service.ImportAdminExecl(entities);
+        return  bool;
     }
 
 
+    /**
+     *   个人医护
+     * @param row
+     * @return
+     */
+    private   UsersForm GetXSSFCell(XSSFRow row)
+    {
+        UsersForm entity=new UsersForm();
+        entity.setRoleId(2L);
+        entity.setIssub(0);
+        entity.setReview(1);
+        entity.setEnable(2);
+        entity.setIsReferrer(1);
+        entity.setRoleName("个人科研人员（医护）");
+        entity.setUserName(row.getCell(0).toString()); //名称
+        entity.setUserHospital( row.getCell(1).toString());//所属医院
+        entity.setUserDepartment( row.getCell(2).toString()); //所属科室
+        entity.setUserPosition( row.getCell(3).toString()); //所属职位
+        entity.setUserBankCardNumber(row.getCell(9).toString()); //银行卡号
+        entity.setUserCardholderIdCard(row.getCell(12).toString()); //持卡人身份证
+        entity.setProvinces(row.getCell(13).toString());//省
+        entity.setMunicipalities(row.getCell(14).toString()); //市
+         entity.setUserCardholderName(row.getCell(10).toString());//持卡人姓名
+        entity.setUserCardholderPhone(row.getCell(11).toString()); //持卡人电话
+        entity.setDistricts(row.getCell(15).toString()); //区
+        entity.setPhone(row.getCell(5).toString()); //电话
+        entity.setGrade(row.getCell(7).toString());//等级
+        entity.setNature(row.getCell(8).toString());//性质
+        entity.setTitle(row.getCell(4).toString());//职称
+        entity.setUserEmail(row.getCell(6).toString()); //邮箱
+        entity.setPassword("123456");
+      return  entity;
+    }
+    private  UsersForm GetHSSFCell(HSSFRow row)
+    {
+        UsersForm entity=new UsersForm();
+        entity.setReview(1);
+        entity.setEnable(2);
+        entity.setIsReferrer(1);
+        entity.setPassword("123456");
+        entity.setPhone( row.getCell(5).toString()); //电话
+        entity.setUserName( row.getCell(0).toString()); //名称
+        entity.setUserHospital( row.getCell(1).toString());//所属医院
+        entity.setUserDepartment( row.getCell(2).toString()); //所属科室
+        entity.setUserPosition( row.getCell(3).toString()); //所属职位
+        entity.setGrade(row.getCell(7).toString());//等级
+        entity.setNature(row.getCell(8).toString());//性质
+        entity.setTitle(row.getCell(5).toString());//职称
+        entity.setUserEmail(row.getCell(6).toString()); //邮箱
+        entity.setUserBankCardNumber(row.getCell(9).toString()); //银行卡号
+        entity.setUserCardholderName(row.getCell(10).toString());//持卡人姓名
+        entity.setUserCardholderPhone(row.getCell(11).toString()); //持卡人电话
+        entity.setUserCardholderIdCard(row.getCell(12).toString()); //持卡人身份证
+        entity.setProvinces(row.getCell(13).toString());//省
+        entity.setMunicipalities(row.getCell(14).toString()); //市
+        entity.setDistricts(row.getCell(15).toString()); //区
+        entity.setRoleId(2L);
+        entity.setIssub(0);
+        entity.setRoleName("个人科研人员（医护）");
+        return  entity;
+    }
+
+    /***
+     *  医院
+     */
+    private UsersForm GetHospitalXSSFCell(XSSFRow row)
+    {
+        UsersForm entity=new UsersForm();
+        entity.setRoleId(3L);
+        entity.setIssub(0);
+        entity.setRoleName("经营或制造企业投资机构");
+        entity.setUserName(row.getCell(0).toString());
+        entity.setPhone(row.getCell(1).toString());
+        entity.setPassword("123456");
+        entity.setCompanyName(row.getCell(2).toString());
+        entity.setCompanyCode(row.getCell(3).toString());
+        entity.setReview(1);
+        entity.setEnable(2);
+        entity.setIsReferrer(1);
+        return  entity;
+    }
+    private UsersForm GetHospitalHSSFCell(HSSFRow row)
+    {
+        UsersForm entity=new UsersForm();
+        entity.setUserName(row.getCell(0).toString());
+        entity.setPhone(row.getCell(1).toString());
+        entity.setPassword("123456");
+        entity.setCompanyName(row.getCell(2).toString());
+        entity.setCompanyCode(row.getCell(3).toString());
+        entity.setRoleId(3L);
+        entity.setIssub(0);
+        entity.setRoleName("经营或制造企业投资机构");
+        entity.setReview(1);
+        entity.setEnable(2);
+        entity.setIsReferrer(1);
+        return  entity;
+    }
+
+    /**
+     *  医疗机构
+     * @param row
+     * @return
+     */
+    private  UsersForm GetMedicalXSSFCell(XSSFRow row){
+        UsersForm entity=new UsersForm();
+        entity.setRoleId(4L);
+        entity.setRoleName("医疗机构");
+        entity.setPassword("123456");
+        entity.setIssub(0);
+        entity.setReview(1);
+        entity.setEnable(2);
+        entity.setIsReferrer(1);
+        entity.setUserName(row.getCell(0).toString());
+        entity.setPhone(row.getCell(1).toString());
+        entity.setOrganizationName(row.getCell(2).toString());
+        entity.setOrganizationCode(row.getCell(3).toString());
+        entity.setContacts(row.getCell(4).toString());
+        entity.setContact_phone(row.getCell(5).toString());
+        entity.setContacts(row.getCell(6).toString());
+        entity.setContact_phone(row.getCell(7).toString());
+        entity.setContacts(row.getCell(8).toString());
+        return entity;
+    }
+    private  UsersForm GetMedicalHSSFCell(HSSFRow row){
+
+        UsersForm entity=new UsersForm();
+        entity.setUserName(row.getCell(0).toString());
+        entity.setPhone(row.getCell(1).getCellStyle().toString());
+        entity.setContacts(row.getCell(4).toString());
+        entity.setContact_phone(row.getCell(5).toString());
+        entity.setOrganizationName(row.getCell(2).toString());
+        entity.setOrganizationCode(row.getCell(3).toString());
+        entity.setContacts(row.getCell(6).toString());
+        entity.setContact_phone(row.getCell(7).toString());
+        entity.setContacts(row.getCell(8).toString());
+        entity.setRoleId(4L);
+        entity.setRoleName("医疗机构");
+        entity.setPassword("123456");
+        entity.setIssub(0);
+        entity.setReview(1);
+        entity.setEnable(2);
+        entity.setIsReferrer(1);
+        return entity;
+    }
 }

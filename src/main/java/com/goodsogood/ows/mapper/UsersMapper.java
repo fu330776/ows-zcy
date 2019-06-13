@@ -78,6 +78,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "user_cardholder_phone,user_cardholder_idcard,company_name,company_code,organization_name,organization_code,review,enable,code,referrer,",
             "is_referrer,addtime,updatetime,phone,",
             "Issub,provinces,municipalities,districts,grade,nature,title",
+            ",contacts,contact_phone,detailed_address,business_license",
             ") VALUES(",
             "<if test='userId !=null' >#{userId,jdbcType=BIGINT},</if> ",
             "#{userName,jdbcType=VARCHAR},#{userHospital,jdbcType=VARCHAR},",
@@ -88,7 +89,8 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "#{enable,jdbcType=BIT},#{code,jdbcType=VARCHAR},#{referrer,jdbcType=BIGINT},",
             "#{isReferrer,jdbcType=BIT},#{addtime,jdbcType=TIMESTAMP},#{updatetime,jdbcType=TIMESTAMP},",
             "#{phone,jdbcType=VARCHAR},#{Issub,jdbcType=BIT},#{provinces,jdbcType=VARCHAR},#{municipalities,jdbcType=VARCHAR}",
-            ",#{districts,jdbcType=VARCHAR},#{grade,jdbcType=VARCHAR},#{nature,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR})",
+            ",#{districts,jdbcType=VARCHAR},#{grade,jdbcType=VARCHAR},#{nature,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR},",
+            " #{contacts,jdbcType=VARCHAR},#{contact_phone,jdbcType=VARCHAR},#{detailed_address,jdbcType=VARCHAR},#{business_license,jdbcType=VARCHAR})",
             "</script>"
 
     })
@@ -106,8 +108,9 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ",zu.user_cardholder_name as userCardholderName,zu.user_cardholder_phone as userCardholderPhone",
             ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
             ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
-            "zr.role_id as roleId,zr.role_name as roleName,zu.phone",
+            "zr.role_id as roleId,zr.role_name as roleName,zu.phone,",
             "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
+            ",contacts,contact_phone,detailed_address,business_license",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
@@ -129,6 +132,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "zr.role_id as roleId,zr.role_name as roleName,",
             "zu.phone,",
             "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
+            ",contacts,contact_phone,detailed_address,business_license",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
@@ -151,6 +155,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "zr.role_id as roleId,zr.role_name as roleName,",
             "zu.phone,zaur.account_id as accountId,",
             "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
+            ",contacts,contact_phone,detailed_address,business_license",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id  where zr.role_id =#{roleId,jdbcType=BIGINT}",
@@ -192,6 +197,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "zr.role_id as roleId,zr.role_name as roleName,",
             "zu.phone,",
             "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
+            ",contacts,contact_phone,detailed_address,business_license",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
@@ -241,7 +247,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
 
     @Select({
             "<script>",
-            "select Count(0) from zcy_users where phone=#{phone,jdbcType=VARCHAR}  and review=2 and  enable=1 and Issue",
+            "select Count(0) from zcy_users where phone=#{phone,jdbcType=VARCHAR}  and review=2 and  enable=1 and Issub=1",
             "</script>"
     })
     int GetByPhone(@Param(value = "phone") String phone);

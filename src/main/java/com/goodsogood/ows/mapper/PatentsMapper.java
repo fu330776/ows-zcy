@@ -80,4 +80,10 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
     })
     PatentsVo GetById(@Param(value = "id") Long id);
 
+    @Update({
+            "<script>",
+            "UPDATE zcy_patents SET is_pay=2 where patent_id=#{pid,jdbcType=BIGINT} ",
+            "</script>"
+    })
+    int UpdateIdea(@Param(value = "pid") Long pid);
 }

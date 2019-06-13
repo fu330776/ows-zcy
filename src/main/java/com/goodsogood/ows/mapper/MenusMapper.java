@@ -21,9 +21,10 @@ public interface MenusMapper extends MyMapper<MenusEntity> {
 //    })
 //    List<MenusEntity> GetLogin(@Param(value = "roleId") Long roleId);
     @Select({
-            "SELECT * FROM zcy_menus where (menu_id in (SELECT menu_id FROM zcy_roles_menus where role_id=(select role_id from zcy_accounts_users_roles where ",
-            "user_id=#{roleId,jdbcType=BIGINT})) or parent_id in (SELECT menu_id FROM zcy_roles_menus where role_id=(select role_id from ",
-            "zcy_accounts_users_roles where user_id=#{userId,jdbcType=BIGINT})));"
+            "<script>",
+            "SELECT menu_id as menuId,menu_icon as menuIcon,menu_name as menuName,menu_url as menuUrl,parent_id as parentId FROM zcy_menus where menu_id in (SELECT menu_id FROM zcy_roles_menus where role_id= #{roleid,jdbcType=BIGINT})",
+            "or parent_id in(SELECT menu_id FROM zcy_roles_menus where role_id=#{roleid,jdbcType=BIGINT} )",
+            "</script>"
     })
-    List<MenusEntity> GetLogin(@Param(value = "userId") Long userId);
+    List<MenusEntity> GetLogin(@Param(value = "roleid") Long roleid);
 }

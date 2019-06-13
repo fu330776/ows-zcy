@@ -10,22 +10,16 @@ public class UsersForm {
 
     @ApiModelProperty(value = "电话")
     public String phone;
-
     @ApiModelProperty(value = "密码")
     public String password;
-
     @ApiModelProperty(value = "个人姓名")
     public String userName;
-
     @ApiModelProperty(value = "个人所属医院")
     public String userHospital;
-
     @ApiModelProperty(value = "个人所属科室")
     public String userDepartment;
-
     @ApiModelProperty(value = "个人职位：1、医生 2、护士")
     public String userPosition;
-
     @ApiModelProperty(value = "个人邮箱")
     public String userEmail;
 
@@ -54,19 +48,14 @@ public class UsersForm {
     public String organizationCode;
     @ApiModelProperty(value = "是否审核 1、未审核 2、已审核")
     public Integer review;
-
     @ApiModelProperty(value = "是否起禁用 1、启用  2、禁用")
     public Integer enable;
-
     @ApiModelProperty(value = "推荐码（自动生成4~6位唯一，字母+数字混合）")
     public String code;
-
     @ApiModelProperty(value = "推荐人（对应其他用户的推荐码）")
     public String referrer;
-
     @ApiModelProperty(value = "是否被管理员指定为推荐人 1、不是 2、是")
     public Integer isReferrer;
-
     public Long roleId;
 
     @ApiModelProperty(value = "角色名")
@@ -88,5 +77,14 @@ public class UsersForm {
     public  String nature;
     @ApiModelProperty(value = "职称")
     public String title;
+
+    @ApiModelProperty(value = "联系人")
+    public  String contacts;
+    @ApiModelProperty(value = "联系电话")
+    public String contact_phone;
+    @ApiModelProperty(value = "医疗机构详细地址")
+    public  String detailed_address;
+    @ApiModelProperty(value = "企业会员营业执照")
+    public  String business_license;
 
 }

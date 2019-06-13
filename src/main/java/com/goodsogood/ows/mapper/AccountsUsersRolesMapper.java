@@ -71,4 +71,14 @@ public interface AccountsUsersRolesMapper extends MyMapper<AccountsUsersRolesEnt
             "</script>"
     })
     List<AccountUsersVo> GetCount();
+
+    @Select(
+            {
+                    "<script>",
+                    "SELECT COUNT(0) FROM zcy_accounts_users_roles where role_id=#{roleId,jdbcType=BIGINT}  and account_id=#{AccountId,jdbcType=BIGINT} ",
+                    "</script>"
+            }
+    )
+    int GetIsNum(@Param(value = "AccountId") Long AccountId,@Param(value = "roleId") Long roleId);
+
 }

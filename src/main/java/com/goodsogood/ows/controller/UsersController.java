@@ -86,6 +86,17 @@ public class UsersController {
         entity.setUserEmail(user.getUserEmail());
         entity.setCode(user.getCode());
         entity.setUserId(user.getUserId());
+        entity.setBusiness_license(user.getBusiness_license());
+        entity.setDetailed_address(user.getDetailed_address());
+        entity.setContacts(user.getContacts());
+        entity.setContact_phone(user.getContact_phone());
+        entity.setTitle(user.getTitle());
+        entity.setNature(user.getNature());
+        entity.setGrade(user.getGrade());
+        entity.setDistricts(user.getDistricts());
+        entity.setProvinces(user.getProvinces());
+        entity.setIssub(user.getIssub());
+        entity.setMunicipalities(user.getMunicipalities());
         Integer num = this.usersService.Update(entity);
         if (num <= 0) {
             throw new ApiException("个人信息修改失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));

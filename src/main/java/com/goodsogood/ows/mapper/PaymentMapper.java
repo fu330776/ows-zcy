@@ -97,4 +97,21 @@ public interface PaymentMapper extends MyMapper<PaymentEntity> {
             "</script>"
     })
     List<PaymentEntity> GetByAdmin(@Param(value = "orderNo") String orderNo, @Param(value = "status") String status,@Param(value = "name") String name);
+
+    @Select({
+            "<script>",
+            "select ",
+            "payment_id as paymentId,order_no as orderNo,",
+            "payment_total_money as totalMoney,payment_real_money as realMoney,",
+            "payment_type as type,good_id as goodId,good_title as goodName,",
+            "user_id as userId,user_name as userName,pay_status as Status,",
+            "pay_way as payWay,payment_number as number,wx_order_no as wxOrderNo,",
+            "payment_time as payTime, payment_addtime as addTime",
+            " from zcy_payment where pay_status='未支付'  and order_no=#{orderNo,jdbcType=VARCHAR}",
+            "</script>"
+
+    })
+    PaymentEntity GetFind(@Param(value = "orderNo") String orderNo);
+
 }
+

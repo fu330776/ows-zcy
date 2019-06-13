@@ -35,8 +35,8 @@ public class MenusService {
      * 角色确认后返回 按钮权限
      */
     public List<MenusResult> GetMenus(Long userid) throws Exception {
-//        AccountsUsersRolesEntity entitys = this.accountsUsersRolesMapper.GetUserId(userid);
-        List<MenusEntity> entity = this.mapper.GetLogin(userid);
+       AccountsUsersRolesEntity entitys = this.accountsUsersRolesMapper.GetUserId(userid);
+        List<MenusEntity> entity = this.mapper.GetLogin(entitys.getRoleId());
         return SortMenus(entity);
     }
 

@@ -77,4 +77,29 @@ public class UserinfoForm {
 
     @ApiModelProperty(value = "是否被管理员指定为推荐人 1、不是 2、是")
     public Integer isReferrer;
+    @ApiModelProperty(value = "是否子管理 是:1 否:2")
+    public Integer Issub;
+    @ApiModelProperty(value = "省")
+    public  String provinces;
+    @ApiModelProperty(value = "市")
+    public  String municipalities;
+    @ApiModelProperty(value = "区")
+    public  String districts;
+    @ApiModelProperty(value = "等级")
+    public  String grade;
+    @ApiModelProperty(value = "性质")
+    public  String nature;
+    @ApiModelProperty(value = "职称")
+    public String title;
+
+    @ApiModelProperty(value = "联系人")
+    public  String contacts;
+    @ApiModelProperty(value = "联系电话")
+    public String contact_phone;
+    @ApiModelProperty(value = "医疗机构详细地址")
+    public  String detailed_address;
+    @ApiModelProperty(value = "企业会员营业执照")
+    public  String business_license;
+
+
 }

@@ -19,7 +19,7 @@ public class UserRoleForm {
     @ApiModelProperty(value = "性质")
     public  String nature;
     @ApiModelProperty(value = "关键字搜索")
-    public  String Keyword;
+    public  String keyword;
 
 
 }

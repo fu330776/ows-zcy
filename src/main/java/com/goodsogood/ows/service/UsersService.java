@@ -110,6 +110,11 @@ public class UsersService {
            entitys.setUserDepartment(user.getUserDepartment());
            entitys.setPhone(user.getPhone());
            entitys.setIssub(user.getIssub());
+           entitys.setContact_phone(user.getContact_phone());
+           entitys.setContacts(user.getContacts());
+           entitys.setDetailed_address(user.getDetailed_address());
+           entitys.setBusiness_license(user.getBusiness_license());
+
            Long userid = this.mapper.Insert(entitys);
            userid = entitys.getUserId ();
            if (userid == null) {
@@ -200,8 +205,10 @@ public class UsersService {
         entity.setNature(user.getNature());
         entity.setTitle(user.getTitle());
         entity.setIssub(user.getIssub());
-
-
+        entity.setDetailed_address(user.getDetailed_address());
+        entity.setBusiness_license(user.getBusiness_license());
+        entity.setContact_phone(user.getContact_phone());
+        entity.setContacts(user.getContacts());
         Long userid = this.mapper.Insert(entity);
         userid = entity.getUserId();
         if (userid == null) {
@@ -217,6 +224,90 @@ public class UsersService {
             return false;
         }
         return true;
+    }
+
+    /**
+     *  导入批量创建账户
+     * @param users
+     * @return
+     */
+    @Transactional
+    public  Boolean ImportAdminExecl(List<UsersForm> users)
+    {
+        for (UsersForm user:users)
+        {
+            int nums =  this.mapper.GetByPhone(user.getPhone());
+            if(nums >0)
+            {
+                return  false;
+            }
+            //查询账号是否已经注册
+            AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
+            Long accountId;
+            if (entitys != null) {
+                accountId = entitys.getAccountId();
+               int num=  this.aurmapper.GetIsNum(accountId,user.getRoleId());
+                if(num >0)
+                {
+                    return  false;
+                }
+            } else {
+                entitys = new AccountsEntity();
+                entitys.setPassWord(MD5Utils.MD5(user.getPassword()));
+                entitys.setEnable(1);
+                entitys.setAddtime(new Date());
+                entitys.setPhone(user.getPhone());
+                entitys.setPassWordLaws(user.getPassword());
+                this.amapper.Insert(entitys);
+                accountId = entitys.getAccountId();
+            }
+
+
+            //注册资料
+            UsersEntity entity = new UsersEntity();
+            entity.setReview(2);
+            entity.setUserDepartment(user.getUserDepartment());
+            entity.setUpdatetime(new Date());
+            entity.setCompanyCode(user.getCompanyCode());
+            entity.setUserName(user.getUserName());
+            entity.setAddtime(new Date());
+            entity.setCode(GetCode());
+            entity.setCompanyName(user.getCompanyName());
+            entity.setEnable(1);
+            entity.setIsReferrer(1);
+            entity.setOrganizationCode(user.getOrganizationCode());
+            entity.setOrganizationName(user.getOrganizationName());
+            entity.setReferrer(user.getReferrer());
+            entity.setUserBankCardNumber(user.getUserBankCardNumber());
+            entity.setUserCardholderIdcard(user.getUserCardholderIdCard());
+            entity.setUserPosition(user.getUserPosition());
+            entity.setPhone(user.getPhone());
+            entity.setUserCardholderName(user.getUserCardholderName());
+            entity.setUserCardholderPhone(user.getUserCardholderPhone());
+            entity.setDistricts(user.getDistricts());
+            entity.setGrade(user.getGrade());
+            entity.setNature(user.getNature());
+            entity.setTitle(user.getTitle());
+            entity.setIssub(user.getIssub());
+            entity.setProvinces(user.getProvinces());
+            entity.setUserEmail(user.getUserEmail());
+            entity.setUserHospital(user.getUserHospital());
+            entity.setMunicipalities(user.getMunicipalities());
+            entity.setDetailed_address(user.getDetailed_address());
+            entity.setBusiness_license(user.getBusiness_license());
+            entity.setContact_phone(user.getContact_phone());
+            entity.setContacts(user.getContacts());
+            Long userId = this.mapper.Insert(entity);
+            userId = entity.getUserId();
+            //添加关联
+            AccountsUsersRolesEntity usersRolesEntity = new AccountsUsersRolesEntity();
+            usersRolesEntity.setRoleId(user.getRoleId());
+            usersRolesEntity.setUserId(userId);
+            usersRolesEntity.setAccountId(accountId);
+            Long aurId = this.aurmapper.RewriteInsert(usersRolesEntity);
+
+        }
+        return  true;
     }
 
     /**
@@ -262,6 +353,10 @@ public class UsersService {
         }
         //注册资料
         UsersEntity entity = new UsersEntity();
+        entity.setDetailed_address(user.getDetailed_address());
+        entity.setBusiness_license(user.getBusiness_license());
+        entity.setContact_phone(user.getContact_phone());
+        entity.setContacts(user.getContacts());
         entity.setUserName(user.getUserName());
         entity.setAddtime(new Date());
         entity.setCode(GetCode());
@@ -404,6 +499,25 @@ public class UsersService {
         PageHelper.startPage(p, r);
         return new PageInfo<>(this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword));
     }
+
+    /**
+     *  根据查询条件 导出
+     * @param rId
+     * @param name
+     * @param provinces
+     * @param municipalities
+     * @param districts
+     * @param grade
+     * @param nature
+     * @param Keyword
+     * @return
+     */
+    public  List<UserInfoVo> GetByExport(Long rId, String name,String provinces,String municipalities,String districts,String grade,String nature,String Keyword)
+    {
+        return  this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword);
+    }
+
+
 
     /**
      *  子管理查询本科院

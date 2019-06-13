@@ -25,14 +25,14 @@ import java.util.Date;
 @Log4j2
 public class PayService {
     private PaymentMapper mapper;
-    private TasksMapper tasksManager;
+    private TasksMapper tasksMapper;
     private PatentsMapper patentsMapper;
     private UsersMapper usersMapper;
 
     @Autowired
-    public PayService(PaymentMapper paymentMapper, TasksMapper tasksManager, PatentsMapper patentsMapper, UsersMapper usersMapper) {
+    public PayService(PaymentMapper paymentMapper, TasksMapper tasksMapper, PatentsMapper patentsMapper, UsersMapper usersMapper) {
         this.mapper = paymentMapper;
-        this.tasksManager = tasksManager;
+        this.tasksMapper = tasksMapper;
         this.patentsMapper = patentsMapper;
         this.usersMapper = usersMapper;
     }
@@ -46,6 +46,7 @@ public class PayService {
     @Transactional
     public PaymentEntity InsertPatents(Long pid) {
         PaymentEntity entity;
+
         entity = this.Get(pid, 1);
         if (entity == null) {
             PatentsVo vo = this.patentsMapper.GetById(pid);
@@ -64,6 +65,7 @@ public class PayService {
             entity.setNumber(1);
             entity.setGoodName(vo.getPatentTitle());
             int num = this.mapper.Insert(entity);
+
         }
         return entity;
     }
@@ -79,7 +81,7 @@ public class PayService {
         PaymentEntity entity;
         entity = this.Get(tid, 2);
         if (entity == null) {
-            TasksEntity tasksEntity = this.tasksManager.GetByTaskId(tid);
+            TasksEntity tasksEntity = this.tasksMapper.GetByTaskId(tid);
             UserInfoVo userVo = this.usersMapper.GetUserById(tasksEntity.getUserId());
             entity.setTotalMoney(tasksEntity.getTaskMoney());
             entity.setAddTime(new Date());
@@ -106,14 +108,34 @@ public class PayService {
      * @param orderNo
      * @param wxOrderNo
      */
+    @Transactional
     public void Update(String orderNo, String wxOrderNo) {
-        PaynentPayForm pay = new PaynentPayForm();
-        pay.setOrderNo(orderNo);
-        pay.setPayTime(new Date());
-        pay.setPayWay("微信支付");
-        pay.setStatus("已支付");
-        pay.setWxOrderNo(wxOrderNo);
-        this.mapper.Update(pay);
+        PaymentEntity pays = this.mapper.GetFind(orderNo);
+        if(pays !=null)
+        {
+            PaynentPayForm pay = new PaynentPayForm();
+            pay.setOrderNo(orderNo);
+            pay.setPayTime(new Date());
+            pay.setPayWay("微信支付");
+            pay.setStatus("已支付");
+            pay.setWxOrderNo(wxOrderNo);
+            this.mapper.Update(pay);
+            switch (pays.getType())
+            {
+                case 1:
+                    this.patentsMapper.UpdateIdea(pays.getGoodId());
+                    break;
+                case 2:
+                    TasksEntity entity = this.tasksMapper.GetByTaskId(pays.getGoodId());
+                    entity.setIs_pay(2);
+                    this.tasksMapper.updateByPrimaryKey(entity);
+                    break;
+            }
+
+
+
+        }
+
     }
 
 

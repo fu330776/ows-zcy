@@ -76,4 +76,13 @@ public class SonUserForm {
     public  String nature;
     @ApiModelProperty(value = "职称")
     public String title;
+    @ApiModelProperty(value = "联系人")
+    public  String contacts;
+    @ApiModelProperty(value = "联系电话")
+    public String contact_phone;
+    @ApiModelProperty(value = "医疗机构详细地址")
+    public  String detailed_address;
+    @ApiModelProperty(value = "企业会员营业执照")
+    public  String business_license;
+
 }

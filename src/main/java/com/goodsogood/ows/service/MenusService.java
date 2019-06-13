@@ -35,7 +35,7 @@ public class MenusService {
      * 角色确认后返回 按钮权限
      */
     public List<MenusResult> GetMenus(Long userid) throws Exception {
-       AccountsUsersRolesEntity entitys = this.accountsUsersRolesMapper.GetUserId(userid);
+        AccountsUsersRolesEntity entitys = this.accountsUsersRolesMapper.GetUserId(userid);
         List<MenusEntity> entity = this.mapper.GetLogin(entitys.getRoleId());
         return SortMenus(entity);
     }
@@ -51,12 +51,14 @@ public class MenusService {
                 result.menuSize = info.menuSize;
                 List<MenusResult> childens = new ArrayList<>();
                 for (MenusEntity info1 : list) {
-                    MenusResult childen = new MenusResult();
-                    childen.menuName = info1.menuName;
-                    childen.menuIcon = info1.menuIcon;
-                    childen.menuUrl = info1.menuUrl;
-                    childen.menuSize = info1.menuSize;
-                    childens.add(childen);
+                    if (info.menuId == info1.parentId) {
+                        MenusResult childen = new MenusResult();
+                        childen.menuName = info1.menuName;
+                        childen.menuIcon = info1.menuIcon;
+                        childen.menuUrl = info1.menuUrl;
+                        childen.menuSize = info1.menuSize;
+                        childens.add(childen);
+                    }
                 }
                 result.menus = childens;
                 results.add(result);

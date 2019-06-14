@@ -234,13 +234,19 @@ public class UsersService {
     @Transactional
     public  Boolean ImportAdminExecl(List<UsersForm> users)
     {
-        for (UsersForm user:users)
+
+        for ( UsersForm user:users)
         {
             int nums =  this.mapper.GetByPhone(user.getPhone());
             if(nums >0)
             {
                 return  false;
             }
+        }
+
+        for (UsersForm user:users)
+        {
+
             //查询账号是否已经注册
             AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
             Long accountId;
@@ -305,7 +311,6 @@ public class UsersService {
             usersRolesEntity.setUserId(userId);
             usersRolesEntity.setAccountId(accountId);
             Long aurId = this.aurmapper.RewriteInsert(usersRolesEntity);
-
         }
         return  true;
     }
@@ -493,11 +498,11 @@ public class UsersService {
      * @param pageNumber
      * @return
      */
-    public PageInfo<UserInfoVo> GetByRole(Long rId, String name,String provinces,String municipalities,String districts,String grade,String nature,String Keyword, PageNumber pageNumber) {
+    public PageInfo<UserInfoVo> GetByRole(Long rId, String name,String provinces,String municipalities,String districts,String grade,String nature,String Keyword,Integer review,Integer enable, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword));
+        return new PageInfo<>(this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword,review,enable));
     }
 
     /**
@@ -512,9 +517,9 @@ public class UsersService {
      * @param Keyword
      * @return
      */
-    public  List<UserInfoVo> GetByExport(Long rId, String name,String provinces,String municipalities,String districts,String grade,String nature,String Keyword)
+    public  List<UserInfoVo> GetByExport(Long rId, String name,String provinces,String municipalities,String districts,String grade,String nature,String Keyword,Integer review,Integer enable)
     {
-        return  this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword);
+        return  this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword,review,enable);
     }
 
 
@@ -530,13 +535,13 @@ public class UsersService {
      * @param pageNumber
      * @return
      */
-    public  PageInfo<UserInfoVo> GetByIssue(Long userId,String provinces,String municipalities,String districts,String grade,String nature,String Keyword,PageNumber pageNumber)
+    public  PageInfo<UserInfoVo> GetByIssue(Long userId,String provinces,String municipalities,String districts,String grade,String nature,String Keyword ,Integer review,Integer enable,PageNumber pageNumber)
     {
         UserInfoVo vo=  this.mapper.GetUserById(userId);
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetByIssue(vo.getCompanyCode(),provinces,municipalities,districts,grade,nature,Keyword));
+        return new PageInfo<>(this.mapper.GetByIssue(vo.getCompanyCode(),provinces,municipalities,districts,grade,nature,Keyword,review,enable));
     }
 
     /**

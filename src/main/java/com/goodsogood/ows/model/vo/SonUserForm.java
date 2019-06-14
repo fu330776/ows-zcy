@@ -40,7 +40,7 @@ public class SonUserForm {
     @ApiModelProperty(value = "个人持卡人身份证")
     public String userCardholderIdCard;
     @ApiModelProperty(value = "ID")
-    public String userId;
+    public Long userId;
 
 
     @ApiModelProperty(value = "是否审核 1、未审核 2、已审核")
@@ -62,7 +62,7 @@ public class SonUserForm {
     @ApiModelProperty(value = "角色名")
     public String roleName;
 
-    @ApiModelProperty(value = "是否子管理 是:1 否:2")
+    @ApiModelProperty(value = "是否子管理 是:1 否:0")
     public Integer Issub;
     @ApiModelProperty(value = "省")
     public  String provinces;

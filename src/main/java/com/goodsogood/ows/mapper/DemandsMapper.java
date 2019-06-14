@@ -20,7 +20,9 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
             "(SELECT zu.user_name from zcy_users zu where zu.user_id=zd.user_id)userName",
             "FROM zcy_demands zd WHERE user_id=#{userId,jdbcType=BIGINT} and demand_type=#{demandType,jdbcType=BIT}",
             "<if test='isContact !=null'> and is_contact=#{isContact,jdbcType=BIT}</if>",
-            "<if test='name !=null'>and demand_name LIKE concat(CONCAT('%',#{name,jdbcType=VARCHAR},'%'))</if>",
+            "<if test='name !=null'>and ( demand_name LIKE concat(CONCAT('%',#{name,jdbcType=VARCHAR},'%'))",
+            " or demand_content like concat(CONCAT('%',#{name,jdbcType=VARCHAR},'%'))",
+            ")</if>",
             "</script>"
     })
     List<DemandsVo> Get(@Param(value = "userId") Long userId, @Param(value = "demandType") Integer demandType
@@ -81,7 +83,9 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
             "(SELECT zu.user_name from zcy_users zu where zu.user_id=zd.user_id)userName",
             "FROM zcy_demands zd WHERE  demand_type=#{demandType,jdbcType=BIT}",
             "<if test='isContact !=null'> and is_contact=#{isContact,jdbcType=BIT}</if>",
-            "<if test='name !=null'> and demand_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
+            "<if test='name !=null'> and (demand_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
+            " or demand_content like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
+            ")</if>",
             "</script>"
     })
     List<DemandsVo> GetTypeAll(@Param(value = "demandType") Integer demandType, @Param(value = "isContact") Integer isContact,@Param(value = "name") String name);

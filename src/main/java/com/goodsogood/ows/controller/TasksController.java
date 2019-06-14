@@ -247,12 +247,12 @@ public class TasksController {
     @ApiOperation(value = "管理员根据类型查询")
     @GetMapping("/getType/{type}")
     public ResponseEntity<Result<PageInfo<TaskListForm>>> getType(@ApiParam(value = "type", required = true)
-                                                                  @PathVariable Integer type,String name, Integer page, Integer pageSize) {
+                                                                  @PathVariable Integer type,String name,Integer is_fulfill,Integer is_pay,Integer page, Integer pageSize) {
         if (page == null || pageSize == null) {
             page = 1;
             pageSize = 10;
         }
-        PageInfo<TaskListForm> entities = this.service.getByType(type, name,new PageNumber(page, pageSize));
+        PageInfo<TaskListForm> entities = this.service.getByType(type, name,is_fulfill,is_pay,new PageNumber(page, pageSize));
         Result<PageInfo<TaskListForm>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

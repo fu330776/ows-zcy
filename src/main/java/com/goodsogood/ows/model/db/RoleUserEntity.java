@@ -15,5 +15,6 @@ public class RoleUserEntity extends  BaseEntity  {
     public Long roleId;
     public String roleName;
     public Integer isDel;
+    public  Integer issub;
 
 }

@@ -21,7 +21,7 @@ public interface RoleUserMapper extends MyMapper<RoleUserEntity> {
 //            " zr.account_id=#{id,jdbcType=BIGINT} ",
 //            "</script>",
             "<script>",
-            "SELECT zu.user_id as userId,zr.role_id as roleId,zr.role_name as roleName ",
+            "SELECT zu.user_id as userId,zr.role_id as roleId,zr.role_name as roleName ,zu.Issub as issub",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zu.user_id =zaur.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id",

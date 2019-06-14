@@ -15,12 +15,9 @@ import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.UsersService;
 import com.goodsogood.ows.service.WithdrawsService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.models.auth.In;
 import lombok.extern.log4j.Log4j2;
-import org.apache.ibatis.session.ResultContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -316,7 +313,7 @@ public class UsersController {
             page = 1;
             pageSize = 11;
         }
-        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId,user.getName(),user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword() ,new PageNumber(page, pageSize));
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId,user.getName(),user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword(),user.getReview(),user.getEnable() ,new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -332,7 +329,7 @@ public class UsersController {
             page = 1;
             pageSize = 12;
         }
-        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByIssue(uid,user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword() ,new PageNumber(page, pageSize));
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByIssue(uid,user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword(),user.getReview(),user.getEnable() ,new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

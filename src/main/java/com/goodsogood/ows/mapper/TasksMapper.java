@@ -77,10 +77,16 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
             "(SELECT zu.user_name FROM zcy_users zu where zu.user_id = zt.user_id) as userName",
             " from zcy_tasks zt WHERE",
             "task_type=#{type,jdbcType=BIT}",
+            "<if test='is_fulfill !=null'> and is_fulfill=#{is_fulfill,jdbcType=BIT} </if>",
+            "<if test='is_pay !=null'> and is_pay=#{is_pay,jdbcType=BIT} </if>",
             "<if test='name !=null'> and task_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
+
             "</script>"
     })
-    List<TaskListForm> GetAll(@Param(value = "type") Integer type,@Param(value = "name")String name);
+    List<TaskListForm> GetAll(@Param(value = "type") Integer type
+            ,@Param(value = "name")String name
+            ,@Param(value = "is_fulfill")Integer is_fulfill
+            ,@Param(value = "is_pay") Integer is_pay);
 
 
     @Update({

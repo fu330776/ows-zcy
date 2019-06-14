@@ -75,11 +75,11 @@ public class TasksService {
      * @param type 1:任务书 2：委托书
      * @return
      */
-    public PageInfo<TaskListForm> getByType(Integer type,String name, PageNumber pageNumber) {
+    public PageInfo<TaskListForm> getByType(Integer type,String name,Integer is_fulfill,Integer is_pay, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetAll(type,name));
+        return new PageInfo<>(this.mapper.GetAll(type,name,is_fulfill,is_pay));
     }
 
     /**

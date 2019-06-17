@@ -141,12 +141,12 @@ public class FundsController {
     @ApiOperation(value = "管理员查询")
     @GetMapping(value = "/getByType/{type}")
     public ResponseEntity<Result<PageInfo<FundsVo>>> getByAdmin(@ApiParam(value = "type", required = true)
-                                                                @PathVariable Integer type, String name, Integer page, Integer pageSize) {
+                                                                @PathVariable Integer type, String name,Integer success, Integer page, Integer pageSize) {
         if (page == null || pageSize == null) {
             page = 1;
             pageSize = 10;
         }
-        PageInfo<FundsVo> entity = this.service.GetByAdmin(type, name, new PageNumber(page, pageSize));
+        PageInfo<FundsVo> entity = this.service.GetByAdmin(type, name, success,new PageNumber(page, pageSize));
         Result<PageInfo<FundsVo>> result = new Result<>(entity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

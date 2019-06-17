@@ -53,11 +53,11 @@ public class FundsService {
     /**
      * 管理员查询 医创梦计划基金
      */
-    public PageInfo<FundsVo> GetByAdmin(Integer type,String name,PageNumber pageNumber) {
+    public PageInfo<FundsVo> GetByAdmin(Integer type,String name,Integer success,PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetAll(type,name));
+        return new PageInfo<>(this.mapper.GetAll(type,name,success));
     }
 
 }

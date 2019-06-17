@@ -116,6 +116,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
             "WHERE zu.user_id=#{userId,jdbcType=BIGINT} and zu.review=2 and  zu.enable=1",
+            " ORDER BY zu.addtime desc",
             "</script>"
     })
     UserInfoVo GetUserById(@Param(value = "userId") Long userId);
@@ -136,7 +137,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ",contacts,contact_phone,detailed_address,business_license",
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
-            "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
+            "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id  ORDER BY zu.addtime desc",
             "</script>"
 
     })
@@ -180,6 +181,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             " or user_hospital like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
             " or user_department like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
             ")</if>",
+            " ORDER BY zu.addtime desc",
             "</script>"
 
     })
@@ -213,7 +215,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
-            "where zu.company_code=#{code,jdbcType=VARCHAR}",
+            "where zu.company_code=#{code,jdbcType=VARCHAR} and zr.role_id=2",
             "<if test='review !=null'> and zu.review=#{review,jdbcType=BIT} </if>",
             "<if test='enable !=null'> and zu.enable=#{enable,jdbcType=BIT} </if>",
             "<if test='provinces !=null'> and provinces=#{provinces,jdbcType=VARCHAR} </if>",
@@ -233,8 +235,8 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             " or user_hospital like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
             " or user_department like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
             ")</if>",
+            " ORDER BY zu.addtime desc",
             "</script>"
-
     })
     List<UserInfoVo> GetByIssue(@Param(value = "code") String code
             ,@Param(value = "provinces") String provinces

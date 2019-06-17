@@ -42,13 +42,14 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
             "<script>",
             "SELECT ",
             "user_id as userId,title,introduction,identity,addtime,fund_id as fundId,",
-            "(SELECT zu.user_name FROM zcy_users zu where zu.user_id=zf.user_id)userName,is_success as success",
+            "(SELECT zu.user_name FROM zcy_users zu where zu.user_id=zf.user_id) userName,is_success as success",
             "FROM zcy_funds zf ",
             "where zf.identity=#{type,jdbcType=BIT}",
+            " <if test ='success !=null '> and is_success =#{success,jdbcType=BIT} </if>",
             "<if test='name !=null'> and title like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
             "</script>"
     })
-    List<FundsVo> GetAll(@Param(value = "type") Integer type,@Param(value = "name") String name);
+    List<FundsVo> GetAll(@Param(value = "type") Integer type,@Param(value = "name") String name,@Param(value = "success") Integer success);
 
 
     @Update({

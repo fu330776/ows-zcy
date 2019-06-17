@@ -109,7 +109,7 @@ public class UsersService {
            entitys.setUserCardholderPhone(user.getUserCardholderPhone());
            entitys.setUserDepartment(user.getUserDepartment());
            entitys.setPhone(user.getPhone());
-           entitys.setIssub(user.getIssub());
+           entitys.setIssub(user.getIssub()==null?0:1);
            entitys.setContact_phone(user.getContact_phone());
            entitys.setContacts(user.getContacts());
            entitys.setDetailed_address(user.getDetailed_address());
@@ -204,7 +204,7 @@ public class UsersService {
         entity.setGrade(user.getGrade());
         entity.setNature(user.getNature());
         entity.setTitle(user.getTitle());
-        entity.setIssub(user.getIssub());
+        entity.setIssub(user.getIssub()==null?0:user.getIssub());
         entity.setDetailed_address(user.getDetailed_address());
         entity.setBusiness_license(user.getBusiness_license());
         entity.setContact_phone(user.getContact_phone());
@@ -383,7 +383,7 @@ public class UsersService {
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
         entity.setPhone(user.getPhone());
-        entity.setIssub(user.getIssub());
+        entity.setIssub(user.getIssub()==null?0:user.getIssub());
         entity.setProvinces(user.getProvinces());
         entity.setMunicipalities(user.getMunicipalities());
         entity.setDistricts(user.getDistricts());

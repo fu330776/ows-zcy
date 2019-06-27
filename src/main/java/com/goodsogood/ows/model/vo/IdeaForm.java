@@ -12,4 +12,5 @@ public class IdeaForm {
     public Long userId;
     public float money;
     public Integer isPay;
+    public  String picture;
 }

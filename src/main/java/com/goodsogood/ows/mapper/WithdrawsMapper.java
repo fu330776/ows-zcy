@@ -31,7 +31,6 @@ public interface WithdrawsMapper extends MyMapper<WithdrawsEntity> {
     @Options(useGeneratedKeys = true, keyProperty = "withdrawId", keyColumn = "withdraw_id")
     int Insert(WithdrawsEntity withdrawsEntity);
 
-
     @Update({
             "<script>",
             "UPDATE zcy_withdraws SET is_withdraw=2 where withdraw_id=#{withdrawId,jdbcType=BIGINT}",

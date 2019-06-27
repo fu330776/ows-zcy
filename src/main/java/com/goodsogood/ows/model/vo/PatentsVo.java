@@ -54,4 +54,8 @@ public class PatentsVo {
 
     public String userName;
 
+    public  String picture;
+    public  String state;
+
+
 }

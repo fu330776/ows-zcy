@@ -37,4 +37,8 @@ public class DemandsVo {
     public String phone;
 
     public String userName;
+
+    public  String picture;
+
+    public String state;
 }

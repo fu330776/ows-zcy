@@ -7,8 +7,8 @@ import lombok.Data;
 @ApiModel
 public class PwdFrom {
     public  String code;
-    public  String Pwd;
-    public  String NewPwd;
-    public  String Phone;
+    public  String pwd;
+    public  String newPwd;
+    public  String phone;
     public  Long userId;
 }

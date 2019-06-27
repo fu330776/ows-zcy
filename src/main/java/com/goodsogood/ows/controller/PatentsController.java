@@ -7,10 +7,7 @@ import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.PatentsEntity;
-import com.goodsogood.ows.model.vo.IdeaForm;
-import com.goodsogood.ows.model.vo.PatentApplicationForm;
-import com.goodsogood.ows.model.vo.PatentsVo;
-import com.goodsogood.ows.model.vo.Result;
+import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.DataService;
 import com.goodsogood.ows.service.PatentsService;
 import io.swagger.annotations.Api;
@@ -18,6 +15,7 @@ import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -35,7 +33,7 @@ public class PatentsController {
     private final PatentsService service;
     private final Errors errors;
     private final DataService dataService;
-
+    @Autowired
     public PatentsController(PatentsService patentsService, DataService dataService, Errors errors) {
         this.service = patentsService;
         this.dataService = dataService;
@@ -60,6 +58,8 @@ public class PatentsController {
         entity.setIsPay(0);
         entity.setPatentContent(patent.getContent());
         entity.setUserId(patent.getUserid());
+        entity.setPicture(patent.getPicture());
+        entity.setState("递交成功");
         Boolean bool;
         bool = this.service.Insert(entity);
 
@@ -88,9 +88,11 @@ public class PatentsController {
         entity.setIsNeedPay(2);
         entity.setAddtime(new Date());
         entity.setIsPay(0);
-        entity.setPatentContent(patent.content);
-        entity.setPatentTitle(patent.title);
-        entity.setUserId(patent.userid);
+        entity.setPatentContent(patent.getContent());
+        entity.setPatentTitle(patent.getTitle());
+        entity.setUserId(patent.getUserid());
+        entity.setState("递交成功");
+        entity.setPicture(patent.getPicture());
         Boolean bool = this.service.Insert(entity);
         if (!bool) {
             throw new ApiException("服务器繁忙，申请专利失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
@@ -121,6 +123,8 @@ public class PatentsController {
         entity.setPatentTitle(form.getTitle());
         entity.setPatentType(2);
         entity.setUserId(form.getUserId());
+        entity.setPicture(form.getPicture());
+        entity.setState("递交成功");
         Boolean bool = this.service.Insert(entity);
         Result<Boolean> result = new Result<>(true, errors);
         if (bool == false) {
@@ -136,6 +140,28 @@ public class PatentsController {
      */
     private void Statistics(Integer type) {
         this.dataService.Update(type);
+    }
+
+
+    /**
+     * 修改状态
+     * @param dsf
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "修改状态")
+    @PostMapping(value = "/state")
+    public  ResponseEntity<Result<Boolean>> UpdateState(@Valid @RequestBody DemandStateForm  dsf,BindingResult bindingResult)
+    {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if(dsf.getState().isEmpty()){
+           throw new ApiException("状态不可为空", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean bl=this.service.UpdateState(dsf.getDemandId(),dsf.getState());
+        Result<Boolean> result=new Result<>(bl,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
     }
 
     /**

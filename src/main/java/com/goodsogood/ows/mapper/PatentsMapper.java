@@ -17,13 +17,14 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
             "INSERT INTO zcy_patents(",
             "<if test='patentId !=null' >patent_id,</if> ",
             "patent_title,patent_content,user_id,patent_type,patent_money,patent_stamp,is_need_pay,is_pay,addtime,pay_time",
-            ")",
+            " ,picture,state  )",
             " VALUES( ",
             "<if test='patentId !=null' >#{patent_id,jdbcType=BIGINT},</if>",
             "#{patentTitle,jdbcType=VARCHAR},#{patentContent,jdbcType=VARCHAR},",
             "#{userId,jdbcType=BIGINT},#{patentType,jdbcType=BIT},#{patentMoney,jdbcType=DECIMAL},",
             "#{patentStamp,jdbcType=VARCHAR},#{isNeedPay,jdbcType=BIT},#{isPay,jdbcType=BIT},",
             "#{addtime,jdbcType=TIMESTAMP},#{pay_time,jdbcType=TIMESTAMP}",
+            ",#{picture,jdbcType=VARCHAR},#{state,jdbcType=VARCHAR}",
             ")",
             "</script>"
     })
@@ -33,7 +34,7 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
     @Select({
             "<script>",
             "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType, ",
-            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time,",
+            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time,picture,state,",
             "(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
             ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
             "FROM zcy_patents z where user_id=#{id,jdbcType=BIGINT} and patent_type=#{type,jdbcType=BIT}",
@@ -47,7 +48,7 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
 
             "<script>",
             "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
-            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time ",
+            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time ,picture,state",
             ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
             ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
             "FROM zcy_patents z where patent_type=#{type,jdbcType=BIT}",
@@ -59,7 +60,7 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
     @Select({
             "<script>",
             "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
-            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time ",
+            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time,picture,state ",
             ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
             ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
             "FROM zcy_patents z where patent_type=#{type,jdbcType=BIT} and is_need_pay=1 and is_pay=#{isPay,jdbcType=BIT}",
@@ -72,7 +73,7 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
     @Select({
             "<script>",
             "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
-            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time",
+            "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time,picture,state",
             ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
             ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
             "FROM zcy_patents z where patent_id=#{id,jdbcType=BIGINT}",
@@ -86,4 +87,12 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
             "</script>"
     })
     int UpdateIdea(@Param(value = "pid") Long pid);
+
+
+    @Update({
+            "<script>",
+            "Update zcy_patents set state=#{state,jdbcType=VARCHAR} where patent_id=#{id,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int UpdateState(@Param(value = "id") Long id,@Param(value = "state") String state);
 }

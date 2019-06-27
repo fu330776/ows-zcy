@@ -51,4 +51,9 @@ public class DemandsEntity extends BaseEntity {
     public  Long userId;
 
     public Date addtime;
+
+    @ApiModelProperty(value = "图片")
+    public  String picture;
+    @ApiModelProperty(value = "状态：递交失败、递交成功、已受理、未受理、受理失败")
+    public  String state;
 }

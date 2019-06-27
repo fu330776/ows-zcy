@@ -7,10 +7,7 @@ import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.model.db.DataEntity;
 import com.goodsogood.ows.model.db.DemandsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
-import com.goodsogood.ows.model.vo.DemandAddForm;
-import com.goodsogood.ows.model.vo.DemandsForm;
-import com.goodsogood.ows.model.vo.DemandsVo;
-import com.goodsogood.ows.model.vo.Result;
+import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.DataService;
 import com.goodsogood.ows.service.DemandsService;
 import io.swagger.annotations.Api;
@@ -58,6 +55,8 @@ public class DemandsController {
         entity.setDemandType(addForm.getDemandType());
         entity.setIsContact(addForm.getIsContact());
         entity.setUserId(addForm.getUserId());
+        entity.setPicture(addForm.getPicture());
+        entity.setState("递交成功");
         Boolean bool = this.service.Insert(entity);
 
         /**
@@ -159,6 +158,30 @@ public class DemandsController {
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    /**
+     *  修改状态
+     * @param state
+     * @param bindingResult
+     * @return
+     */
+    @ApiModelProperty(value = "修改状态")
+    @PostMapping("/state")
+    public  ResponseEntity<Result<Boolean>> UpdateState(@Valid @RequestBody DemandStateForm state,BindingResult bindingResult)
+    {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if(state.getState().isEmpty())
+        {
+            throw new ApiException("参数错误,不能为空或空字符串", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean bl=this.service.UpdateState(state.getDemandId(),state.getState());
+        Result<Boolean> result=new Result<>(bl,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+
 
     /**
      * 根据用户类型查询

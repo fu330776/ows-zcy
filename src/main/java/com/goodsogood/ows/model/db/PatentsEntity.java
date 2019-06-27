@@ -68,5 +68,8 @@ public class PatentsEntity extends BaseEntity {
 
         @ApiModelProperty(value = "支付时间")
         public  Date pay_time;
-
+        @ApiModelProperty(value = "图片")
+        public  String picture;
+        @ApiModelProperty(value = "状态：递交失败、递交成功、已受理、未受理、受理失败")
+        public  String state;
 }

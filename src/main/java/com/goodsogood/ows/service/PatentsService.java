@@ -30,6 +30,21 @@ public class PatentsService {
         return true;
     }
 
+    /**
+     *  修改状态
+     * @param id
+     * @param state
+     * @return
+     */
+    public  Boolean UpdateState(Long id,String state)
+    {
+        int num=this.mapper.UpdateState(id,state);
+        if(num<=0)
+        {
+            return  false;
+        }
+        return  true;
+    }
 
     /**
      * 分页查询用户（根据类型查询）

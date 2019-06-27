@@ -84,3 +84,4 @@ file:
   #pdf: D://file//PDF
   pdf: /root/app/fileTemplates
   pdfs: /root/app/fileTemp
+  picture: /root/app/filePicture

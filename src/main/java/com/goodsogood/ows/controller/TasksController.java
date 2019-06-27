@@ -28,6 +28,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.RecursiveTask;
 
 @RestController
 @RequestMapping("/v-task")
@@ -73,8 +74,9 @@ public class TasksController {
         entity.setTaskMoney(vo.getTaskMoney());
         entity.setTaskContent(vo.getTaskContent());
         entity.setAddtime(new Date());
-        this.service.Insert(entity);
-        Result<Boolean> result = new Result<>(true, errors);
+        entity.setState("递交成功");
+       Boolean bl=  this.service.Insert(entity);
+        Result<Boolean> result = new Result<>(bl, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
@@ -88,11 +90,9 @@ public class TasksController {
      * @return
      */
     @HttpMonitorLogger
-    @PutMapping("/AddEntrust")
+    @PostMapping("/AddEntrust")
     public ResponseEntity<Result<Boolean>> AddE(@Valid @RequestBody EntrustForm vo, BindingResult bindingResult) {
-
         log.debug("bindingResult->{}", bindingResult);
-
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
@@ -107,13 +107,35 @@ public class TasksController {
         entity.setTaskContent(vo.getTaskContent());
         entity.setTaskMoney(0);
         entity.setTaskName(vo.getTaskName());
-        entity.setTaskFileUrl("");
+        entity.setTaskFileUrl(vo.getTaskFileUrl());
         entity.setIs_fulfill(1);
+        entity.setState("递交成功");
         Boolean bool = this.service.Insert(entity);
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    /**
+     *  修改状态
+     * @param dsf
+     * @param bindingResult
+     * @return
+     */
+    @HttpMonitorLogger
+    @PostMapping("/state")
+    public  ResponseEntity<Result<Boolean>> UpdateState(@Valid @RequestBody DemandStateForm dsf,BindingResult bindingResult)
+    {
+        log.debug("bindingResult->{}", bindingResult);
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if(dsf.getState().isEmpty()){
+            throw new ApiException("状态错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Boolean bl=this.service.UpdateState(dsf.getDemandId(),dsf.getState());
+        Result<Boolean> result=new Result<>(bl,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
 
     /**
      * 修改任务 或委托 完成度

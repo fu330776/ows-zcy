@@ -202,6 +202,21 @@ public class TasksService {
         PageHelper.startPage(p, r);
         return new PageInfo<>(this.ToMapper.Get(userId, type));
     }
+
+    /**
+     *  修改状态
+     * @param id
+     * @param state
+     * @return
+     */
+    public  Boolean UpdateState(Long id,String state)
+    {
+        int num= this.mapper.UpdateState(id,state);
+        if(num<=0)return  false;
+        return  true;
+    }
+
+
 //    /**
 //     * 添加任务，并制定周期与人
 //     */

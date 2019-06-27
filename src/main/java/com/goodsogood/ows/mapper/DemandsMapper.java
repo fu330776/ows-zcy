@@ -15,7 +15,7 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
     @Select({
             "<script>",
             "SELECT  demand_id as demandId, demand_type as demandType , demand_name as demandName,",
-            "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime,",
+            "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime,picture,state,",
             "(SELECT zu.phone from zcy_users zu where zu.user_id=zd.user_id)phone,",
             "(SELECT zu.user_name from zcy_users zu where zu.user_id=zd.user_id)userName",
             "FROM zcy_demands zd WHERE user_id=#{userId,jdbcType=BIGINT} and demand_type=#{demandType,jdbcType=BIT}",
@@ -32,12 +32,13 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
             "<script>",
             "insert into zcy_demands(",
             "<if test='demandId !=null'> demand_id,</if>",
-            "demand_type,demand_name,demand_content,is_contact,user_id,addtime)",
+            "demand_type,demand_name,demand_content,is_contact,user_id,addtime,picture,state)",
             "Values (",
             "<if test='demandId !=null'> #{demandId,jdbcType=BIGINT},</if>",
             "#{demandType,jdbcType=BIT},#{demandName,jdbcType=VARCHAR},",
             "#{demandContent,jdbcType=VARCHAR},#{isContact,jdbcType=BIT},",
-            "#{userId,jdbcType=BIGINT},#{addtime,jdbcType=TIMESTAMP}",
+            "#{userId,jdbcType=BIGINT},#{addtime,jdbcType=TIMESTAMP},",
+            "#{picture,jdbcType=VARCHAR},#{state,jdbcType=VARCHAR}",
             ")",
             "</script>"
     })
@@ -78,7 +79,7 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
     @Select({
             "<script>",
             "SELECT  demand_id as demandId, demand_type as demandType , demand_name as demandName,",
-            "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime,",
+            "demand_content as demandContent ,is_contact as isContact ,user_id as userId,addtime,picture,state,",
             "(SELECT zu.phone from zcy_users zu where zu.user_id=zd.user_id)phone,",
             "(SELECT zu.user_name from zcy_users zu where zu.user_id=zd.user_id)userName",
             "FROM zcy_demands zd WHERE  demand_type=#{demandType,jdbcType=BIT}",
@@ -89,4 +90,12 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
             "</script>"
     })
     List<DemandsVo> GetTypeAll(@Param(value = "demandType") Integer demandType, @Param(value = "isContact") Integer isContact,@Param(value = "name") String name);
+
+
+    @Update({
+            "<script>",
+            "update zcy_demands set demand_name=#{state,jdbcType=VARCHAR}  where demand_id=#{demandId,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int UpdateState(@Param(value = "id")Long id,@Param(value = "state") String state);
 }

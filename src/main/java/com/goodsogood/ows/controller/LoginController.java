@@ -280,6 +280,7 @@ public class LoginController {
             smsEntity.setSmsExpireDate(stampToDate());    //失效时间
             smsEntity = this.usersService.SmsInsert(smsEntity, entity.getType());
         }
+        smsEntity.setSmsCode("123456");
         Result<SmssEntity> result = new Result<>(smsEntity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

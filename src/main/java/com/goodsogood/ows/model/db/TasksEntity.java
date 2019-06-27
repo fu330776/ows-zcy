@@ -70,5 +70,7 @@ public class TasksEntity extends BaseEntity {
     @ApiModelProperty(value = "1、个人任务书，2、企业委托书")
     @Column(name="task_type")
     public  Integer taskType;
+    @ApiModelProperty(value = "状态：递交失败、递交成功、已受理、未受理、受理失败")
+    public String state;
 
 }

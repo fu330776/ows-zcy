@@ -438,10 +438,10 @@ public class UsersService {
 
         SmssEntity sms = this.smssMapper.GetByPhone(Phone, new Date(), 2);
         if (sms == null) {
-            return -1;
+            return null;
         }
-        if (sms.getSmsCode() != code) {
-            return -1;
+        if (sms.getSmsCode().equals(code)) {
+            return null;
         }
         return this.amapper.UpdatePwd(Phone, pwd, MD5Utils.MD5(pwd));
     }
@@ -460,6 +460,7 @@ public class UsersService {
         SmssEntity sms = this.smssMapper.GetByPhone(smssEntity.getSmsPhone(), smssEntity.getAddtime(), type);
         if (sms != null) {
             sms.setSmsSendFrequency(sms.getSmsSendFrequency() + 1);
+            sms.setSmsUse(1);
             this.smssMapper.updateByPrimaryKey(sms);
         } else {
             this.smssMapper.Insert(smssEntity);

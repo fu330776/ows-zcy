@@ -111,11 +111,13 @@ public class UsersController {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Integer isNum = this.usersService.UpdatePassWord(pwd.Phone, pwd.NewPwd, pwd.code);
-        if (isNum <= 0) {
-            throw new ApiException("服务器繁忙，修改失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        Integer isNum = this.usersService.UpdatePassWord(pwd.getPhone(), pwd.getPwd(), pwd.getCode());
+        Result<Boolean> result;
+        if (isNum == null) {
+            result = new Result<>(false, errors);
+        } else {
+            result = new Result<>(true, errors);
         }
-        Result<Boolean> result = new Result<>(true, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -313,10 +315,11 @@ public class UsersController {
             page = 1;
             pageSize = 11;
         }
-        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId,user.getName(),user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword(),user.getReview(),user.getEnable() ,new PageNumber(page, pageSize));
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByRole(roleId, user.getName(), user.getProvinces(), user.getMunicipalities(), user.getDistricts(), user.getGrade(), user.getNature(), user.getKeyword(), user.getReview(), user.getEnable(), new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
     @ApiOperation(value = "子管理 获取本医院下的用户信息")
     @GetMapping("/getIssue/{uid}")
     public ResponseEntity<Result<PageInfo<UserInfoVo>>> GetIssue(
@@ -329,7 +332,7 @@ public class UsersController {
             page = 1;
             pageSize = 12;
         }
-        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByIssue(uid,user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword(),user.getReview(),user.getEnable() ,new PageNumber(page, pageSize));
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByIssue(uid, user.getProvinces(), user.getMunicipalities(), user.getDistricts(), user.getGrade(), user.getNature(), user.getKeyword(), user.getReview(), user.getEnable(), new PageNumber(page, pageSize));
         Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

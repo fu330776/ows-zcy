@@ -50,6 +50,9 @@ public class UpLoadController {
     private String PDF;
     @Value("${file.pdfs}")
     private String PDFs;
+    @Value(value = "${file.picture}")
+    private String picture;
+
     private final String Url = "http://www.ztsms.cn/sendNSms.do";
     private final String pwd = "zcyun2019GS";
     private final String productid = "95533";
@@ -83,6 +86,20 @@ public class UpLoadController {
         return vo;
     }
 
+    @HttpMonitorLogger
+    @ApiOperation(value = "图片上传")
+    @PostMapping("/uploadPicture")
+    public  UpLoadVo UploadPictures(MultipartFile file, HttpServletRequest request)
+    {
+        UpLoadVo vo = new UpLoadVo();
+        try {
+            UploadUtils uploadUtils = new UploadUtils();
+            vo = uploadUtils.importPicture(file, request, "//ffff");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return vo;
+    }
 
     @HttpMonitorLogger
     @ApiOperation(value = "测试验证码发送")

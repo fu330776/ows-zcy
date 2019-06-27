@@ -59,6 +59,7 @@ public class DemandsService {
      * 根据类型不同添加需求表数据
      */
     public Boolean Insert(DemandsEntity demandsEntity) {
+
         int num = this.mapper.Insert(demandsEntity);
         return IsBool(num);
     }
@@ -92,6 +93,21 @@ public class DemandsService {
         int num=this.mapper.Update(aid,name,content,isContact);
         return  IsBool(num);
     }
+
+
+    /**
+     *  递交状态修改
+     * @param id
+     * @param state
+     * @return
+     */
+    public  Boolean UpdateState(long id,String state)
+    {
+        int num=this.mapper.UpdateState(id,state);
+        return  IsBool(num);
+    }
+
+
 
     /**
      * 判断 是否执行成功 成功返回true

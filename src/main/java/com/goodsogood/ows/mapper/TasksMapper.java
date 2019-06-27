@@ -15,7 +15,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
             "<script>",
             "INSERT INTO zcy_tasks(",
             "<if test='taskId !=null'>task_id, </if>",
-            "task_name,task_content,task_file_url,addtime,task_money,user_id,is_fulfill,schedule,is_pay, task_completion_days,task_completed_days,task_type",
+            "task_name,task_content,task_file_url,addtime,task_money,user_id,is_fulfill,schedule,is_pay, task_completion_days,task_completed_days,task_type,state",
             ")VALUES(",
             "<if test='taskId !=null'>#{taskId,jdbcType=BIGINT},</if>",
             "#{taskName,jdbcType=VARCHAR},#{taskContent,jdbcType=VARCHAR},",
@@ -23,7 +23,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
             "#{taskMoney,jdbcType=FLOAT},#{userId,jdbcType=BIGINT},",
             "#{is_fulfill,jdbcType=BIT},#{schedule,jdbcType=FLOAT},",
             "#{is_pay,jdbcType=BIT},#{taskCompletionDays,jdbcType=BIT},#{taskCompletedDays,jdbcType=BIT},",
-            "#{taskType,jdbcType=BIT}",
+            "#{taskType,jdbcType=BIT},#{state,jdbcType=VARCHAR}",
             ")",
             "</script>"
     })
@@ -33,7 +33,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "task_id as taskId,task_name as taskName,task_content as taskContent,",
+            "task_id as taskId,task_name as taskName,task_content as taskContent,state,",
             "task_file_url as taskFileUrl,task_money as taskMoney,",
             "is_fulfill,`schedule`,is_pay,addtime,user_id as userId,task_completion_days as taskCompletionDays,task_completed_days as taskCompletedDays,task_type as taskType",
             " from zcy_tasks WHERE",
@@ -47,7 +47,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "task_id as taskId,task_name as taskName,task_content as taskContent,",
+            "task_id as taskId,task_name as taskName,task_content as taskContent,state,",
             "task_file_url as taskFileUrl,task_money as taskMoney,",
             "is_fulfill,`schedule`,is_pay,addtime,user_id as userId,task_completion_days as taskCompletionDays,task_completed_days as taskCompletedDays,task_type as taskType",
             " from zcy_tasks WHERE ",
@@ -60,7 +60,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "task_id as taskId,task_name as taskName,task_content as taskContent,",
+            "task_id as taskId,task_name as taskName,task_content as taskContent,state,",
             "task_file_url as taskFileUrl,task_money as taskMoney,",
             "is_fulfill,`schedule`,is_pay,addtime,user_id as userId,task_completion_days as taskCompletionDays,task_completed_days as taskCompletedDays,task_type as taskType",
             "from zcy_tasks WHERE  task_id=#{taskId,jdbcType=BIGINT}",
@@ -71,7 +71,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "task_id as taskId,task_name as taskName,task_content as taskContent,",
+            "task_id as taskId,task_name as taskName,task_content as taskContent,state,",
             "task_file_url as taskFileUrl,task_money as taskMoney,",
             "is_fulfill,`schedule`,is_pay,addtime,user_id as userId,task_completion_days as taskCompletionDays,task_completed_days as taskCompletedDays,task_type as taskType,",
             "(SELECT zu.user_name FROM zcy_users zu where zu.user_id = zt.user_id) as userName",
@@ -109,5 +109,11 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
     })
     int PutTaskUpdate(@Param(value = "taskId") Long taskId, @Param(value = "taskCompletionDays") Integer taskCompletionDays, @Param(value = "taskCompletedDays") Integer taskCompletedDays);
 
+    @Update({
+            "<script>",
+            "update zcy_tasks set state=#{state,jdbcType=VARCHAR} where task_id=#{id,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int UpdateState(@Param(value = "id")Long id,@Param(value = "state")String state);
 
 }

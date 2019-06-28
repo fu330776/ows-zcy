@@ -100,6 +100,15 @@ public class UpLoadController {
         }
         return vo;
     }
+    @HttpMonitorLogger
+    @ApiOperation(value = "图片下载")
+    @PostMapping("/down")
+    public  UpLoadVo DownPDF(String url,HttpServletRequest request,HttpServletResponse response)
+    {
+        UploadUtils uploadUtils = new UploadUtils();
+        return  uploadUtils.downloadImage(url,request,response);
+    }
+
 
     @HttpMonitorLogger
     @ApiOperation(value = "测试验证码发送")

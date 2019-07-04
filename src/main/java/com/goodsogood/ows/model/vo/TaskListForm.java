@@ -58,4 +58,6 @@ public class TaskListForm {
 
     public String userName;
 
+    public  String state;
+
 }

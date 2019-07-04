@@ -95,7 +95,7 @@ public class UploadUtils {
             }
             new File(folder, newName).delete();
             //协议，域名，端口号，地址，文件 //req.getScheme() +":"+"//" + req.getServerName() + ":" + req.getServerPort()+
-            String url ="/"+ realPath + "/y" + newName;
+            String url = "/"+format + "/y" + newName;
             vo.setSuccess(true);
             vo.setMsg("上传成功");
             vo.setCode(200);

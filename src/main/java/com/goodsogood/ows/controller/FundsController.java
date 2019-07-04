@@ -64,6 +64,7 @@ public class FundsController {
         entity.setIntroduction(form.getIntroduction());
         entity.setTitle(form.getTitle());
         entity.setUserId(form.getUserId());
+        entity.setTypes(form.getType());
         entity.setSuccess(1);
         Integer num = this.service.AddFuns(entity);
         Result<Boolean> result = new Result<>(true, errors);
@@ -120,12 +121,12 @@ public class FundsController {
     @ApiOperation(value = "用户查询")
     @GetMapping(value = "/getById/{id}")
     public ResponseEntity<Result<PageInfo<FundsEntity>>> getUser(@ApiParam(value = "id", required = true)
-                                                                 @PathVariable Long id, Integer page, Integer pageSize) {
+                                                                 @PathVariable Long id, int type,Integer page, Integer pageSize) {
         if (page == null || pageSize == null) {
             page = 1;
             pageSize = 10;
         }
-        PageInfo<FundsEntity> entity = this.service.GetByUserId(id, new PageNumber(page, pageSize));
+        PageInfo<FundsEntity> entity = this.service.GetByUserId(id,type, new PageNumber(page, pageSize));
         Result<PageInfo<FundsEntity>> result = new Result<>(entity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -141,12 +142,12 @@ public class FundsController {
     @ApiOperation(value = "管理员查询")
     @GetMapping(value = "/getByType/{type}")
     public ResponseEntity<Result<PageInfo<FundsVo>>> getByAdmin(@ApiParam(value = "type", required = true)
-                                                                @PathVariable Integer type, String name,Integer success, Integer page, Integer pageSize) {
+                                                                @PathVariable Integer type,int types ,String name,Integer success, Integer page, Integer pageSize) {
         if (page == null || pageSize == null) {
             page = 1;
             pageSize = 10;
         }
-        PageInfo<FundsVo> entity = this.service.GetByAdmin(type, name, success,new PageNumber(page, pageSize));
+        PageInfo<FundsVo> entity = this.service.GetByAdmin(type, name, success,types,new PageNumber(page, pageSize));
         Result<PageInfo<FundsVo>> result = new Result<>(entity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

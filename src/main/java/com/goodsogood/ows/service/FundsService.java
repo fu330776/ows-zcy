@@ -42,22 +42,22 @@ public class FundsService {
     /**
      * 用户查询 医创梦计划基金
      */
-    public PageInfo<FundsEntity> GetByUserId(Long userId, PageNumber pageNumber) {
+    public PageInfo<FundsEntity> GetByUserId(Long userId,int type, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.Get(userId));
+        return new PageInfo<>(this.mapper.Get(userId,type));
 
     }
 
     /**
      * 管理员查询 医创梦计划基金
      */
-    public PageInfo<FundsVo> GetByAdmin(Integer type,String name,Integer success,PageNumber pageNumber) {
+    public PageInfo<FundsVo> GetByAdmin(Integer type,String name,Integer success,int types,PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetAll(type,name,success));
+        return new PageInfo<>(this.mapper.GetAll(type,name,success,types));
     }
 
 }

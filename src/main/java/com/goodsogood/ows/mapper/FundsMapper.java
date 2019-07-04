@@ -19,7 +19,7 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
             ")VALUES(",
             "<if test='fundId !=null'>#{fundId,jdbcType=BIGINT}, </if>",
             "#{userId,jdbcType=BIGINT},#{title,jdbcType=VARCHAR},#{introduction,jdbcType=VARCHAR},#{identity,jdbcType=BIT},#{addtime,jdbcType=TIMESTAMP}",
-            ",#{success,jdbcType=BIT})",
+            ",#{success,jdbcType=BIT},#{types,jdbcType=BIT})",
             "</script>"
 
     })
@@ -32,10 +32,10 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
             "SELECT ",
             "user_id,title,introduction,identity,addtime,fund_id,is_success as success",
             "FROM zcy_funds",
-            "WHERE user_id=#{userId,jdbcType=BIGINT}",
+            "WHERE user_id=#{userId,jdbcType=BIGINT} and types=#{type,jdbcType=BIT}",
             "</script>"
     })
-    List<FundsEntity> Get(@Param(value = "userId") Long userId);
+    List<FundsEntity> Get(@Param(value = "userId") Long userId,@Param(value = "type") int type);
 
 
     @Select({
@@ -44,16 +44,16 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
             "user_id as userId,title,introduction,identity,addtime,fund_id as fundId,",
             "(SELECT zu.user_name FROM zcy_users zu where zu.user_id=zf.user_id) userName,is_success as success",
             "FROM zcy_funds zf ",
-            "where zf.identity=#{type,jdbcType=BIT}",
+            "where zf.identity=#{type,jdbcType=BIT} and zf.types=#{types,jdbcType=BIT}",
             " <if test ='success !=null '> and is_success =#{success,jdbcType=BIT} </if>",
             "<if test='name !=null'> and title like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
             "</script>"
     })
-    List<FundsVo> GetAll(@Param(value = "type") Integer type,@Param(value = "name") String name,@Param(value = "success") Integer success);
+    List<FundsVo> GetAll(@Param(value = "type") Integer type,@Param(value = "name") String name,@Param(value = "success") Integer success
+            ,@Param(value = "types") int types);
 
 
     @Update({
-
             "<script>",
             "UPDATE zcy_funds SET ",
             "<if test='title !=null'>title=#{title,jdbcType=VARCHAR},</if> ",

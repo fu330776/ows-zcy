@@ -41,8 +41,7 @@ public class PayController {
      * @param bindingResult
      * @return
      */
-        public ResponseEntity<Result<PaymentEntity>>  CreateOrder(@Valid @RequestBody CreateOrderForm form, BindingResult bindingResult )
-        {
+        public ResponseEntity<Result<PaymentEntity>>  CreateOrder(@Valid @RequestBody CreateOrderForm form, BindingResult bindingResult ){
             if (bindingResult.hasFieldErrors()) {
                 throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
             }

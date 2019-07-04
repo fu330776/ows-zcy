@@ -94,7 +94,7 @@ public class UpLoadController {
         UpLoadVo vo = new UpLoadVo();
         try {
             UploadUtils uploadUtils = new UploadUtils();
-            vo = uploadUtils.importPicture(file, request, "//ffff");
+            vo = uploadUtils.importPicture(file, request, picture);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -131,7 +131,6 @@ public class UpLoadController {
         Date date = new Date();
         date.setTime(date.getTime() + 10 * 60 * 1000);
         return date;
-
     }
 
     @HttpMonitorLogger

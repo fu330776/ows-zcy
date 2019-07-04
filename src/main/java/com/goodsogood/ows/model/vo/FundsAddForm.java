@@ -18,6 +18,8 @@ public class FundsAddForm {
     public String introduction;
     @ApiModelProperty(value = "身份：1、个人 2、医疗结构")
     public Integer identity;
+    @ApiModelProperty(value = "1:梦计划，2：医创杯")
+    public  int type;
 }
 
 

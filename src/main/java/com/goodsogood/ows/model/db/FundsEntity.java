@@ -48,4 +48,6 @@ public class FundsEntity extends BaseEntity {
     @Column(name = "is_success")
     public  int success;
 
+    @ApiModelProperty(value = "1:梦计划申请，2：医创杯")
+    public  int types;
 }

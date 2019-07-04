@@ -94,7 +94,7 @@ public interface DemandsMapper extends MyMapper<DemandsEntity> {
 
     @Update({
             "<script>",
-            "update zcy_demands set demand_name=#{state,jdbcType=VARCHAR}  where demand_id=#{demandId,jdbcType=BIGINT}",
+            "update zcy_demands set state=#{state,jdbcType=VARCHAR}  where demand_id=#{id,jdbcType=BIGINT}",
             "</script>"
     })
     int UpdateState(@Param(value = "id")Long id,@Param(value = "state") String state);

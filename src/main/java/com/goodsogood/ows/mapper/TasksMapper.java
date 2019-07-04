@@ -47,7 +47,7 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "task_id as taskId,task_name as taskName,task_content as taskContent,state,",
+            "task_id as taskId,task_name as taskName,task_content as taskContent,state as state,",
             "task_file_url as taskFileUrl,task_money as taskMoney,",
             "is_fulfill,`schedule`,is_pay,addtime,user_id as userId,task_completion_days as taskCompletionDays,task_completed_days as taskCompletedDays,task_type as taskType",
             " from zcy_tasks WHERE ",

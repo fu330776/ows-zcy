@@ -145,13 +145,13 @@ public class LoginController {
             throw new ApiException("账号不能为空或空字符串", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         List<RoleUserEntity> rlist = null;
-        if (user.code.isEmpty()) {
+        if (user.getCode().isEmpty()) {
             rlist = this.loginService.getList(user.getPhone(), MD5Utils.MD5(user.getPassword()));
             if (rlist == null || rlist.size() == 0) {
                 throw new ApiException("服务器繁忙，登录失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
             }
         }
-        if (!user.code.isEmpty() && user.getPassword().isEmpty()) {
+        if (!user.getCode().isEmpty() && user.getPassword().isEmpty()) {
             rlist = this.loginService.getListPhone(user.getPhone(), user.getCode());
             if (rlist == null) {
                 throw new ApiException("服务器繁忙，登录失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));

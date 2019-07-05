@@ -1,5 +1,8 @@
 server:
   port: 8089
+  servlet:
+    context-path: /filePicture #应用上下文路径
+
 
 spring:
   application:
@@ -24,7 +27,6 @@ spring:
       max-lifetime: 2000000
       connection-timeout: 30000
       register-mbeans: true
-
 
   messages:
     basename: messages
@@ -81,7 +83,7 @@ management:
 
 
 file:
-  #pdf: D://file//PDF
-  pdf: /root/app/fileTemplates
-  pdfs: /root/app/fileTemp
-  picture: /root/app/filePicture
+#  pdf: root/app/fileTemplates/
+#  pdfs: root/app/fileTemp/
+  picture: /filePicture/
+#  picture: root/app/filePicture

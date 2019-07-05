@@ -21,9 +21,9 @@ public class UploadUtils {
         vo.setMsg("文件上传失败");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         String format = sdf.format(new Date());
-        String Path = req.getSession().getServletContext().getRealPath("/");
-        String realPath = urls + "/" + format;
-        File folder = new File(Path + realPath);
+        //String Path = req.getSession().getServletContext().getRealPath("/");
+        String realPath = urls;// + "/" + format Path +
+        File folder = new File(realPath);
         if (!folder.exists()) {
             folder.mkdirs();
         }
@@ -39,9 +39,10 @@ public class UploadUtils {
         String hz = oldName.substring(oldName.lastIndexOf("."));
         if (hz.equals(".pdf")) {
             String newName = UUID.randomUUID().toString() + hz;
-            file.transferTo(new File(folder, newName));
+            File newFile=new File(folder, newName);
+            file.transferTo(newFile);
             //协议，域名，端口号，地址，文件 req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort()+
-            String url ="/"+ realPath + "/" + newName;
+            String url =realPath+newName;
             vo.setSuccess(true);
             vo.setMsg("上传成功");
             vo.setCode(200);
@@ -59,9 +60,10 @@ public class UploadUtils {
         vo.setMsg("上传失败");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         String format = sdf.format(new Date());
-        String Path = req.getSession().getServletContext().getRealPath("/");
-        String realPath = urls + "/" + format;
-        File folder = new File(Path + realPath);
+
+       // String Path = req.getSession().getServletContext().getRealPath("root/"+urls+"/");//Path +
+        String realPath =urls ; //+ "/" + format
+        File folder = new File(realPath);
         if (!folder.exists()) {
             folder.mkdirs();
         }
@@ -82,20 +84,20 @@ public class UploadUtils {
             String oldPath=new File(folder, newName).getPath();
 
             String path=new File(folder, "y"+newName).getPath();
-
+            String url = realPath+ "/" + newName;
             if(size >= 5 * 1024 * 1024) {
                 if (size > 0) {
                     scale = (5 * 1024f *  1024f) / size;
                 }
                 if (size < 5 * 1024 * 1024) {
-                    Thumbnails.of(oldPath).scale(0.5f).toFile(path);
+                    Thumbnails.of(oldPath).scale(1).toFile(path);
                 } else {
                     Thumbnails.of(oldPath).scale(0.5f).outputQuality(scale).toFile(path);
+                    new File(folder, newName).delete();
+                    url = realPath+ "/y" + newName;
                 }
             }
-            new File(folder, newName).delete();
-            //协议，域名，端口号，地址，文件 //req.getScheme() +":"+"//" + req.getServerName() + ":" + req.getServerPort()+
-            String url = "/"+format + "/y" + newName;
+            //协议，域名，端口号，地址，文件 //req.getScheme() +":"+"//" + req.getServerName() + ":" + req.getServerPort()+ "/"+format + "/y" + newName
             vo.setSuccess(true);
             vo.setMsg("上传成功");
             vo.setCode(200);

@@ -46,9 +46,9 @@ public class UpLoadController {
         this.wservice = withdrawsService;this.service=service;
     }
 
-    @Value("${file.pdf}")
+    @Value("${file.picture}")
     private String PDF;
-    @Value("${file.pdfs}")
+    @Value("${file.picture}")
     private String PDFs;
     @Value(value = "${file.picture}")
     private String picture;

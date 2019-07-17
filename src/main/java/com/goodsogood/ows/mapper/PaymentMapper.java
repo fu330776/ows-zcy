@@ -113,5 +113,11 @@ public interface PaymentMapper extends MyMapper<PaymentEntity> {
     })
     PaymentEntity GetFind(@Param(value = "orderNo") String orderNo);
 
+    @Delete({
+            "<script>",
+            "delete * from zcy_payment where payment_id=#{paymentId,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int Delete(@Param(value = "paymentId") Long paymentId);
 }
 

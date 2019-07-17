@@ -51,98 +51,126 @@ public class UsersService {
     }
 
     /**
-     *  注册子账户
+     * 判断 邀请码是否生效
+     *
+     * @param code
+     * @return
+     */
+    public int VerificationCode(String code) {
+        return this.mapper.GetCodeCount(code);
+    }
+
+    /**
+     *    保存用户唯一 openID
+     * @param id
+     * @param openid
+     * @return
+     */
+    public int updateOpen(Long id, String openid) {
+        return this.mapper.updateOpenId(openid, id);
+    }
+
+    /**
+     *  查询用户openid
+     * @param id
+     * @return   openid
+     */
+    public  String getOpenId(Long id)
+    {
+        return  this.mapper.getOpenId(id);
+    }
+
+    /**
+     * 注册子账户
+     *
      * @param user
      * @return
      */
     @Transactional
-    public  Boolean SonAdminRegister(SonUserForm user)
-    {
-        int nums =  this.mapper.GetByPhone(user.getPhone());
-        if(nums >0)
-        {
-            return  false;
+    public Boolean SonAdminRegister(SonUserForm user) {
+        int nums = this.mapper.GetByPhone(user.getPhone());
+        if (nums > 0) {
+            return false;
         }
-        Boolean isb=false;
-       AccountsEntity entity =  this.Get(user.getPhone());
-        UsersEntity users=this.mapper.selectByPrimaryKey(user.getUserId());
-       if(entity==null)
-       {
-           entity = new AccountsEntity();
-           entity.setAddtime(new Date());
-           entity.setPhone(user.getPhone());
-           entity.setPassWordLaws(user.getPassword());
-           entity.setPassWord(MD5Utils.MD5(user.getPassword()));
-           entity.setEnable(1);
-           this.amapper.Insert(entity);
-           Long  accountId = entity.getAccountId();
-           if (accountId == null) {
-               return false;
-           }  //注册资料
+        Boolean isb = false;
+        AccountsEntity entity = this.Get(user.getPhone());
+        UsersEntity users = this.mapper.selectByPrimaryKey(user.getUserId());
+        if (entity == null) {
+            entity = new AccountsEntity();
+            entity.setAddtime(new Date());
+            entity.setPhone(user.getPhone());
+            entity.setPassWordLaws(user.getPassword());
+            entity.setPassWord(MD5Utils.MD5(user.getPassword()));
+            entity.setEnable(1);
+            this.amapper.Insert(entity);
+            Long accountId = entity.getAccountId();
+            if (accountId == null) {
+                return false;
+            }  //注册资料
 
 
-           UsersEntity entitys = new UsersEntity();
-           entitys.setUserName(user.getUserName());
-           entitys.setAddtime(new Date());
-           entitys.setCode(GetCode());
-           entitys.setCompanyCode(users.getCompanyCode());
-           entitys.setCompanyName(users.getCompanyName());
-           entitys.setProvinces(user.getProvinces());
-           entitys.setMunicipalities(user.getMunicipalities());
-           entitys.setDistricts(user.getDistricts());
-           entitys.setGrade(user.getGrade());
-           entitys.setNature(user.getNature());
-           entitys.setTitle(user.getTitle());
-           entitys.setEnable(1);
-           entitys.setIsReferrer(1);
-           entitys.setOrganizationCode("");
-           entitys.setOrganizationName("");
-           entitys.setReferrer(user.getReferrer());
-           entitys.setReview(2);
-           entitys.setUpdatetime(new Date());
-           entitys.setUserEmail(user.getUserEmail());
-           entitys.setUserHospital(user.getUserHospital());
-           entitys.setUserPosition(user.getUserPosition());
-           entitys.setUserBankCardNumber(user.getUserBankCardNumber());
-           entitys.setUserCardholderIdcard(user.getUserCardholderIdCard());
-           entitys.setUserCardholderName(user.getUserCardholderName());
-           entitys.setUserCardholderPhone(user.getUserCardholderPhone());
-           entitys.setUserDepartment(user.getUserDepartment());
-           entitys.setPhone(user.getPhone());
-           entitys.setIssub(user.getIssub()==null?0:1);
-           entitys.setContact_phone(user.getContact_phone());
-           entitys.setContacts(user.getContacts());
-           entitys.setDetailed_address(user.getDetailed_address());
-           entitys.setBusiness_license(user.getBusiness_license());
+            UsersEntity entitys = new UsersEntity();
+            entitys.setUserName(user.getUserName());
+            entitys.setAddtime(new Date());
+            entitys.setCode(GetCode());
+            entitys.setCompanyCode(users.getCompanyCode());
+            entitys.setCompanyName(users.getCompanyName());
+            entitys.setProvinces(user.getProvinces());
+            entitys.setMunicipalities(user.getMunicipalities());
+            entitys.setDistricts(user.getDistricts());
+            entitys.setGrade(user.getGrade());
+            entitys.setNature(user.getNature());
+            entitys.setTitle(user.getTitle());
+            entitys.setEnable(1);
+            entitys.setIsReferrer(1);
+            entitys.setOrganizationCode("");
+            entitys.setOrganizationName("");
+            entitys.setReferrer(user.getReferrer());
+            entitys.setReview(2);
+            entitys.setUpdatetime(new Date());
+            entitys.setUserEmail(user.getUserEmail());
+            entitys.setUserHospital(user.getUserHospital());
+            entitys.setUserPosition(user.getUserPosition());
+            entitys.setUserBankCardNumber(user.getUserBankCardNumber());
+            entitys.setUserCardholderIdcard(user.getUserCardholderIdCard());
+            entitys.setUserCardholderName(user.getUserCardholderName());
+            entitys.setUserCardholderPhone(user.getUserCardholderPhone());
+            entitys.setUserDepartment(user.getUserDepartment());
+            entitys.setPhone(user.getPhone());
+            entitys.setIssub(user.getIssub() == null ? 0 : 1);
+            entitys.setContact_phone(user.getContact_phone());
+            entitys.setContacts(user.getContacts());
+            entitys.setDetailed_address(user.getDetailed_address());
+            entitys.setBusiness_license(user.getBusiness_license());
 
-           Long userid = this.mapper.Insert(entitys);
-           userid = entitys.getUserId ();
-           if (userid == null) {
-               return false;
-           }
+            Long userid = this.mapper.Insert(entitys);
+            userid = entitys.getUserId();
+            if (userid == null) {
+                return false;
+            }
 
-           //添加关联
-           AccountsUsersRolesEntity Entitys = new AccountsUsersRolesEntity();
-           Entitys.setAccountId(accountId);
-           Entitys.setRoleId(user.getRoleId());
-           Entitys.setUserId(userid);
-           Long aurId = this.aurmapper.RewriteInsert(Entitys);
-           if (aurId == null) {
-               return false;
-           }
-           return true;
+            //添加关联
+            AccountsUsersRolesEntity Entitys = new AccountsUsersRolesEntity();
+            Entitys.setAccountId(accountId);
+            Entitys.setRoleId(user.getRoleId());
+            Entitys.setUserId(userid);
+            Long aurId = this.aurmapper.RewriteInsert(Entitys);
+            if (aurId == null) {
+                return false;
+            }
+            return true;
 
-       }
+        }
 
-        Long userId=this.aurmapper.GetAdminFind(entity.getPhone(),entity.getPassWord());
+        Long userId = this.aurmapper.GetAdminFind(entity.getPhone(), entity.getPassWord());
         UsersEntity usersEntity = this.mapper.selectByPrimaryKey(userId);
         usersEntity.setCompanyCode(users.getCompanyCode());
         usersEntity.setCompanyName(users.getCompanyName());
-        int num= this.mapper.updateByPrimaryKey(usersEntity);
-        if(num>0) {
-            isb=true;
+        int num = this.mapper.updateByPrimaryKey(usersEntity);
+        if (num > 0) {
+            isb = true;
         }
-        return  isb;
+        return isb;
     }
 
 
@@ -151,10 +179,9 @@ public class UsersService {
      */
     @Transactional
     public Boolean AdminRegister(UsersForm user) {
-        int nums =  this.mapper.GetByPhone(user.getPhone());
-        if(nums >0)
-        {
-            return  false;
+        int nums = this.mapper.GetByPhone(user.getPhone());
+        if (nums > 0) {
+            return false;
         }
         //查询账号是否已经注册
         AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
@@ -204,7 +231,7 @@ public class UsersService {
         entity.setGrade(user.getGrade());
         entity.setNature(user.getNature());
         entity.setTitle(user.getTitle());
-        entity.setIssub(user.getIssub()==null?0:user.getIssub());
+        entity.setIssub(user.getIssub() == null ? 0 : user.getIssub());
         entity.setDetailed_address(user.getDetailed_address());
         entity.setBusiness_license(user.getBusiness_license());
         entity.setContact_phone(user.getContact_phone());
@@ -227,35 +254,31 @@ public class UsersService {
     }
 
     /**
-     *  导入批量创建账户
+     * 导入批量创建账户
+     *
      * @param users
      * @return
      */
     @Transactional
-    public  Boolean ImportAdminExecl(List<UsersForm> users)
-    {
+    public Boolean ImportAdminExecl(List<UsersForm> users) {
 
-        for ( UsersForm user:users)
-        {
-            int nums =  this.mapper.GetByPhone(user.getPhone());
-            if(nums >0)
-            {
-                return  false;
+        for (UsersForm user : users) {
+            int nums = this.mapper.GetByPhone(user.getPhone());
+            if (nums > 0) {
+                return false;
             }
         }
 
-        for (UsersForm user:users)
-        {
+        for (UsersForm user : users) {
 
             //查询账号是否已经注册
             AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
             Long accountId;
             if (entitys != null) {
                 accountId = entitys.getAccountId();
-               int num=  this.aurmapper.GetIsNum(accountId,user.getRoleId());
-                if(num >0)
-                {
-                    return  false;
+                int num = this.aurmapper.GetIsNum(accountId, user.getRoleId());
+                if (num > 0) {
+                    return false;
                 }
             } else {
                 entitys = new AccountsEntity();
@@ -312,7 +335,7 @@ public class UsersService {
             usersRolesEntity.setAccountId(accountId);
             Long aurId = this.aurmapper.RewriteInsert(usersRolesEntity);
         }
-        return  true;
+        return true;
     }
 
     /**
@@ -328,10 +351,9 @@ public class UsersService {
      */
     @Transactional
     public Boolean Register(UsersForm user) {
-       int num=  this.mapper.GetByPhone(user.getPhone());
-        if(num >0)
-        {
-            return  false;
+        int num = this.mapper.GetByPhone(user.getPhone());
+        if (num > 0) {
+            return false;
         }
         //校验手机验证码
         SmssEntity sms = this.smssMapper.GetByPhone(user.getPhone(), new Date(), 1);
@@ -383,7 +405,7 @@ public class UsersService {
         entity.setUserHospital(user.getUserHospital());
         entity.setUserPosition(user.getUserPosition());
         entity.setPhone(user.getPhone());
-        entity.setIssub(user.getIssub()==null?0:user.getIssub());
+        entity.setIssub(user.getIssub() == null ? 0 : user.getIssub());
         entity.setProvinces(user.getProvinces());
         entity.setMunicipalities(user.getMunicipalities());
         entity.setDistricts(user.getDistricts());
@@ -391,7 +413,7 @@ public class UsersService {
         entity.setNature(user.getNature());
         entity.setTitle(user.getTitle());
         this.mapper.Insert(entity);
-        Long  userid = entity.getUserId();
+        Long userid = entity.getUserId();
 
         //添加关联
         AccountsUsersRolesEntity UsersRolesEntity = new AccountsUsersRolesEntity();
@@ -499,15 +521,16 @@ public class UsersService {
      * @param pageNumber
      * @return
      */
-    public PageInfo<UserInfoVo> GetByRole(Long rId, String name,String provinces,String municipalities,String districts,String grade,String nature,String Keyword,Integer review,Integer enable, PageNumber pageNumber) {
+    public PageInfo<UserInfoVo> GetByRole(Long rId, String name, String provinces, String municipalities, String districts, String grade, String nature, String Keyword, Integer review, Integer enable, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword,review,enable));
+        return new PageInfo<>(this.mapper.GetByRoleAll(rId, name, provinces, municipalities, districts, grade, nature, Keyword, review, enable));
     }
 
     /**
-     *  根据查询条件 导出
+     * 根据查询条件 导出
+     *
      * @param rId
      * @param name
      * @param provinces
@@ -518,15 +541,14 @@ public class UsersService {
      * @param Keyword
      * @return
      */
-    public  List<UserInfoVo> GetByExport(Long rId, String name,String provinces,String municipalities,String districts,String grade,String nature,String Keyword,Integer review,Integer enable)
-    {
-        return  this.mapper.GetByRoleAll(rId, name,provinces,municipalities,districts,grade,nature,Keyword,review,enable);
+    public List<UserInfoVo> GetByExport(Long rId, String name, String provinces, String municipalities, String districts, String grade, String nature, String Keyword, Integer review, Integer enable) {
+        return this.mapper.GetByRoleAll(rId, name, provinces, municipalities, districts, grade, nature, Keyword, review, enable);
     }
 
 
-
     /**
-     *  子管理查询本科院
+     * 子管理查询本科院
+     *
      * @param provinces
      * @param municipalities
      * @param districts
@@ -536,13 +558,12 @@ public class UsersService {
      * @param pageNumber
      * @return
      */
-    public  PageInfo<UserInfoVo> GetByIssue(Long userId,String provinces,String municipalities,String districts,String grade,String nature,String Keyword ,Integer review,Integer enable,PageNumber pageNumber)
-    {
-        UserInfoVo vo=  this.mapper.GetUserById(userId);
+    public PageInfo<UserInfoVo> GetByIssue(Long userId, String provinces, String municipalities, String districts, String grade, String nature, String Keyword, Integer review, Integer enable, PageNumber pageNumber) {
+        UserInfoVo vo = this.mapper.GetUserById(userId);
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetByIssue(vo.getCompanyCode(),provinces,municipalities,districts,grade,nature,Keyword,review,enable));
+        return new PageInfo<>(this.mapper.GetByIssue(vo.getCompanyCode(), provinces, municipalities, districts, grade, nature, Keyword, review, enable));
     }
 
     /**
@@ -554,7 +575,6 @@ public class UsersService {
     public UserInfoVo GetByUser(Long userId) {
         return this.mapper.GetUserById(userId);
     }
-
 
 
     /**

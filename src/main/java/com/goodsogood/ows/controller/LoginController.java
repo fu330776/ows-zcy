@@ -86,6 +86,28 @@ public class LoginController {
 
     }
 
+    /**
+     *  邀请码验证
+     * @param code
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "邀请码验证")
+    @HttpMonitorLogger
+    @PostMapping("/VerificationCode")
+    public  ResponseEntity<Result<Integer>> VerificationCode(@Valid @RequestBody String code,BindingResult bindingResult)
+    {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        Integer num=  this.usersService.VerificationCode(code);
+        Result<Integer> result=new Result<>(num,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+
+    }
+
+
+
 
     /**
      * 注册账号(管理员)

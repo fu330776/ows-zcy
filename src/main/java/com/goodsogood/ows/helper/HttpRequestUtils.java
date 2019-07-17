@@ -1,5 +1,8 @@
 package com.goodsogood.ows.helper;
 
+import com.unboundid.util.json.JSONObject;
+import org.springframework.boot.jackson.JsonObjectSerializer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -44,6 +47,7 @@ public class HttpRequestUtils {
             in = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
             String line;
+
             while ((line = in.readLine()) != null) {
                 result += line;
             }
@@ -122,4 +126,5 @@ public class HttpRequestUtils {
         }
         return result;
     }
+
 }

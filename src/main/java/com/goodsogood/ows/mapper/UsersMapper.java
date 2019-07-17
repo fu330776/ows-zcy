@@ -277,4 +277,24 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
     })
     int GetByPhone(@Param(value = "phone") String phone);
 
+    @Select({
+            "<script>",
+            "select Count(0) from zcy_users where code=#{code,jdbcType=VARCHAR}  and review=2 and enable=1 and Issub=0,is_referrer=2",
+            "</script>"
+    })
+    int GetCodeCount(@Param(value = "code") String code );
+
+    @Update({
+            "<script>",
+            "update zcy_users set openid=#{openid,jdbcType=VARCHAR} where user_id=#{id,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int updateOpenId(@Param(value = "openid") String openid,@Param(value = "id") Long id);
+
+    @Select({
+            "<script>",
+            "select  openid from where user_id=#{id,jdbcType=BIGINT}",
+            "</script>"
+    })
+    String getOpenId(@Param(value = "id") Long id);
 }

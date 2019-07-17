@@ -5,8 +5,6 @@ import lombok.Data;
 
 @ApiModel
 @Data
-public class CreateOrderForm {
-    public  Long gid;
-    public  int type;
-    public  String openId;
+public class PayOrderForm {
+    public String orderNo;
 }

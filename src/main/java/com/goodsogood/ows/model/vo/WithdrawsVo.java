@@ -34,4 +34,10 @@ public class WithdrawsVo {
     public Date paytime;
 
     public String userName;
+    @ApiModelProperty(value = "银行账号")
+    public  String bankNumber;
+
+    public  String userCardholderName;
+    public  String    userCardholderPhone;
+    public  String  userCardholderIdcard;
 }

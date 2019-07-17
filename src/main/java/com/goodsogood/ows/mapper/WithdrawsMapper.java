@@ -63,11 +63,13 @@ public interface WithdrawsMapper extends MyMapper<WithdrawsEntity> {
 
     @Select({
             "<script>",
-            "SELECT withdraw_id as withdrawId,withdraw_number as withdrawNumber,",
-            "withdraw_money as withdrawMoney,user_id as userId,is_withdraw as isWithdraw,addtime,paytime,",
-            "(SELECT zu.user_name as userName FROM zcy_users zu where zu.user_id =zw.user_id)userName",
-            " FROM zcy_withdraws zw where user_id=#{userId,jdbcType=BIGINT}",
-            "<if test='isw!=null'> and is_withdraw=#{isw,jdbcType=BIT} </if>",
+            "select zw.withdraw_id as withdrawId,zw.withdraw_number as withdrawNumber,",
+            "zw.withdraw_money as withdrawMoney,zw.user_id as userId,zw.is_withdraw as isWithdraw,zw.addtime,zw.paytime,zu.user_Name as userName",
+            ",zu.user_bank_card_number as bankNumber",
+            ",zu.user_cardholder_name as userCardholderName,zu.user_cardholder_phone as userCardholderPhone,zu.user_cardholder_idcard as userCardholderIdcard",
+            "from zcy_withdraws zw LEFT JOIN zcy_users zu ON zw.user_id=zu.user_id",
+            " where zw.user_id=#{userId,jdbcType=BIGINT}",
+            "<if test='isw!=null'> and zw.is_withdraw=#{isw,jdbcType=BIT} </if>",
             "</script>"
 
     })
@@ -75,11 +77,12 @@ public interface WithdrawsMapper extends MyMapper<WithdrawsEntity> {
 
     @Select({
             "<script>",
-            "SELECT withdraw_id as withdrawId,withdraw_number as withdrawNumber,",
-            "withdraw_money as withdrawMoney,user_id as userId,is_withdraw as isWithdraw,addtime,paytime,",
-            "(SELECT zu.user_name as userName FROM zcy_users zu where zu.user_id =zw.user_id)userName",
-            " FROM zcy_withdraws zw",
-            "<if test='isw!=null'> where is_withdraw=#{isw,jdbcType=BIT} </if>",
+            "select zw.withdraw_id as withdrawId,zw.withdraw_number as withdrawNumber,",
+            "zw.withdraw_money as withdrawMoney,zw.user_id as userId,zw.is_withdraw as isWithdraw,zw.addtime,zw.paytime,zu.user_Name as userName",
+            ",zu.user_bank_card_number as bankNumber",
+            ",zu.user_cardholder_name as userCardholderName,zu.user_cardholder_phone as userCardholderPhone,zu.user_cardholder_idcard as userCardholderIdcard",
+            "from zcy_withdraws zw LEFT JOIN zcy_users zu ON zw.user_id=zu.user_id",
+            "<if test='isw!=null'> where zw.is_withdraw=#{isw,jdbcType=BIT} </if>",
             "</script>"
     })
     List<WithdrawsVo> GetAdmin(@Param(value = "isw") Integer isw);

@@ -392,10 +392,9 @@ public class UsersController {
      * @return
      */
     @ApiOperation(value = "查询资金流水")
-    @GetMapping("/getcapitalflow/{is}")
+    @GetMapping("/getcapitalflow")
     public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(
-            @ApiParam(value = "is", required = true)
-            @PathVariable Integer is,
+             Integer is,
             Integer page,
             Integer pageSize
     ) {

@@ -126,4 +126,5 @@ public class UsersEntity extends BaseEntity {
     @ApiModelProperty(value = "企业会员营业执照")
     public  String business_license;
 
+    public String openid;
 }

@@ -185,4 +185,16 @@ public class PayService {
     }
 
 
+    /**
+     *  删除订单
+     * @param pid 当前订单表的自增主键
+     * @return
+     */
+    public  int Del(Long pid)
+    {
+        int num=this.mapper.Delete(pid);
+        return  num;
+    }
+
+
 }

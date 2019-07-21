@@ -36,7 +36,8 @@ public class PayServiceImpl {
         // 返回结果
         Map<String, String> resultMap = new HashMap<>(16);
         // 创建支付订单
-        switch (payBean.getPayType()) {
+        switch (payBean.getPayType())
+        {
             case PayTypeConst.ORDER_PAY_TYPE_WX_NATIVE:
                 // 微信 NATIVE 支付(二维码)
                 Map<String,String> wxPayNativeMap = WxPayManager.createNativeOrder(wxPayConfig, payBean.getOrderNo(),
@@ -54,6 +55,7 @@ public class PayServiceImpl {
                 }
                 Map<String, String> wxPayJsAPIMap = WxPayManager.createJsAPIOrder(wxPayConfig, payBean.getOrderNo(),
                         amountWxPay, payBean.getIp(), payBean.getOpenId());
+                log.debug(wxPayJsAPIMap);
                 if (wxPayJsAPIMap != null &&
                         Objects.equals(wxPayJsAPIMap.get("pre_pay_order_status"), wxPayConfig.getResponseSuccess())) {
                     return ApiResult.success(wxPayJsAPIMap);
@@ -136,6 +138,7 @@ public class PayServiceImpl {
              */
             String strXML = FileUtils.getStringFromStream(inputStream);
             Map<String,String> reqMap = MapUtil.xml2Map(strXML);
+            log.debug("==================================================支付回调===================================================");
             log.debug(strXML);
             log.debug(reqMap);
             if(MapUtil.isEmpty(reqMap)){

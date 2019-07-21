@@ -279,7 +279,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
 
     @Select({
             "<script>",
-            "select Count(0) from zcy_users where code=#{code,jdbcType=VARCHAR}  and review=2 and enable=1 and Issub=0,is_referrer=2",
+            "select Count(0) from zcy_users where code=#{code,jdbcType=VARCHAR}  and review=2 and enable=1 and Issub=0",
             "</script>"
     })
     int GetCodeCount(@Param(value = "code") String code );
@@ -293,7 +293,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
 
     @Select({
             "<script>",
-            "select  openid from where user_id=#{id,jdbcType=BIGINT}",
+            "select  openid from zcy_users where user_id=#{id,jdbcType=BIGINT}",
             "</script>"
     })
     String getOpenId(@Param(value = "id") Long id);

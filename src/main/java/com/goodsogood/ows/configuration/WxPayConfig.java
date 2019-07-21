@@ -126,13 +126,13 @@ public class WxPayConfig {
     /**
      * 微信「统一下单」接口地址
      */
-   // @Value("${wxPay.pay.api.unifiedOrderUrl}")
+    @Value("${wxPay.pay.api.unifiedOrderUrl}")
     private String unifiedOrderUrl;
 
     /**
      * 微信查询订单信息接口地址
      */
-   // @Value("${wxPay.pay.api.orderQueryUrl}")
+    @Value("${wxPay.pay.api.orderQueryUrl}")
     private String orderQueryUrl;
 
 

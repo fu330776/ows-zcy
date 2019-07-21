@@ -1,5 +1,6 @@
 package com.goodsogood.ows.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.configuration.WxPayConfig;
@@ -12,6 +13,7 @@ import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.PayService;
 import com.goodsogood.ows.service.PayServiceImpl;
 import com.goodsogood.ows.service.UsersService;
+import com.unboundid.util.json.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
@@ -48,11 +50,15 @@ public class PayController {
     }
 
     /**
-     *  获取用户openid
+     * 获取用户openid
+     *
      * @param id
      * @return openid
      */
-    public String getOpenId(@Valid @RequestBody Long id) {
+    @ApiModelProperty(value = "创建支付订单")
+    @GetMapping(value = "/getUserOpenId/{id}")
+    public String getOpenId(@ApiParam(value = "page", required = true)
+                                @PathVariable Long id) {
         return this.usersService.getOpenId(id);
     }
 
@@ -64,16 +70,16 @@ public class PayController {
      * @param bindingResult
      * @return
      */
-
-    public ResponseEntity<Result<PaymentEntity>> CreateOrder(@Valid @RequestBody CreateOrderForm form, HttpServletRequest request, BindingResult bindingResult) {
+    @ApiModelProperty(value = "创建支付订单")
+    @PostMapping(value = "/createOrders")
+    public ResponseEntity<Result<ApiResult>> CreateOrder(@Valid @RequestBody CreateOrderForm form, HttpServletRequest request, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         PaymentEntity entity = new PaymentEntity();
         ApiResult apiResult = null;
-        Result<PaymentEntity> result = null;
+        Result<ApiResult> result = null;
         try {
-
             switch (form.getType()) {
                 case 1:
                     entity = this.service.InsertPatents(form.getGid());
@@ -87,21 +93,28 @@ public class PayController {
                 PayBean bean = new PayBean();
                 bean.setAmount(String.valueOf(entity.getRealMoney()));
                 bean.setOrderNo(entity.getOrderNo());
-                bean.setPayType(22);
+                bean.setPayType(form.getPayType());
                 bean.setOpenId(form.getOpenId());
                 bean.setIp(IpUtil.getIpAddr(request));
                 apiResult = payService.createPayOrder(bean);
             }
             if (apiResult != null) {
-                result = new Result<>(entity, errors);
+                apiResult.setOrderNo(entity.getOrderNo());
+                result = new Result<>(apiResult, errors);
             } else {
                 this.service.Del(entity.getPaymentId());
             }
         } catch (Exception e) {
             e.printStackTrace();
+            this.service.Del(entity.getPaymentId());
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+
+
+
+
 
     /**
      * 支付成功
@@ -110,12 +123,13 @@ public class PayController {
      * @param bindingResult
      * @return
      */
+    @ApiModelProperty(value = "支付成功调用")
+    @PostMapping(value = "/pageOrder")
     public ResponseEntity<Result<Boolean>> PayOrder(@Valid @RequestBody PayOrderForm order, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        this.service.Update(order.getOrderNo(), "");
-
+        this.service.Update(order.getOrderNo(), order.getWxOrderNo());
         Result<Boolean> result = new Result<>(false, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -130,16 +144,13 @@ public class PayController {
     @ApiModelProperty(value = "创建支付订单")
     @PostMapping(value = "/createOrder")
     public ApiResult createPayOrder(@Valid @RequestBody PayBean payBean) {
-
         ApiResult apiResult = null;
-
         try {
             apiResult = payService.createPayOrder(payBean);
 
         } catch (Exception e) {
             log.error("支付订单创建失败", e);
         }
-
         return apiResult;
     }
 
@@ -152,15 +163,13 @@ public class PayController {
     @ApiModelProperty(value = "查询订单支付结果")
     @PostMapping(value = "/getPayResult")
     public ApiResult getPayResult(@RequestBody PayBean payBean) {
-
         ApiResult apiResult = null;
-
         try {
             apiResult = payService.getPayResult(payBean);
+
         } catch (Exception e) {
             log.error("订单支付结果查询失败", e);
         }
-
         return apiResult;
     }
 
@@ -172,13 +181,14 @@ public class PayController {
      */
 
     @ApiModelProperty(value = "微信支付结果异步通知")
-    @PostMapping(value = "/wxPayNotify")
+    @GetMapping(value = "/wxPayNotify")
     public String WXPayNotify(HttpServletRequest request) {
 
         log.debug("WxPay notify");
         String result = null;
         try {
             result = payService.wxPayNotify(request);
+            log.debug(result);
         } catch (Exception e) {
             log.error("微信支付结果通知解析失败", e);
             return "FAIL";
@@ -188,19 +198,35 @@ public class PayController {
         return result;
     }
 
+
+
     @ApiModelProperty(value = "获取openId")
     @GetMapping(value = "/getOpenId/{code}")
     public String GetOpen(@ApiParam(value = "page", required = true)
-                              @PathVariable String code) {
+                          @PathVariable String code) {
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token";
         String AppId = wxPayConfig.getPublicAppId();
         String Key = "7e46056922b5b4540e035ef04a058eda";
         log.debug(AppId);
         log.debug(Key);
         String paras = "appid=" + AppId + "&secret=7e46056922b5b4540e035ef04a058eda&code=" + code + "&grant_type=authorization_code";
+        ObjectMapper mapper = new ObjectMapper();
         String result = HttpRequestUtils.sendPost(url, paras);
         return result;
 
     }
+
+    /**
+     * 设置 openid
+     *
+     * @param open
+     * @return
+     */
+    @ApiModelProperty(value = "设置用户唯一openid")
+    @PostMapping("/setOpen")
+    public int updateOpenId(@Valid @RequestBody UserOpen open) {
+        return this.usersService.updateOpen(open.getUserId(), open.getOpenId());
+    }
+
 
 }

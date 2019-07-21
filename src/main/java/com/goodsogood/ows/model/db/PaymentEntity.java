@@ -37,11 +37,11 @@ public class PaymentEntity extends BaseEntity {
 
     @ApiModelProperty(value = "订单金额")
     @Column(name = "payment_total_money")
-    public float totalMoney;
+    public double totalMoney;
 
     @ApiModelProperty(value = "支付金额")
     @Column(name = "payment_real_money")
-    public float realMoney;
+    public double realMoney;
 
     @ApiModelProperty(value = "订单类型 1：idea 确权 2：委托书")
     @Column(name = "payment_type")

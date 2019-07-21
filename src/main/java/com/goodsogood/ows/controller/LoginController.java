@@ -1,5 +1,6 @@
 package com.goodsogood.ows.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.goodsogood.log4j2cm.annotation.HttpMonitorLogger;
 import com.goodsogood.ows.component.Errors;
@@ -19,6 +20,7 @@ import com.unboundid.util.json.JSONObjectReader;
 import com.unboundid.util.json.JSONValue;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonObjectDeserializer;
@@ -68,45 +70,53 @@ public class LoginController {
      * 注册账号(推荐人分享)
      */
     @ApiOperation(value = "注册账号")
-    @HttpMonitorLogger
+//    @HttpMonitorLogger
     @PostMapping("/add")
-    public ResponseEntity<Result<Boolean>> addUser(@Valid @RequestBody UsersForm user, BindingResult bindingResult) {
+    public ResponseEntity<Result<LoginResult>> addUser(@Valid @RequestBody UsersForm user, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Result<Boolean> result;
+        Result<LoginResult> result;
+        LoginResult results = new LoginResult();
+        results.setIsb(false);
+        results.setMsg("注册失败");
         //验证码
         if (user.getPhoneCode().isEmpty()) {
-            result = new Result<>(false, errors, "验证码不可为空");
+            results.setIsb(false);
+            results.setMsg("手机验证码错误");
+            result = new Result<>(results, errors);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         //手机验证码判断
-        result = new Result<>(this.usersService.Register(user), errors);
+        Boolean isb = this.usersService.Register(user);
+        if (isb)
+        {
+             results.setIsb(true);
+             results.setMsg("注册成功");
+        }
+        result = new Result<>(results, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
 
     /**
-     *  邀请码验证
+     * 邀请码验证
+     *
      * @param code
-     * @param bindingResult
+     * @param
      * @return
      */
     @ApiOperation(value = "邀请码验证")
     @HttpMonitorLogger
-    @PostMapping("/VerificationCode")
-    public  ResponseEntity<Result<Integer>> VerificationCode(@Valid @RequestBody String code,BindingResult bindingResult)
-    {
-        if (bindingResult.hasFieldErrors()) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
-        Integer num=  this.usersService.VerificationCode(code);
-        Result<Integer> result=new Result<>(num,errors);
-        return  new ResponseEntity<>(result,HttpStatus.OK);
+    @GetMapping("/VerificationCode/{code}")
+    public ResponseEntity<Result<Integer>> VerificationCode(@ApiParam(value = "code", required = true)
+                                                            @PathVariable String code) {
+        Integer num = this.usersService.VerificationCode(code);
+
+        Result<Integer> result = new Result<>(num, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
-
-
 
 
     /**
@@ -137,21 +147,18 @@ public class LoginController {
 
     @ApiOperation(value = "注册子账号")
     @PostMapping("/addSonAdmin")
-    public ResponseEntity<Result<Boolean>> AddSonAdminUser(@Valid @RequestBody SonUserForm sonUser,BindingResult bindingResult)
-    {
+    public ResponseEntity<Result<Boolean>> AddSonAdminUser(@Valid @RequestBody SonUserForm sonUser, BindingResult bindingResult) {
         log.debug("bindingResult->{}", bindingResult);
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean bool =  this.usersService.SonAdminRegister(sonUser);
+        Boolean bool = this.usersService.SonAdminRegister(sonUser);
         if (!bool) {
             throw new ApiException("注册失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Result<Boolean>  result = new Result<>(bool, errors);
+        Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
-
 
 
     /**
@@ -291,9 +298,11 @@ public class LoginController {
         smsEntity.setSmsCode(code);
         smsEntity.setSmsContent(content);
         smsEntity.setAddtime(time);
-        String sms = SmsUtils.postEncrypt(Url, username, pwd, Phone, content, productid);
-        Integer getCode = Integer.parseInt(sms.split(",")[0]);
-        if (getCode == 1) {
+//        String sms = SmsUtils.postEncrypt(Url, username, pwd, Phone, content, productid);
+        String sms = SmsUtils.SendSms(Phone,"知创云","SMS_171115994",code);
+        ObjectMapper mapper = new ObjectMapper(); //转换器
+        SmsForm getCodes=mapper.readValue(sms,SmsForm.class);
+        if (getCodes.getMessage().equals("OK")) {
 
             smsEntity.setSmsSendType(1); //短信发送类型 1、文字 2、语音
             smsEntity.setSmsType(entity.getType()); //短信类型 1、注册账号 2、修改密码

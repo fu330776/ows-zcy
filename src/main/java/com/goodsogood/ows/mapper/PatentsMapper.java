@@ -38,7 +38,7 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
             "(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
             ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
             "FROM zcy_patents z where user_id=#{id,jdbcType=BIGINT} and patent_type=#{type,jdbcType=BIT}",
-            "<if test='title !=null'> and patent_title LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%')) </if>",
+            "<if test='title !=null'> and patent_title LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%')) </if> order by addtime desc",
             "</script>"
     })
     List<PatentsVo> Get(@Param(value = "id") Long id, @Param(value = "type") Integer type, @Param(value = "title") String title);

@@ -51,6 +51,7 @@ public class PayService {
         if (entity == null) {
             PatentsVo vo = this.patentsMapper.GetById(pid);
             UserInfoVo userVo = this.usersMapper.GetUserById(vo.getUserId());
+            entity=new PaymentEntity();
             entity.setAddTime(new Date());
             entity.setGoodId(vo.getPatentId());
             entity.setUserName(vo.getUserName());
@@ -64,6 +65,7 @@ public class PayService {
             entity.setOrderNo(userVo.getCode() + OrderGeneratorUtils.getOrderIdByTime(userVo.getUserId()));
             entity.setNumber(1);
             entity.setGoodName(vo.getPatentTitle());
+            entity.setWxOrderNo("");
             int num = this.mapper.Insert(entity);
 
         }
@@ -83,6 +85,7 @@ public class PayService {
         if (entity == null) {
             TasksEntity tasksEntity = this.tasksMapper.GetByTaskId(tid);
             UserInfoVo userVo = this.usersMapper.GetUserById(tasksEntity.getUserId());
+            entity=new PaymentEntity();
             entity.setTotalMoney(tasksEntity.getTaskMoney());
             entity.setAddTime(new Date());
             entity.setGoodId(tasksEntity.getTaskId());
@@ -95,6 +98,7 @@ public class PayService {
             entity.setPayTime(new Date());
             entity.setOrderNo(userVo.getCode() + OrderGeneratorUtils.getOrderIdByTime(userVo.getUserId()));
             entity.setNumber(1);
+            entity.setWxOrderNo("");
             entity.setGoodName(tasksEntity.getTaskName());
             int num = this.mapper.Insert(entity);
         }

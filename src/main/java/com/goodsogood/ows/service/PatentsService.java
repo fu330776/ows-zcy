@@ -29,7 +29,13 @@ public class PatentsService {
         }
         return true;
     }
-
+    public PatentsEntity InsertIdea(PatentsEntity patentsEntity) {
+        Integer num = this.mapper.Insert(patentsEntity);
+        if (num == null || num == 0) {
+            return null;
+        }
+        return patentsEntity;
+    }
     /**
      *  修改状态
      * @param id

@@ -11,6 +11,6 @@ public class IdeaForm {
     public String content;
     public Long userId;
     public float money;
-    public Integer isPay;
+      public Integer isPay;
     public  String picture;
 }

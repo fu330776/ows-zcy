@@ -25,7 +25,7 @@ public interface PaymentMapper extends MyMapper<PaymentEntity> {
             "#{realMoney,jdbcType=DECIMAL},#{type,jdbcType=BIT},#{goodId,jdbcType=BIGINT},",
             "#{goodName,jdbcType=VARCHAR},#{userId,jdbcType=BIGINT},#{userName,jdbcType=VARCHAR},",
             "#{Status,jdbcType=VARCHAR},#{payWay,jdbcType=VARCHAR},#{number,jdbcType=BIT},",
-            "#{wxOrder,jdbcType=VARCHAR},#{payTime,jdbcType=TIMESTAMP},#{addTime,jdbcType=TIMESTAMP}",
+            "#{wxOrderNo,jdbcType=VARCHAR},#{payTime,jdbcType=TIMESTAMP},#{addTime,jdbcType=TIMESTAMP}",
             ")",
             "</script>"
     })

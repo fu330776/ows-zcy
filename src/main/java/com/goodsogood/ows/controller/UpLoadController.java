@@ -1,5 +1,7 @@
 package com.goodsogood.ows.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.goodsogood.log4j2cm.annotation.HttpMonitorLogger;
 import com.goodsogood.ows.helper.ExeclUtil;
 import com.goodsogood.ows.helper.SmsUtils;
@@ -7,6 +9,7 @@ import com.goodsogood.ows.helper.UploadUtils;
 import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.UsersService;
 import com.goodsogood.ows.service.WithdrawsService;
+import com.unboundid.util.json.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -113,15 +117,13 @@ public class UpLoadController {
     @HttpMonitorLogger
     @ApiOperation(value = "测试验证码发送")
     @PostMapping("/Sms")
-    public String Sms() {
+    public String Sms() throws IOException {
         String sms = null;
-        String content = "验证码：" + 123456 + "，请不要把验证码泄露给他人，谢谢！【知创云】";
-        try {
-            sms = SmsUtils.postEncrypt(Url, username, pwd, "17783374871", content, productid);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return sms;
+        //String content = "验证码：" + 123456 + "，请不要把验证码泄露给他人，谢谢！【知创云】";
+        sms= SmsUtils.SendSms("17783374871","知创云","SMS_171115994","123456");
+     ObjectMapper mapper = new ObjectMapper(); //转换器
+        SmsForm getCodes=mapper.readValue(sms,SmsForm.class);
+        return getCodes.getMessage();
     }
 
     @HttpMonitorLogger

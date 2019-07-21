@@ -37,7 +37,7 @@ public class TasksOrdersEntity extends BaseEntity {
 
     @ApiModelProperty(value = "金额")
     @Column(name = "task_money")
-    public float taskMoney;
+    public double taskMoney;
 
     public Date addtime;
 

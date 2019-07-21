@@ -110,14 +110,14 @@ public class PatentsController {
      */
     @ApiOperation(value = "idea确权添加")
     @PostMapping(value = "/ideAdd")
-    public ResponseEntity<Result<Boolean>> ideaAdd(@Valid @RequestBody IdeaForm form, BindingResult bindingResult) {
+    public ResponseEntity<Result<PatentsEntity>> ideaAdd(@Valid @RequestBody IdeaForm form, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         PatentsEntity entity = new PatentsEntity();
         entity.setAddtime(new Date());
         entity.setIsNeedPay(1);
-        entity.setIsPay(form.getIsPay());
+        entity.setIsPay(1);
         entity.setPatentContent(form.getContent());
         entity.setPatentMoney(form.getMoney());
         entity.setPatentTitle(form.getTitle());
@@ -125,11 +125,9 @@ public class PatentsController {
         entity.setUserId(form.getUserId());
         entity.setPicture(form.getPicture());
         entity.setState("递交成功");
-        Boolean bool = this.service.Insert(entity);
-        Result<Boolean> result = new Result<>(true, errors);
-        if (bool == false) {
-            result = new Result<>(false, errors);
-        } else {
+        entity = this.service.InsertIdea(entity);
+        Result<PatentsEntity> result = new Result<>(entity, errors);
+       if(entity !=null) {
             Statistics(4);
         }
         return new ResponseEntity<>(result, HttpStatus.OK);

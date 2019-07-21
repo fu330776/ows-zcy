@@ -2,6 +2,8 @@ package com.goodsogood.ows.helper;
 
 import com.goodsogood.ows.configuration.WxPayConfig;
 import com.goodsogood.ows.model.vo.PayTypeConst;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -12,7 +14,8 @@ import java.util.Map;
  * @Author: junqiang.lu
  * @Date: 2018/7/12
  */
-//@Slf4j
+@Log4j2
+@Slf4j
 public class WxPayManager {
 
     /**
@@ -75,6 +78,7 @@ public class WxPayManager {
         dataMap.put("notify_url", wxPayConfig.getNotifyUrl());
         dataMap.put("trade_type", wxPayConfig.getTradeTypeJsApi());
         dataMap.put("openid", openId);
+
         // 签名,请求「统一下单」接口，并解析返回结果
         Map<String, String> responseMap = signAndGetResponse(dataMap, wxPayConfig.getKey(),
                 wxPayConfig.getFieldSign(), wxPayConfig.getUnifiedOrderUrl());

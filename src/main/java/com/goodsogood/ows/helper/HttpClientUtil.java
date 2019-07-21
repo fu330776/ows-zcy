@@ -1,4 +1,6 @@
 package com.goodsogood.ows.helper;
+import lombok.extern.log4j.Log4j2;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -9,6 +11,7 @@ import java.util.Map;
  * @Author: junqiang.lu
  * @Date: 2018/4/26
  */
+@Log4j2
 public final class HttpClientUtil {
 
     private HttpClientUtil(){}
@@ -28,6 +31,7 @@ public final class HttpClientUtil {
                                             int connectTimeoutMs, int readTimeoutMs) throws Exception {
         String UTF8 = "UTF-8";
         String reqBody = MapUtil.map2Xml(reqData);
+
         URL httpUrl = new URL(strUrl);
 
         HttpURLConnection httpURLConnection = (HttpURLConnection) httpUrl.openConnection();
@@ -45,9 +49,11 @@ public final class HttpClientUtil {
         InputStream inputStream = httpURLConnection.getInputStream();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, UTF8));
         final StringBuffer stringBuffer = new StringBuffer();
+        log.debug(bufferedReader);
         String line = null;
         while ((line = bufferedReader.readLine()) != null) {
             stringBuffer.append(line).append("\n");
+            log.debug(line);
         }
         String resp = stringBuffer.toString();
         if (stringBuffer!=null) {

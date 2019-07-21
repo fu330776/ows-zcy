@@ -77,7 +77,7 @@ public class UserInfoVo {
     public String code;
 
     @ApiModelProperty(value = "推荐人（对应其他用户的推荐码）")
-    public Long referrer;
+    public String referrer;
 
     @ApiModelProperty(value = "是否被管理员指定为推荐人 1、不是 2、是")
     @Column(name = "is_referrer")

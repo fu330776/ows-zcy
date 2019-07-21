@@ -44,7 +44,7 @@ public class TasksEntity extends BaseEntity {
 
     @ApiModelProperty(value = "任务金额")
     @Column(name = "task_money")
-    public float taskMoney;
+    public double taskMoney;
     @ApiModelProperty(value = "执行人")
     @Column(name = "user_id")
     public Long userId;

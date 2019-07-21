@@ -360,7 +360,7 @@ public class UsersService {
         if (sms == null) {
             return false;
         }
-        if (sms.getSmsCode() != user.getPhoneCode()) {
+        if (sms.getSmsCode().equals(user.getPhoneCode())) {
             return false;
         }
         this.smssMapper.Update(user.getPhone(), new Date());

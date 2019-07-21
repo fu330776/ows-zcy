@@ -34,7 +34,7 @@ public class WithdrawsEntity extends BaseEntity {
 
     @ApiModelProperty(value = "提现金额")
     @Column(name = "withdraw_money")
-    public float withdrawMoney;
+    public double withdrawMoney;
 
     @ApiModelProperty(value = "提现人")
     @Column(name = "user_id")

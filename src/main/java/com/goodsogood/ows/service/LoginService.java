@@ -41,7 +41,6 @@ public class LoginService {
             return this.mapper.GetLists(accountsEntity.getAccountId());
         }
         return null;
-
     }
 
 

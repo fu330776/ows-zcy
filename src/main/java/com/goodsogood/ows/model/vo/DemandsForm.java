@@ -12,6 +12,7 @@ public class DemandsForm {
     public Integer isContact;
     public String demandName;
     public String demandContent;
+    public String picture;
 
 }
 

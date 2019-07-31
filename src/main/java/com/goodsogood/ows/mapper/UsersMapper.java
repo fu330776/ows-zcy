@@ -161,7 +161,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "FROM zcy_users zu ",
             "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
             "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id  where zr.role_id =#{roleId,jdbcType=BIGINT} and zu.Issub=0",
-            "<if test='name !=null'> and zu.user_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
+           // "<if test='name !=null'> and zu.user_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
             "<if test='review !=null'> and zu.review=#{review,jdbcType=BIT} </if>",
             "<if test='enable !=null'> and zu.enable=#{enable,jdbcType=BIT} </if>",
             "<if test='provinces !=null'> and provinces=#{provinces,jdbcType=VARCHAR} </if>",
@@ -180,6 +180,10 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             " or organization_name like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
             " or user_hospital like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
             " or user_department like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or  phone  like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or `code`  like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or referrer  like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or zu.user_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
             ")</if>",
             " ORDER BY zu.addtime desc",
             "</script>"
@@ -196,6 +200,32 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             , @Param(value = "Keyword") String Keyword
             , @Param(value = "review") Integer review
             , @Param(value = "enable") Integer enable);
+
+
+    @Select({
+            "<script>",
+            "SELECT ",
+            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName",
+            ",zu.`enable`,zu.is_referrer as isReferrer,zu.organization_code as organizationCode,",
+            "zu.organization_name as organizationName,zu.referrer ,zu.review ,zu.updatetime,",
+            "zu.user_bank_card_number as userBankCardNumber,zu.user_cardholder_idcard as userCardholderIdcard",
+            ",zu.user_cardholder_name as userCardholderName,zu.user_cardholder_phone as userCardholderPhone",
+            ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
+            ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
+            "zr.role_id as roleId,zr.role_name as roleName,",
+            "zu.phone,zaur.account_id as accountId,",
+            "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
+            ",contacts,contact_phone,detailed_address,business_license",
+            "FROM zcy_users zu ",
+            "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
+            "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id  where zr.role_id = 1  and zu.Issub = 2",
+            "<if test='name != null'> and (zu.user_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
+            " or zu.phone like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
+            ")</if>",
+            " ORDER BY zu.addtime desc",
+            "</script>"
+    })
+    List<UserInfoVo> GetAdministrator(@Param(value = "name") String name);
 
 
     @Select({
@@ -276,6 +306,21 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "</script>"
     })
     int GetByPhone(@Param(value = "phone") String phone);
+
+
+    @Select({
+            "<script>",
+            "select Count(0) from zcy_users where phone=#{phone,jdbcType=VARCHAR}",
+            "</script>"
+    })
+    int GetPhone(@Param(value = "phone") String phone);
+
+    @Select({
+            "<script>",
+            "select Count(0) from zcy_users where phone=#{phone,jdbcType=VARCHAR} and Issub=2",
+            "</script>"
+    })
+    int GetAdminPhone(@Param(value = "phone") String phone);
 
     @Select({
             "<script>",

@@ -2,11 +2,13 @@ package com.goodsogood.ows.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.helper.HttpUtil;
+import com.goodsogood.ows.helper.SmsUtils;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.SmssEntity;
 import com.goodsogood.ows.model.db.UsersEntity;
@@ -26,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.validation.Valid;
 import java.util.*;
 
@@ -151,31 +154,79 @@ public class UsersController {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
-        String entity_v = HttpUtil.postEncrypt(restTemplate, url, getResArgs(entity.getMobile(), ""), headers, new TypeReference<String>() {
-        });
+//        String entity_v = HttpUtil.postEncrypt(restTemplate, url, getResArgs(entity.getMobile(), ""), headers, new TypeReference<String>() {
+//        });
+
         ObjectMapper mapper = new ObjectMapper();
-        VerificationCode verificationCode = mapper.readValue(entity_v, VerificationCode.class);
+//        VerificationCode verificationCode = mapper.readValue(entity_v, VerificationCode.class);
         String code = map.get("code");
+        SmssEntity smsEntity = this.usersService.SmsGet(entity.getMobile(), 2);
+        if (smsEntity == null) {
+            smsEntity = new SmssEntity();
+            smsEntity.setSmsPhone(map.get("phoneNum"));
+            smsEntity.setSmsCode(code);
+            smsEntity.setAddtime(time);
+        } else {
+            code = smsEntity.getSmsCode();
+        }
         String sms = "【知创云】验证码：" + code + "，请不要把验证码泄露给他人，谢谢！";
-        SmssEntity smsEntity = new SmssEntity();
-        smsEntity.setSmsPhone(map.get("phoneNum"));
-        smsEntity.setSmsCode(code);
         smsEntity.setSmsContent(sms);
-        smsEntity.setAddtime(time);
-
-        if (verificationCode.getCode() == 0) {
-
+        String smsq = SmsUtils.SendSms(entity.getMobile(), "知创云", "SMS_171115994", code);
+        SmsForm getCodes = mapper.readValue(smsq, SmsForm.class);
+        Result<SmssEntity> result = null;
+        if (getCodes.getMessage().equals("OK")) {
             smsEntity.setSmsSendType(1); //短信发送类型 1、文字 2、语音
             smsEntity.setSmsType(2); //短信类型 1、注册账号 2、修改密码
             smsEntity.setSmsSendFrequency(1); //发送次数
             smsEntity.setSmsUse(1);
-            smsEntity.setSmsExpireDate(stampToDate(verificationCode.getTimestamp()));    //失效时间
-
+            smsEntity.setSmsExpireDate(stampToDate());    //失效时间
+            SmssEntity smsEntities = this.usersService.SmsInsert(smsEntity, 2);
+            result = new Result<>(smsEntities, errors);
+        } else {
+            result = new Result<>(null, errors);
         }
-        SmssEntity smsEntities = this.usersService.SmsInsert(smsEntity, 2);
-        Result<SmssEntity> result = new Result<>(smsEntities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+//    /**
+//     * 获取验证码
+//     *
+//     * @param entity
+//     * @return
+//     * @throws Exception
+//     */
+//    @ApiOperation(value = "获取验证码")
+//    @PostMapping(value = "/code")
+//    public ResponseEntity<Result<SmssEntity>> getCode(@Valid @RequestBody CodeForm entity) throws Exception {
+//        Date time = new Date();
+//        getResArgs(entity.getMobile(), "");
+//        String code = map.get("code");
+//        String Phone = map.get("phone");
+//        String content = "验证码：" + code + "，请不要把验证码泄露给他人，谢谢！【知创云】";
+//        SmssEntity smsEntity  = this.usersService.SmsGet(Phone,2);
+//        if(smsEntity == null)
+//        {
+//            smsEntity= new SmssEntity();
+//            smsEntity.setSmsPhone(Phone);
+//            smsEntity.setSmsContent(content);
+//            smsEntity.setAddtime(time);
+//        }else{
+//            code=smsEntity.getSmsCode();
+//        }
+//        String sms = SmsUtils.SendSms(Phone,"知创云","SMS_171115994",code);
+//        ObjectMapper mapper = new ObjectMapper(); //转换器
+//        SmsForm getCodes=mapper.readValue(sms,SmsForm.class);
+//        if (getCodes.getMessage().equals("OK")) {
+//            smsEntity.setSmsSendType(1); //短信发送类型 1、文字 2、语音
+//            smsEntity.setSmsType(entity.getType()); //短信类型 1、注册账号 2、修改密码
+//            smsEntity.setSmsSendFrequency(1); //发送次数
+//            smsEntity.setSmsUse(1);
+//            smsEntity.setSmsExpireDate(stampToDate());    //失效时间
+//            smsEntity = this.usersService.SmsInsert(smsEntity, entity.getType());
+//        }
+//        smsEntity.setSmsCode("123456");
+//        Result<SmssEntity> result = new Result<>(smsEntity, errors);
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+//    }
 
     public Map<String, Object> getResArgs(String phoneNum, String code) throws Exception {
         //生成6位数验证码
@@ -214,8 +265,8 @@ public class UsersController {
     /*
      * 将时间戳转换为时间并加10分钟
      */
-    public Date stampToDate(Long s) {
-        Date date = new Date(s);
+    public Date stampToDate() {
+        Date date = new Date();
         date.setTime(date.getTime() + 10 * 60 * 1000);
         return date;
     }
@@ -320,6 +371,46 @@ public class UsersController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    /**
+     *  根据角色查询用户信息  无分页
+     * @param roleId
+     * @return
+     */
+    @ApiOperation(value = "根据角色获取 用户信息")
+    @GetMapping("/getByRoleNoPage/{roleId}")
+    public  ResponseEntity<Result<List<UserInfoVo>>> getByRoleNoPage(@ApiParam(value = "roleId", required = true)
+                                                                     @PathVariable Long roleId)
+    {
+        List<UserInfoVo>  vos=this.usersService.GetByRoleNoPage(roleId);
+        Result<List<UserInfoVo>> result = new Result<>(vos,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+
+
+    /***
+     *   获取子管理员信息
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+    @ApiOperation(value = "获取子管理员信息")
+    @GetMapping("/getAdministrator")
+    public ResponseEntity<Result<PageInfo<UserInfoVo>>> getAdministrator(Integer page, Integer pageSize, String name) {
+        if (page == null) {
+            page = 1;
+        }
+        if (pageSize == null) {
+            pageSize = 20;
+        }
+        PageInfo<UserInfoVo> pageInfo = this.usersService.GetAdministrator(name, new PageNumber(page, pageSize));
+        Result<PageInfo<UserInfoVo>> result = new Result<>(pageInfo, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+
+    }
+
+
     @ApiOperation(value = "子管理 获取本医院下的用户信息")
     @GetMapping("/getIssue/{uid}")
     public ResponseEntity<Result<PageInfo<UserInfoVo>>> GetIssue(
@@ -394,7 +485,7 @@ public class UsersController {
     @ApiOperation(value = "查询资金流水")
     @GetMapping("/getcapitalflow")
     public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(
-             Integer is,
+            Integer is,
             Integer page,
             Integer pageSize
     ) {

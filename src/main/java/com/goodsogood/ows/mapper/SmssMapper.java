@@ -60,4 +60,12 @@ public interface SmssMapper extends MyMapper<SmssEntity> {
             "</script>"
     })
     int Update(@Param(value = "sms_phone") String sms_phone, @Param(value = "sms_expire_date") Date sms_expire_date);
+
+    @Select({
+            "<script>",
+            "select COUNT(*) from zcy_smss where DATEDIFF(addtime,NOW())=0 and sms_phone=#{phone,jdbcType=VARCHAR}",
+            "</script>"
+    })
+    int NowGetCount(@Param(value = "phone") String phone);
+
 }

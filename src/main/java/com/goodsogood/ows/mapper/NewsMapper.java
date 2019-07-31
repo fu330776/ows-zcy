@@ -1,6 +1,7 @@
 package com.goodsogood.ows.mapper;
 
 import com.goodsogood.ows.model.db.NewsEntity;
+import com.goodsogood.ows.model.vo.NewsVo;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -40,7 +41,7 @@ public interface NewsMapper extends MyMapper<NewsEntity> {
             "</if> ORDER BY news_time DESC",
             "</script>"
     })
-    List<NewsEntity> Get(@Param(value = "title") String title);
+    List<NewsVo> Get(@Param(value = "title") String title);
 
     @Select({
             "<script>",

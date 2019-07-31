@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.NewsMapper;
 import com.goodsogood.ows.model.db.NewsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
+import com.goodsogood.ows.model.vo.NewsVo;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ public class NewsService {
      * @param pageNumber
      * @return
      */
-    public PageInfo<NewsEntity> Get(String title, PageNumber pageNumber) {
+    public PageInfo<NewsVo> Get(String title, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);

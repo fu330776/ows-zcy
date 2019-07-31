@@ -6,6 +6,7 @@ import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.model.db.NewsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.vo.NewsForm;
+import com.goodsogood.ows.model.vo.NewsVo;
 import com.goodsogood.ows.model.vo.Result;
 import com.goodsogood.ows.service.NewsService;
 import io.swagger.annotations.Api;
@@ -100,15 +101,15 @@ public class NewsController {
      */
     @ApiModelProperty(value = "查询最新科研项目")
     @GetMapping("/get")
-    public  ResponseEntity<Result<PageInfo<NewsEntity>>> Get(String title,Integer page, Integer pageSize)
+    public  ResponseEntity<Result<PageInfo<NewsVo>>> Get(String title, Integer page, Integer pageSize)
     {
         if(page==null) {
             page=1;
             pageSize=20;
         }
         PageNumber pageNumber=new PageNumber(page,pageSize);
-        PageInfo<NewsEntity> newsEntityPageInfo= this.service.Get(title,pageNumber);
-        Result< PageInfo<NewsEntity>> result=new Result<>(newsEntityPageInfo,errors);
+        PageInfo<NewsVo> newsEntityPageInfo= this.service.Get(title,pageNumber);
+        Result< PageInfo<NewsVo>> result=new Result<>(newsEntityPageInfo,errors);
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 

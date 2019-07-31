@@ -135,71 +135,71 @@ public class UpLoadController {
         return date;
     }
 
-    @HttpMonitorLogger
-    @ApiOperation(value = "导出")
-    @PostMapping("/export")
-    public void exportSiteDeclareList(HttpServletResponse response) {
-        String[] headArray = {"提现流水号", "提现金额", "提现人", "是否提现", "添加时间", "打款时间"};
-        List<WithdrawsVo> vos = this.wservice.GetOut(1);
-        List<Object[]> contentList = new ArrayList<>();
-        if (vos.size() > 0) {
-            for (WithdrawsVo entity : vos) {
-                Object[] o = {
-                        entity.getWithdrawId(),//"运单号
-                        entity.getWithdrawMoney(),
-                        entity.getUserName(),
-                        entity.getIsWithdraw() == 1 ? "未提现" : "已提现",
-                        entity.getAddtime(),
-                        entity.getPaytime()
-                };
-                contentList.add(o);
-            }
+//    @HttpMonitorLogger
+//    @ApiOperation(value = "导出")
+//    @PostMapping("/export")
+//    public void exportSiteDeclareList(HttpServletResponse response) {
+//        String[] headArray = {"提现流水号", "提现金额", "提现人", "是否提现", "添加时间", "打款时间"};
+//        List<WithdrawsVo> vos = this.wservice.GetOut(1);
+//        List<Object[]> contentList = new ArrayList<>();
+//        if (vos.size() > 0) {
+//            for (WithdrawsVo entity : vos) {
+//                Object[] o = {
+//                        entity.getWithdrawId(),//"运单号
+//                        entity.getWithdrawMoney(),
+//                        entity.getUserName(),
+//                        entity.getIsWithdraw() == 1 ? "未提现" : "已提现",
+//                        entity.getAddtime(),
+//                        entity.getPaytime()
+//                };
+//                contentList.add(o);
+//            }
+//
+//        }
+//        try {
+//            ExeclUtil.ExportExcel(response, headArray, contentList, "SubmenuList.xls");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-        }
-        try {
-            ExeclUtil.ExportExcel(response, headArray, contentList, "SubmenuList.xls");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 
-
-    @HttpMonitorLogger
-    @ApiOperation(value = "用户导出")
-    @PostMapping("/exportStore")
-    public  void exportStore (@Valid @RequestBody UserRoleForm user, HttpServletResponse response)
-    {
-        String [] headArray={};
-        List<Object[]> contentList = new ArrayList<>();
-        String[] headArraygr  = {"名称", "医院", "科室", "职位", "职称", "电话","邮箱","等级","性质","银行卡号","持卡人姓名","持卡人身份证","省","市","区"};
-        String [] headArrayqy = {"姓名","账号","企业名称","企业代码","联系人","联系电话"}; // 医院 企业
-        String [] headArrayjg = {"账号名称","账号","机构名称","机构代码","联系人","联系电话","详细地址"};
-        List<UserInfoVo> entitys = this.service.GetByExport(user.getRoleId(),user.getName(),user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword()
-        ,user.getReview(),user.getEnable());
-      int rid=user.getRoleId().intValue();
-        switch (rid)
-        {
-            case  2 :
-                headArray=headArraygr;
-                contentList=GetAssemble(entitys);
-                break;
-            case  3 :
-                headArray=headArrayqy;
-                contentList=GetAssembleyy(entitys);
-                break;
-            case  4 :
-                headArray=headArrayjg;
-                contentList=GetAssemblejg(entitys);
-                break;
-        }
-        try {
-            ExeclUtil.ExportExcel(response, headArray, contentList, "user.xls");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
+//    @HttpMonitorLogger
+//    @ApiOperation(value = "用户导出")
+//    @PostMapping("/exportStore")
+//    public  void exportStore (@Valid @RequestBody UserRoleForm user, HttpServletResponse response)
+//    {
+//        String [] headArray={};
+//        List<Object[]> contentList = new ArrayList<>();
+//        String[] headArraygr  = {"名称", "医院", "科室", "职位", "职称", "电话","邮箱","等级","性质","银行卡号","持卡人姓名","持卡人身份证","省","市","区"};
+//        String [] headArrayqy = {"姓名","账号","企业名称","企业代码","联系人","联系电话"}; // 医院 企业
+//        String [] headArrayjg = {"账号名称","账号","机构名称","机构代码","联系人","联系电话","详细地址"};
+//        List<UserInfoVo> entitys = this.service.GetByExport(user.getRoleId(),user.getName(),user.getProvinces(),user.getMunicipalities(),user.getDistricts(),user.getGrade(),user.getNature(),user.getKeyword()
+//        ,user.getReview(),user.getEnable());
+//      int rid=user.getRoleId().intValue();
+//        switch (rid)
+//        {
+//            case  2 :
+//                headArray=headArraygr;
+//                contentList=GetAssemble(entitys);
+//                break;
+//            case  3 :
+//                headArray=headArrayqy;
+//                contentList=GetAssembleyy(entitys);
+//                break;
+//            case  4 :
+//                headArray=headArrayjg;
+//                contentList=GetAssemblejg(entitys);
+//                break;
+//        }
+//        try {
+//            ExeclUtil.ExportExcel(response, headArray, contentList, "user.xls");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
     /**
      *  个人

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.Column;
+import java.math.BigDecimal;
 
 @ApiModel
 @Data
@@ -20,6 +21,7 @@ public class FundsAddForm {
     public Integer identity;
     @ApiModelProperty(value = "1:梦计划，2：医创杯")
     public  int type;
+    public double applyMoney;
 }
 
 

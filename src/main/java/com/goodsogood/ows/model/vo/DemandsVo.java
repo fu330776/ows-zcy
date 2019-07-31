@@ -32,7 +32,7 @@ public class DemandsVo {
     @Column(name = "user_id")
     public Long userId;
 
-    public Date addtime;
+    public String addtime;
 
     public String phone;
 

@@ -7,6 +7,7 @@ import com.goodsogood.ows.helper.MD5Utils;
 import com.goodsogood.ows.helper.RandomUtils;
 import com.goodsogood.ows.mapper.*;
 import com.goodsogood.ows.model.db.*;
+import com.goodsogood.ows.model.vo.LoginResult;
 import com.goodsogood.ows.model.vo.SonUserForm;
 import com.goodsogood.ows.model.vo.UserInfoVo;
 import com.goodsogood.ows.model.vo.UsersForm;
@@ -61,7 +62,8 @@ public class UsersService {
     }
 
     /**
-     *    保存用户唯一 openID
+     * 保存用户唯一 openID
+     *
      * @param id
      * @param openid
      * @return
@@ -71,13 +73,13 @@ public class UsersService {
     }
 
     /**
-     *  查询用户openid
+     * 查询用户openid
+     *
      * @param id
-     * @return   openid
+     * @return openid
      */
-    public  String getOpenId(Long id)
-    {
-        return  this.mapper.getOpenId(id);
+    public String getOpenId(Long id) {
+        return this.mapper.getOpenId(id);
     }
 
     /**
@@ -106,9 +108,8 @@ public class UsersService {
             Long accountId = entity.getAccountId();
             if (accountId == null) {
                 return false;
-            }  //注册资料
-
-
+            }
+            //注册资料
             UsersEntity entitys = new UsersEntity();
             entitys.setUserName(user.getUserName());
             entitys.setAddtime(new Date());
@@ -338,6 +339,106 @@ public class UsersService {
         return true;
     }
 
+
+    @Transactional
+    public  LoginResult AddAdministrator(UsersForm user)
+    {
+        LoginResult result =new LoginResult();
+        try{
+            int num = this.mapper.GetAdminPhone(user.getPhone());
+            if(num >0)
+            {
+                result.setIsb(false);
+                result.setMsg("账号已存在，不可注册为管理员");
+                return  result;
+            }
+
+            Long AccountId ;
+            AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
+            if(entitys ==null)
+            {
+                entitys=new AccountsEntity();
+                entitys.setAddtime(new Date());
+                entitys.setPassWordLaws(user.getPassword());
+                entitys.setPassWord(MD5Utils.MD5(user.getPassword()));
+                entitys.setPhone(user.getPhone());
+                this.amapper.Insert(entitys);
+                AccountId = entitys.getAccountId();
+            }
+            else
+            {
+                AccountId=entitys.getAccountId();
+            }
+
+
+            if(AccountId == null)
+            {
+                result.setIsb(false);
+                result.setMsg("账号创建失败");
+                return  result;
+            }
+            //注册资料
+            Long userid ;
+            UsersEntity entity = new UsersEntity();
+            entity.setCompanyCode(user.getCompanyCode());
+            entity.setCompanyName(user.getCompanyName());
+            entity.setDetailed_address(user.getDetailed_address());
+            entity.setBusiness_license(user.getBusiness_license());
+            entity.setIsReferrer(2);
+            entity.setOrganizationCode(user.getOrganizationCode());
+            entity.setOrganizationName(user.getOrganizationName());
+            entity.setContact_phone(user.getContact_phone());
+            entity.setContacts(user.getContacts());
+            entity.setUserName(user.getUserName());
+            entity.setAddtime(new Date());
+            entity.setCode(GetCode());
+            entity.setEnable(1);
+            entity.setIssub(2); //子超级管理
+            entity.setProvinces(user.getProvinces());
+            entity.setMunicipalities(user.getMunicipalities());
+            entity.setDistricts(user.getDistricts());
+            entity.setGrade(user.getGrade());
+            entity.setUserCardholderPhone(user.getUserCardholderPhone());
+            entity.setUserDepartment(user.getUserDepartment());
+            entity.setUserEmail(user.getUserEmail());
+            entity.setUserHospital(user.getUserHospital());
+            entity.setUserPosition(user.getUserPosition());
+            entity.setPhone(user.getPhone());
+            entity.setReferrer(user.getReferrer());
+            entity.setReview(2);
+            entity.setUpdatetime(new Date());
+            entity.setUserBankCardNumber(user.getUserBankCardNumber());
+            entity.setUserCardholderIdcard(user.getUserCardholderIdCard());
+            entity.setUserCardholderName(user.getUserCardholderName());
+            entity.setNature(user.getNature());
+            entity.setTitle(user.getTitle());
+            this.mapper.Insert(entity);
+            userid = entity.getUserId();
+            //添加关联
+            AccountsUsersRolesEntity UsersRolesEntity = new AccountsUsersRolesEntity();
+            UsersRolesEntity.setUserId(userid);
+            UsersRolesEntity.setAccountId(AccountId);
+            UsersRolesEntity.setRoleId(1L);
+            Long aurid = this.aurmapper.RewriteInsert(UsersRolesEntity);
+            if (aurid == null) {
+                result.setMsg("注册失败");
+                return result;
+            }
+            result.setIsb(true);
+            result.setMsg("注册成功");
+        }
+        catch (Exception ex)
+        {
+            result.setIsb(false);
+            result.setMsg(ex.getMessage());
+        }
+        return  result;
+    }
+
+
+
+
+
     /**
      * 根据账号查询
      */
@@ -350,18 +451,23 @@ public class UsersService {
      * 注册
      */
     @Transactional
-    public Boolean Register(UsersForm user) {
-        int num = this.mapper.GetByPhone(user.getPhone());
+    public LoginResult Register(UsersForm user) {
+        int num = this.mapper.GetPhone(user.getPhone());
+        LoginResult result = new LoginResult();
+        result.setIsb(false);
         if (num > 0) {
-            return false;
+            result.setMsg("账号已存在");
+            return result;
         }
         //校验手机验证码
         SmssEntity sms = this.smssMapper.GetByPhone(user.getPhone(), new Date(), 1);
         if (sms == null) {
-            return false;
+            result.setMsg("验证码不存在");
+            return result;
         }
-        if (sms.getSmsCode().equals(user.getPhoneCode())) {
-            return false;
+        if (!sms.getSmsCode().equals(user.getPhoneCode())) {
+            result.setMsg("验证码错误");
+            return result;
         }
         this.smssMapper.Update(user.getPhone(), new Date());
         //查询账号是否已经注册
@@ -414,7 +520,10 @@ public class UsersService {
         entity.setTitle(user.getTitle());
         this.mapper.Insert(entity);
         Long userid = entity.getUserId();
-
+        if (userid == null) {
+            result.setMsg("注册错误");
+            return result;
+        }
         //添加关联
         AccountsUsersRolesEntity UsersRolesEntity = new AccountsUsersRolesEntity();
         UsersRolesEntity.setAccountId(AccountId);
@@ -422,11 +531,36 @@ public class UsersService {
         UsersRolesEntity.setUserId(userid);
         Long aurid = this.aurmapper.RewriteInsert(UsersRolesEntity);
         if (aurid == null) {
-            return false;
+            result.setMsg("注册错误");
+            return result;
         }
-        return true;
+        result.setIsb(true);
+        result.setMsg("注册成功");
+        return result;
     }
 
+    /**
+     *  账号是否注册验证
+     * @param phone
+     * @return
+     */
+    public LoginResult IsPhone(String phone) {
+        LoginResult result = new LoginResult();
+        result.setIsb(false);
+        result.setMsg("账号未注册");
+        int nums=this.smssMapper.NowGetCount(phone);
+        if(nums > 10)
+        {
+            result.setMsg("手机号当天短信数已达到上限");
+            return  result;
+        }
+        int num = this.mapper.GetPhone(phone);
+        if (num > 0) {
+            result.setMsg("账号已注册");
+            return  result;
+        }
+        return result;
+    }
 
     /**
      * 生成一个随机唯一邀请码
@@ -462,7 +596,7 @@ public class UsersService {
         if (sms == null) {
             return null;
         }
-        if (sms.getSmsCode().equals(code)) {
+        if (!sms.getSmsCode().equals(code)) {
             return null;
         }
         return this.amapper.UpdatePwd(Phone, pwd, MD5Utils.MD5(pwd));
@@ -527,6 +661,31 @@ public class UsersService {
         PageHelper.startPage(p, r);
         return new PageInfo<>(this.mapper.GetByRoleAll(rId, name, provinces, municipalities, districts, grade, nature, Keyword, review, enable));
     }
+
+    /**
+     *  查询所有用户 不分页
+     * @param rid
+     * @return
+     */
+    public  List<UserInfoVo> GetByRoleNoPage(Long rid){
+        return  this.mapper.GetByRoleAll(rid, null, null, null, null, null, null, null, null, null);
+    }
+
+    /***
+     *  查询 子管理员
+     * @param name
+     * @param pageNumber
+     * @return
+     */
+    public  PageInfo<UserInfoVo> GetAdministrator(String name, PageNumber pageNumber)
+    {
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return  new PageInfo<>(this.mapper.GetAdministrator(name));
+    }
+
+
 
     /**
      * 根据查询条件 导出

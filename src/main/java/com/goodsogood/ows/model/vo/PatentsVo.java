@@ -45,10 +45,10 @@ public class PatentsVo {
     public Integer isPay;
 
     @ApiModelProperty(value = "添加时间")
-    public Date addtime;
+    public String addtime;
 
     @ApiModelProperty(value = "支付时间")
-    public Date pay_time;
+    public String pay_time;
 
     public String phone;
 

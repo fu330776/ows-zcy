@@ -15,11 +15,11 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
             "<script>",
             "INSERT INTO zcy_funds(",
             "<if test='fundId !=null'>fund_id, </if>",
-            "user_id,title,introduction,identity,addtime,is_success",
+            "user_id,title,introduction,identity,addtime,is_success,types,applyMoney",
             ")VALUES(",
             "<if test='fundId !=null'>#{fundId,jdbcType=BIGINT}, </if>",
             "#{userId,jdbcType=BIGINT},#{title,jdbcType=VARCHAR},#{introduction,jdbcType=VARCHAR},#{identity,jdbcType=BIT},#{addtime,jdbcType=TIMESTAMP}",
-            ",#{success,jdbcType=BIT},#{types,jdbcType=BIT})",
+            ",#{success,jdbcType=BIT},#{types,jdbcType=BIT},#{applyMoney,jdbcType=DECIMAL})",
             "</script>"
 
     })
@@ -30,7 +30,7 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "user_id,title,introduction,identity,addtime,fund_id,is_success as success",
+            "user_id as userId ,title,introduction,identity,addtime,fund_id as fundId,is_success as success,applyMoney",
             "FROM zcy_funds",
             "WHERE user_id=#{userId,jdbcType=BIGINT} and types=#{type,jdbcType=BIT}",
             "</script>"
@@ -40,13 +40,18 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
 
     @Select({
             "<script>",
+            "select * from(",
             "SELECT ",
-            "user_id as userId,title,introduction,identity,addtime,fund_id as fundId,",
+            "user_id as userId,title,introduction,identity,addtime,fund_id as fundId,applyMoney,",
             "(SELECT zu.user_name FROM zcy_users zu where zu.user_id=zf.user_id) userName,is_success as success",
+            ",(SELECT zu.phone FROM zcy_users zu where zu.user_id=zf.user_id) userPhone",
             "FROM zcy_funds zf ",
             "where zf.identity=#{type,jdbcType=BIT} and zf.types=#{types,jdbcType=BIT}",
-            " <if test ='success !=null '> and is_success =#{success,jdbcType=BIT} </if>",
-            "<if test='name !=null'> and title like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
+            " <if test ='success !=null '> and is_success =#{success,jdbcType=BIT} </if>) as zcy ",
+            "<if test='name !=null'> where (title like concat(concat('%',#{name,jdbcType=VARCHAR}),'%') ",
+            "or userPhone like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
+            "or userName like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
+            ")</if>",
             "</script>"
     })
     List<FundsVo> GetAll(@Param(value = "type") Integer type,@Param(value = "name") String name,@Param(value = "success") Integer success

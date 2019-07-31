@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
@@ -50,4 +51,6 @@ public class FundsEntity extends BaseEntity {
 
     @ApiModelProperty(value = "1:梦计划申请，2：医创杯")
     public  int types;
+    @ApiModelProperty(value = "梦计划申请金额")
+    public double applyMoney;
 }

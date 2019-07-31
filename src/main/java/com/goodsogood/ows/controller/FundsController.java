@@ -24,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @RestController
@@ -66,6 +67,10 @@ public class FundsController {
         entity.setUserId(form.getUserId());
         entity.setTypes(form.getType());
         entity.setSuccess(1);
+        if(form.getType() == 1)
+        {
+            entity.setApplyMoney(form.getApplyMoney());
+        }
         Integer num = this.service.AddFuns(entity);
         Result<Boolean> result = new Result<>(true, errors);
         if (num == null || num == 0) {

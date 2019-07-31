@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.Column;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @ApiModel
@@ -26,10 +27,11 @@ public class FundsVo {
     public int identity;
 
     @ApiModelProperty(value = "添加时间")
-    public Date addtime;
+    public String addtime;
 
     public String userName;
 
     @ApiModelProperty(value = "是否审核")
     public int success;
+    public double applyMoney;
 }

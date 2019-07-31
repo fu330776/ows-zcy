@@ -28,10 +28,10 @@ public class WithdrawsVo {
     @Column(name = "is_withdraw")
     public Integer isWithdraw;
 
-    public Date addtime;
+    public String addtime;
 
     @ApiModelProperty(value = "打款时间")
-    public Date paytime;
+    public String paytime;
 
     public String userName;
     @ApiModelProperty(value = "银行账号")

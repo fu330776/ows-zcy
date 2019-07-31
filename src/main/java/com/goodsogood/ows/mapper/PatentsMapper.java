@@ -45,14 +45,17 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
 
 
     @Select({
-
             "<script>",
+            "select * from(",
             "SELECT patent_id as patentId,patent_title as patentTitle,patent_content as patentContent,user_id as userId,patent_type as patentType,",
             "patent_money as patentMoney,patent_stamp as patentStamp,is_need_pay as isNeedPay,is_pay as isPay,addtime,pay_time ,picture,state",
             ",(SELECT phone from zcy_users zu where zu.user_id=z.user_id)phone",
             ",(SELECT zu.user_name from zcy_users zu where zu.user_id=z.user_id)userName",
-            "FROM zcy_patents z where patent_type=#{type,jdbcType=BIT}",
-            "<if test='title !=null'> and patent_title LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%')) </if>",
+            "FROM zcy_patents z where patent_type=#{type,jdbcType=BIT}) as zcy",
+            "<if test='title !=null'> where ( patentTitle LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%'))",
+            "or userName LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%'))",
+            "or phone LIKE CONCAT(CONCAT('%',#{title,jdbcType=VARCHAR},'%'))",
+            ") </if>",
             "</script>"
     })
     List<PatentsVo> GetByType(@Param(value = "type") Integer type, @Param(value = "title") String title);

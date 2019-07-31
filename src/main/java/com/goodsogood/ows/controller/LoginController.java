@@ -70,7 +70,6 @@ public class LoginController {
      * 注册账号(推荐人分享)
      */
     @ApiOperation(value = "注册账号")
-//    @HttpMonitorLogger
     @PostMapping("/add")
     public ResponseEntity<Result<LoginResult>> addUser(@Valid @RequestBody UsersForm user, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
@@ -88,16 +87,43 @@ public class LoginController {
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         //手机验证码判断
-        Boolean isb = this.usersService.Register(user);
-        if (isb)
-        {
-             results.setIsb(true);
-             results.setMsg("注册成功");
-        }
+        results = this.usersService.Register(user);
         result = new Result<>(results, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
+
+    /**
+     * 账号验证(推荐人分享)
+     */
+    @ApiOperation(value = "账号验证")
+    @PostMapping("/isPhone")
+    public ResponseEntity<Result<LoginResult>> IsPhone(@Valid @RequestBody String phone, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult results = this.usersService.IsPhone(phone);
+        Result<LoginResult> result = new Result<>(results, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /***
+     *  管理员添加
+     * @param user
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "添加管理员")
+    @PostMapping("/AddAdministrator")
+    public ResponseEntity<Result<LoginResult>> AddAdministrator(@Valid @RequestBody UsersForm user, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult cresult = this.usersService.AddAdministrator(user);
+        Result<LoginResult> result = new Result<>(cresult, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
     /**
      * 邀请码验证
@@ -112,7 +138,6 @@ public class LoginController {
     public ResponseEntity<Result<Integer>> VerificationCode(@ApiParam(value = "code", required = true)
                                                             @PathVariable String code) {
         Integer num = this.usersService.VerificationCode(code);
-
         Result<Integer> result = new Result<>(num, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
 
@@ -292,18 +317,21 @@ public class LoginController {
         getResArgs(entity.getMobile(), "");
         String code = map.get("code");
         String Phone = map.get("phone");
+
+        SmssEntity srs = this.usersService.SmsGet(entity.getMobile(), entity.getType());
+        if (srs != null) {
+            code = srs.getSmsCode();
+        }
         String content = "验证码：" + code + "，请不要把验证码泄露给他人，谢谢！【知创云】";
         SmssEntity smsEntity = new SmssEntity();
         smsEntity.setSmsPhone(Phone);
-        smsEntity.setSmsCode(code);
         smsEntity.setSmsContent(content);
+        smsEntity.setSmsCode(code);
         smsEntity.setAddtime(time);
-//        String sms = SmsUtils.postEncrypt(Url, username, pwd, Phone, content, productid);
-        String sms = SmsUtils.SendSms(Phone,"知创云","SMS_171115994",code);
+        String sms = SmsUtils.SendSms(Phone, "知创云", "SMS_171115994", code);
         ObjectMapper mapper = new ObjectMapper(); //转换器
-        SmsForm getCodes=mapper.readValue(sms,SmsForm.class);
+        SmsForm getCodes = mapper.readValue(sms, SmsForm.class);
         if (getCodes.getMessage().equals("OK")) {
-
             smsEntity.setSmsSendType(1); //短信发送类型 1、文字 2、语音
             smsEntity.setSmsType(entity.getType()); //短信类型 1、注册账号 2、修改密码
             smsEntity.setSmsSendFrequency(1); //发送次数

@@ -70,17 +70,22 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
 
     @Select({
             "<script>",
+            "SELECT * FROM (",
             "SELECT ",
             "task_id as taskId,task_name as taskName,task_content as taskContent,state,",
             "task_file_url as taskFileUrl,task_money as taskMoney,",
             "is_fulfill,`schedule`,is_pay,addtime,user_id as userId,task_completion_days as taskCompletionDays,task_completed_days as taskCompletedDays,task_type as taskType,",
-            "(SELECT zu.user_name FROM zcy_users zu where zu.user_id = zt.user_id) as userName",
+            "(SELECT zu.user_name FROM zcy_users zu where zu.user_id = zt.user_id) as userName,",
+            "(SELECT zu.phone FROM zcy_users zu where zu.user_id = zt.user_id) as userPhone ",
             " from zcy_tasks zt WHERE",
             "task_type=#{type,jdbcType=BIT}",
             "<if test='is_fulfill !=null'> and is_fulfill=#{is_fulfill,jdbcType=BIT} </if>",
-            "<if test='is_pay !=null'> and is_pay=#{is_pay,jdbcType=BIT} </if>",
-            "<if test='name !=null'> and task_name like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')</if>",
-
+            "<if test='is_pay !=null'> and is_pay=#{is_pay,jdbcType=BIT} </if>) as zcy",
+            "<if test='name !=null'> ",
+            "where (userPhone like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
+            "or taskName like concat(concat('%',#{name,jdbcType=VARCHAR}),'%')",
+            "or userName like concat(concat('%',#{name,jdbcType=VARCHAR}),'%'))",
+            "</if>",
             "</script>"
     })
     List<TaskListForm> GetAll(@Param(value = "type") Integer type

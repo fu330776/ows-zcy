@@ -6,6 +6,7 @@ import com.goodsogood.ows.mapper.DemandsMapper;
 import com.goodsogood.ows.model.db.DemandsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.vo.DemandsVo;
+import com.goodsogood.ows.model.vo.LoginResult;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,11 @@ public class DemandsService {
     /**
      * 后台管理员查看 根据类型查看
      */
-    public PageInfo<DemandsVo> GetTypeAll(Integer type, Integer isCount, String name, PageNumber pageNumber) {
+    public PageInfo<DemandsVo> GetTypeAll(Integer type, Integer isCount, String name,String state, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetTypeAll(type, isCount,name));
+        return new PageInfo<>(this.mapper.GetTypeAll(type, isCount,name,state));
     }
 
 
@@ -88,9 +89,9 @@ public class DemandsService {
      * @param isContact 是否联系
      * @return
      */
-    public  Boolean Update(Long aid, String name, String content,Integer isContact)
+    public  Boolean Update(Long aid, String name, String content,Integer isContact,String picture)
     {
-        int num=this.mapper.Update(aid,name,content,isContact);
+        int num=this.mapper.Update(aid,name,content,isContact,picture);
         return  IsBool(num);
     }
 
@@ -107,6 +108,25 @@ public class DemandsService {
         return  IsBool(num);
     }
 
+    /**
+     *  撤销创新需求
+     * @param id
+     * @return
+     */
+    public LoginResult UpdateRevoke(Long id)
+    {
+        LoginResult result =new LoginResult();
+        int num =this.mapper.UpdateRevoke(id);
+        if(num >0)
+        {
+            result.setIsb(true);
+            result.setMsg("撤销成功");
+            return  result;
+        }
+        result.setMsg("撤销失败");
+        result.setIsb(false);
+        return  result;
+    }
 
 
     /**

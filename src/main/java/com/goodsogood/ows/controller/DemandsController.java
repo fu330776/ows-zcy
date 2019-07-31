@@ -154,10 +154,12 @@ public class DemandsController {
         if (demandsForm.getDemandName().isEmpty() || demandsForm.getDemandContent().isEmpty() || demandsForm.getIsContact() == null) {
             throw new ApiException("参数错误,不能为空或空字符串", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean bool = this.service.Update(demandsForm.getDemandId(), demandsForm.getDemandName(), demandsForm.getDemandContent(), demandsForm.getIsContact());
+        Boolean bool = this.service.Update(demandsForm.getDemandId(), demandsForm.getDemandName(), demandsForm.getDemandContent(), demandsForm.getIsContact(),demandsForm.getPicture());
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+
 
     /**
      *  修改状态
@@ -181,6 +183,28 @@ public class DemandsController {
         return  new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    /***
+     *  撤销
+     * @param id
+     * @param bindingResult
+     * @return
+     */
+    @ApiModelProperty(value = "未受理需求 撤销")
+    @PostMapping("/Revoke")
+    public  ResponseEntity<Result<LoginResult>> UpdateRevoke(@Valid @RequestBody Long id,BindingResult bindingResult  )
+    {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if(id == null)
+        {
+            throw new ApiException("必传参数不可为空", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult loginResult=this.service.UpdateRevoke(id);
+        Result<LoginResult> result =new Result<>(loginResult,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+
+    }
 
 
     /**
@@ -217,13 +241,13 @@ public class DemandsController {
     public ResponseEntity<Result<PageInfo<DemandsVo>>> GetAdminByType(
             @ApiParam(value = "type", required = true)
             @PathVariable
-                    Integer type, Integer IsCount, String name, Integer page, Integer pageSize
+                    Integer type, Integer IsCount, String name,String state, Integer page, Integer pageSize
     ) {
         if (page == null || pageSize == null) {
             page = 1;
             pageSize = 10;
         }
-        PageInfo<DemandsVo> demandsEntityList = this.service.GetTypeAll(type, IsCount, name, new PageNumber(page, pageSize));
+        PageInfo<DemandsVo> demandsEntityList = this.service.GetTypeAll(type, IsCount, name,state,new PageNumber(page, pageSize));
         Result<PageInfo<DemandsVo>> result = new Result<>(demandsEntityList, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

@@ -83,9 +83,9 @@ public class UserInfoVo {
     @Column(name = "is_referrer")
     public Integer isReferrer;
 
-    public Date addtime;
+    public String addtime;
 
-    public Date updatetime;
+    public String updatetime;
 
 
     @Column(name = "role_id")

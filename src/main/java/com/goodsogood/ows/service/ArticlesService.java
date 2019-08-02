@@ -7,9 +7,11 @@ import com.goodsogood.ows.model.db.ArticlesEntity;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+
 
 @Service
 @Log4j2
@@ -18,7 +20,7 @@ import java.util.List;
  * */
 public class ArticlesService {
     private ArticlesMapper mapper;
-
+    @Autowired
     public ArticlesService(ArticlesMapper articlesMapper) {
         this.mapper = articlesMapper;
     }

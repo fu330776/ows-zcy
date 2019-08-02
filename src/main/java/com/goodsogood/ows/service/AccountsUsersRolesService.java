@@ -2,11 +2,11 @@ package com.goodsogood.ows.service;
 
 import com.goodsogood.ows.mapper.AccountsMapper;
 import com.goodsogood.ows.mapper.AccountsUsersRolesMapper;
-import com.goodsogood.ows.mapper.UsersMapper;
 import com.goodsogood.ows.model.db.AccountsEntity;
 import com.goodsogood.ows.model.db.AccountsUsersRolesEntity;
 import com.goodsogood.ows.model.vo.AccountUsersVo;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +16,13 @@ import java.util.List;
 public class AccountsUsersRolesService {
     private AccountsUsersRolesMapper mapper;
     private AccountsMapper amapper;
-    private UsersMapper usersMapper;
 
-    public AccountsUsersRolesService(AccountsUsersRolesMapper accountsUsersRolesMapper, AccountsMapper accountsMapper,UsersMapper usersMapper) {
+
+    @Autowired
+    public AccountsUsersRolesService(AccountsUsersRolesMapper accountsUsersRolesMapper, AccountsMapper accountsMapper) {
         this.amapper = accountsMapper;
         this.mapper = accountsUsersRolesMapper;
-        this.usersMapper=usersMapper;
+
     }
 
     /**

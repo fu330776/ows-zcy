@@ -1,8 +1,6 @@
 package com.goodsogood.ows.mapper;
 
-import com.goodsogood.ows.model.db.AccountsEntity;
 import com.goodsogood.ows.model.db.AccountsUsersRolesEntity;
-import com.goodsogood.ows.model.db.MenusEntity;
 import com.goodsogood.ows.model.vo.AccountUsersVo;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;

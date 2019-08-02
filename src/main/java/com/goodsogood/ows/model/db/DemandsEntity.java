@@ -50,6 +50,8 @@ public class DemandsEntity extends BaseEntity {
     @Column(name = "user_id")
     public  Long userId;
 
+    @ApiModelProperty(value = "添加时间")
+    @Column(name = "addtime")
     public Date addtime;
 
     @ApiModelProperty(value = "图片")

@@ -15,7 +15,6 @@ import com.goodsogood.ows.service.FundsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.models.auth.In;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -156,6 +155,4 @@ public class FundsController {
         Result<PageInfo<FundsVo>> result = new Result<>(entity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
-
 }

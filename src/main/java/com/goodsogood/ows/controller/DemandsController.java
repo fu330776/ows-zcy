@@ -4,7 +4,6 @@ import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
-import com.goodsogood.ows.model.db.DataEntity;
 import com.goodsogood.ows.model.db.DemandsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.vo.*;
@@ -14,7 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.Data;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

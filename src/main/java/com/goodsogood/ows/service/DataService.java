@@ -45,7 +45,8 @@ public class DataService {
      * @return
      */
     public DataEntity Get(Integer type) {
-        return this.mapper.Get(type);
+        DataEntity entity=this.mapper.Get(type);
+        return entity;
     }
 
     /**

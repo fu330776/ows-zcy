@@ -5,8 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.Column;
-import java.math.BigDecimal;
-import java.util.Date;
+
 
 @ApiModel
 @Data

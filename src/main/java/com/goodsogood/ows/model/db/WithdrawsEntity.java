@@ -49,4 +49,7 @@ public class WithdrawsEntity extends BaseEntity {
     @ApiModelProperty(value = "打款时间")
     public Date paytime;
 
+    @ApiModelProperty(value = "0: 无状态 1：未受理，2：已受理  4：提现完成")
+    public Integer status;
+
 }

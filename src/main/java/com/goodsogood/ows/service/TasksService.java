@@ -150,8 +150,21 @@ public class TasksService {
             orderEntity.setTaskId(entity.getTaskId());
             orderEntity.setTaskMoney(entity.getTaskMoney());
             orderEntity.setUserId(entity.getUserId());
-            orderEntity.setIsReceive(1);
+            orderEntity.setIsReceive(2);
             bool = this.ToMapper.Insert(orderEntity) > 0;
+            if(bool){
+                WithdrawsEntity withdrawsEntity = new WithdrawsEntity();
+                withdrawsEntity.setAddtime(new Date());
+                withdrawsEntity.setIsWithdraw(1);
+                withdrawsEntity.setUserId(entity.getUserId());
+                withdrawsEntity.setWithdrawMoney(entity.getTaskMoney());
+                withdrawsEntity.setWithdrawNumber(new Date().toString());
+                withdrawsEntity.setPaytime(new Date());
+                withdrawsEntity.setWithdrawNumber(OrderGeneratorUtils.getOrderIdByUUId());
+                withdrawsEntity.setStatus(0);
+                bool = this.withdrawsMapper.Insert(withdrawsEntity) > 0;
+            }
+
         }
         return bool;
     }
@@ -176,17 +189,17 @@ public class TasksService {
             /**
              *  未提现金额
              */
-            WithdrawsEntity withdrawsEntity = new WithdrawsEntity();
-            withdrawsEntity.setAddtime(new Date());
-            withdrawsEntity.setIsWithdraw(1);
-            withdrawsEntity.setUserId(entity.getUserId());
-            withdrawsEntity.setWithdrawMoney(entity.getTaskMoney());
-            withdrawsEntity.setWithdrawNumber(new Date().toString());
-            withdrawsEntity.setPaytime(new Date());
-            withdrawsEntity.setWithdrawNumber(OrderGeneratorUtils.getOrderIdByUUId());
-            bool = this.withdrawsMapper.Insert(withdrawsEntity) > 0;
+//            WithdrawsEntity withdrawsEntity = new WithdrawsEntity();
+//            withdrawsEntity.setAddtime(new Date());
+//            withdrawsEntity.setIsWithdraw(1);
+//            withdrawsEntity.setUserId(entity.getUserId());
+//            withdrawsEntity.setWithdrawMoney(entity.getTaskMoney());
+//            withdrawsEntity.setWithdrawNumber(new Date().toString());
+//            withdrawsEntity.setPaytime(new Date());
+//            withdrawsEntity.setWithdrawNumber(OrderGeneratorUtils.getOrderIdByUUId());
+//            bool = this.withdrawsMapper.Insert(withdrawsEntity) > 0;
         }
-        return bool;
+        return false;
     }
 
     /**

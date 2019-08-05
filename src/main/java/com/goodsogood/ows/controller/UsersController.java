@@ -271,51 +271,51 @@ public class UsersController {
         return date;
     }
 
-    /**
-     * 提现
-     *
-     * @param wids
-     * @param bindingResult
-     * @return
-     */
-    @ApiOperation(value = "个人金额提现")
-    @PostMapping("/cash")
-    public ResponseEntity<Result<Boolean>> userCash(@Valid @RequestBody List<Long> wids, BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
-        if (wids.size() <= 0) {
-            throw new ApiException("服务器繁忙，提现失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
-        Boolean bool = false;
-        if (wids.size() == 1) {
-            bool = this.withdrawsService.cashOut(wids.get(0));
-        } else {
-            bool = this.withdrawsService.cashOuts(wids);
-        }
-        Result<Boolean> result = new Result<>(bool, errors);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    /**
-     * 获取当前登录用户 金额
-     *
-     * @param userId        用户唯一标识
-     * @param bindingResult
-     * @return
-     */
-    @ApiOperation("获取当前用户 金额信息")
-    @PostMapping("/getMoney")
-    public ResponseEntity<Result<UserMoneyVo>> getSumMoney(@Valid @RequestBody Long userId, BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
-        }
-        UserMoneyVo vo = new UserMoneyVo();
-        vo.setNoMoney(this.withdrawsService.getSum(userId));
-        vo.setTooMoney(this.withdrawsService.getSumToo(userId));
-        Result<UserMoneyVo> result = new Result<>(vo, errors);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
+//    /**
+//     * 提现
+//     *
+//     * @param wids
+//     * @param bindingResult
+//     * @return
+//     */
+//    @ApiOperation(value = "个人金额提现")
+//    @PostMapping("/cash")
+//    public ResponseEntity<Result<Boolean>> userCash(@Valid @RequestBody List<Long> wids, BindingResult bindingResult) {
+//        if (bindingResult.hasFieldErrors()) {
+//            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+//        }
+//        if (wids.size() <= 0) {
+//            throw new ApiException("服务器繁忙，提现失败", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+//        }
+//        Boolean bool = false;
+//        if (wids.size() == 1) {
+//            bool = this.withdrawsService.cashOut(wids.get(0));
+//        } else {
+//            bool = this.withdrawsService.cashOuts(wids);
+//        }
+//        Result<Boolean> result = new Result<>(bool, errors);
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+//    }
+//
+//    /**
+//     * 获取当前登录用户 金额
+//     *
+//     * @param userId        用户唯一标识
+//     * @param bindingResult
+//     * @return
+//     */
+//    @ApiOperation("获取当前用户 金额信息")
+//    @PostMapping("/getMoney")
+//    public ResponseEntity<Result<UserMoneyVo>> getSumMoney(@Valid @RequestBody Long userId, BindingResult bindingResult) {
+//        if (bindingResult.hasFieldErrors()) {
+//            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+//        }
+//        UserMoneyVo vo = new UserMoneyVo();
+//        vo.setNoMoney(this.withdrawsService.getSum(userId));
+//        vo.setTooMoney(this.withdrawsService.getSumToo(userId));
+//        Result<UserMoneyVo> result = new Result<>(vo, errors);
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+//    }
 
 
     /**
@@ -460,18 +460,18 @@ public class UsersController {
      * @param pageSize
      * @return
      */
-    @ApiOperation(value = "查询资金流水")
-    @GetMapping("/getcapital/{userId}")
-    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "userId", required = true)
-                                                                              @PathVariable Long userId, Integer is, Integer page, Integer pageSize) {
-        if (page == null || pageSize == null) {
-            page = 1;
-            pageSize = 11;
-        }
-        PageInfo<WithdrawsVo> entity = this.withdrawsService.Get(userId, is, new PageNumber(page, pageSize));
-        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
+//    @ApiOperation(value = "查询资金流水")
+//    @GetMapping("/getcapital/{userId}")
+//    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "userId", required = true)
+//                                                                              @PathVariable Long userId, Integer is, Integer page, Integer pageSize) {
+//        if (page == null || pageSize == null) {
+//            page = 1;
+//            pageSize = 11;
+//        }
+//        PageInfo<WithdrawsVo> entity = this.withdrawsService.Get(userId, is, new PageNumber(page, pageSize));
+//        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+//    }
 
 
     /**
@@ -482,22 +482,22 @@ public class UsersController {
      * @param pageSize
      * @return
      */
-    @ApiOperation(value = "查询资金流水")
-    @GetMapping("/getcapitalflow")
-    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(
-            Integer is,
-            Integer page,
-            Integer pageSize
-    ) {
-        if (page == null || pageSize == null) {
-            page = 1;
-            pageSize = 10;
-        }
-        PageInfo<WithdrawsVo> entity = this.withdrawsService.GetAdmin(is, new PageNumber(page, pageSize));
-        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-
-    }
+//    @ApiOperation(value = "查询资金流水")
+//    @GetMapping("/getcapitalflow")
+//    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(
+//            Integer is,
+//            Integer page,
+//            Integer pageSize
+//    ) {
+//        if (page == null || pageSize == null) {
+//            page = 1;
+//            pageSize = 10;
+//        }
+//        PageInfo<WithdrawsVo> entity = this.withdrawsService.GetAdmin(is, new PageNumber(page, pageSize));
+//        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+//
+//    }
 
     /**
      * 账号审核

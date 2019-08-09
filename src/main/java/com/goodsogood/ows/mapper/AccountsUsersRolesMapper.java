@@ -79,4 +79,19 @@ public interface AccountsUsersRolesMapper extends MyMapper<AccountsUsersRolesEnt
     )
     int GetIsNum(@Param(value = "AccountId") Long AccountId,@Param(value = "roleId") Long roleId);
 
+    /**
+     *  查询账号是否存在多个账号
+     * @param userId
+     * @return
+     */
+    @Select({
+            "<script>",
+            "SELECT aur_id as AurId, account_id as AccountId ,user_id as UserId,role_id as RoleId ",
+            "from zcy_accounts_users_roles where account_id = (SELECT account_id from zcy_accounts_users_roles where user_id=#{userId,jdbcType=BIGINT} )",
+            "</script>"
+    })
+    List<AccountsUsersRolesEntity> GET(@Param(value = "userId") Long userId );
+
+
+
 }

@@ -91,5 +91,5 @@ management:
 file:
 #  pdf: root/app/fileTemplates/
 #  pdfs: root/app/fileTemp/
-  picture: /filePicture/
-#  picture: D:\tps
+   picture: /filePicture
+#   picture: D:\tps

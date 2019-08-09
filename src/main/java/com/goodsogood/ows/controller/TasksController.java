@@ -305,6 +305,24 @@ public class TasksController {
     }
 
 
+    /**
+     *  根据唯一标识删除，未审核
+     * @param taskId
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "删除")
+    @PostMapping(value = "/del")
+    public  ResponseEntity<Result<LoginResult>> Del(@Valid @RequestBody Long taskId, BindingResult bindingResult)
+    {
+        if (bindingResult.hasFieldErrors() || taskId==null || taskId<=0) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult loginResult=this.service.Del(taskId);
+        Result<LoginResult> result =new Result<>(loginResult,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
 //    /**
 //     * 新增任务书
 //     */

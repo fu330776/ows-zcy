@@ -55,14 +55,14 @@ public class UploadUtils {
 
     public UpLoadVo importPicture(MultipartFile file, HttpServletRequest req, String urls) throws IOException {
         UpLoadVo vo = new UpLoadVo();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        String format = sdf.format(new Date());
         vo.setSuccess(false);
         vo.setCode(10001);
         vo.setMsg("上传失败");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        String format = sdf.format(new Date());
 
-       // String Path = req.getSession().getServletContext().getRealPath("root/"+urls+"/");//Path +
-        String realPath =urls ; //+ "/" + format
+
+        String realPath =urls ;
         File folder = new File(realPath);
         if (!folder.exists()) {
             folder.mkdirs();
@@ -71,10 +71,7 @@ public class UploadUtils {
         String oldName = file.getOriginalFilename();
         //获取文件大小
         Long size = file.getSize();
-//        if (size > 1024 * 1024* 5) {
-//            vo.setCode(10002);
-//            vo.setMsg("文件大小不能大于5M");
-//        }
+
         //获取文件后缀
         String hz = oldName.substring(oldName.lastIndexOf("."));
         if (hz.equals(".jpg") || hz.equals(".png")) {

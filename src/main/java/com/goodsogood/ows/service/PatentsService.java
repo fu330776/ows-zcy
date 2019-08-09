@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.PatentsMapper;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.PatentsEntity;
+import com.goodsogood.ows.model.vo.LoginResult;
 import com.goodsogood.ows.model.vo.PatentsVo;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
@@ -107,6 +108,24 @@ public class PatentsService {
     public PatentsVo GetFind(Long pid) {
         return this.mapper.GetById(pid);
     }
+    /**
+     *  管理员 删除
+     * @param patentId
+     * @return
+     */
+    public LoginResult Del(Long patentId)
+    {
+        LoginResult result =new LoginResult();
+        result.setMsg("删除失败");
+        result.setIsb(false);
+        int num=this.mapper.CustomDelete(patentId);
+        boolean isb=num > 0 ? true:false;
+        if(isb){
+            result.setIsb(isb);
+            result.setMsg("删除成功");
+        }
+        return  result;
 
+    }
 
 }

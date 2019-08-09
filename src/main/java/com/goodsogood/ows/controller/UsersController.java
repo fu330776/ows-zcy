@@ -372,20 +372,19 @@ public class UsersController {
     }
 
     /**
-     *  根据角色查询用户信息  无分页
+     * 根据角色查询用户信息  无分页
+     *
      * @param roleId
      * @return
      */
     @ApiOperation(value = "根据角色获取 用户信息")
     @GetMapping("/getByRoleNoPage/{roleId}")
-    public  ResponseEntity<Result<List<UserInfoVo>>> getByRoleNoPage(@ApiParam(value = "roleId", required = true)
-                                                                     @PathVariable Long roleId)
-    {
-        List<UserInfoVo>  vos=this.usersService.GetByRoleNoPage(roleId);
-        Result<List<UserInfoVo>> result = new Result<>(vos,errors);
-        return  new ResponseEntity<>(result,HttpStatus.OK);
+    public ResponseEntity<Result<List<UserInfoVo>>> getByRoleNoPage(@ApiParam(value = "roleId", required = true)
+                                                                    @PathVariable Long roleId) {
+        List<UserInfoVo> vos = this.usersService.GetByRoleNoPage(roleId);
+        Result<List<UserInfoVo>> result = new Result<>(vos, errors);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
 
 
     /***
@@ -450,6 +449,28 @@ public class UsersController {
         Result<Boolean> result = new Result<>(true, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    /**
+     *  账号删除
+     * @param userId   用户ID
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "删除账号")
+    @PostMapping("/delete")
+    public ResponseEntity<Result<LoginResult>> Delete(@Valid @RequestBody Long userId, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if(userId == null || userId <=0)
+        {
+            throw new ApiException("必填参数不可为空", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult loginResult=  this.usersService.DeleteHealthCare(userId);
+        Result<LoginResult> result =new Result<>(loginResult,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
 
     /**
      * 查询资金流水

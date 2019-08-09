@@ -51,4 +51,17 @@ public interface NewsMapper extends MyMapper<NewsEntity> {
             "</script>"
     })
     NewsEntity GetFind(@Param(value = "id")Long id);
+
+
+    /**
+     *  删除
+     * @param newId
+     * @return
+     */
+    @Delete({
+            "<script>",
+            "DELETE FROM zcy_news where news_id=#{newId,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int CustomDelete(@Param(value = "newId") Long newId);
 }

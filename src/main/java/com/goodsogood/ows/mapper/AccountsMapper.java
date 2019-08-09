@@ -60,6 +60,16 @@ public interface AccountsMapper extends MyMapper<AccountsEntity> {
     })
     int UpdatePassword(@Param(value = "userid") Long userid, @Param(value = "pwd") String pwd, @Param(value = "Md5Pwd") String Md5Pwd);
 
-
+    /**
+     *  删除账号
+     * @param accountId
+     * @return
+     */
+    @Delete({
+            "<script>",
+            "DELETE FROM zcy_accounts where account_id=#{accountId,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int Delete(@Param(value = "accountId") Long accountId);
 
 }

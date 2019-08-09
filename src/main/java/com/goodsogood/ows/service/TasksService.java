@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.helper.OrderGeneratorUtils;
 import com.goodsogood.ows.mapper.*;
 import com.goodsogood.ows.model.db.*;
+import com.goodsogood.ows.model.vo.LoginResult;
 import com.goodsogood.ows.model.vo.TaskListForm;
 import com.goodsogood.ows.model.vo.TaskOrderVo;
 import com.google.common.base.Preconditions;
@@ -229,6 +230,25 @@ public class TasksService {
         return  true;
     }
 
+    /**
+     *  管理员 删除
+     * @param taskId
+     * @return
+     */
+    public LoginResult Del(Long taskId)
+    {
+        LoginResult result =new LoginResult();
+        result.setMsg("删除失败");
+        result.setIsb(false);
+        int num=this.mapper.CustomDelete(taskId);
+        boolean isb=num > 0 ? true:false;
+        if(isb){
+            result.setIsb(isb);
+            result.setMsg("删除成功");
+        }
+        return  result;
+
+    }
 
 //    /**
 //     * 添加任务，并制定周期与人

@@ -121,4 +121,15 @@ public interface TasksMapper extends MyMapper<TasksEntity> {
     })
     int UpdateState(@Param(value = "id")Long id,@Param(value = "state")String state);
 
+    /**
+     *  删除
+     * @param taskId
+     * @return
+     */
+    @Delete({
+            "<script>",
+            "DELETE FROM zcy_tasks where task_id=#{taskId,jdbcType=BIGINT} and state='递交成功'",
+            "</script>"
+    })
+    int CustomDelete(@Param(value = "taskId") Long taskId);
 }

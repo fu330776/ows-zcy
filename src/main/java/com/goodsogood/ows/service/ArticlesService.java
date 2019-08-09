@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.ArticlesMapper;
 import com.goodsogood.ows.model.db.ArticlesEntity;
 import com.goodsogood.ows.model.db.PageNumber;
+import com.goodsogood.ows.model.vo.LoginResult;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 
@@ -57,6 +58,27 @@ public class ArticlesService {
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
         return new PageInfo<>(this.mapper.Get(type)) ;
+
+    }
+
+
+    /**
+     *  管理员 删除
+     * @param articleId
+     * @return
+     */
+    public LoginResult Del(Long articleId)
+    {
+        LoginResult result =new LoginResult();
+        result.setMsg("删除失败");
+        result.setIsb(false);
+        int num=this.mapper.CustomDelete(articleId);
+        boolean isb=num > 0 ? true:false;
+        if(isb){
+            result.setIsb(isb);
+            result.setMsg("删除成功");
+        }
+        return  result;
 
     }
 }

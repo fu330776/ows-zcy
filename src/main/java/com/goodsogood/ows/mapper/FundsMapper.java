@@ -72,4 +72,16 @@ public interface FundsMapper extends MyMapper<FundsEntity> {
                @Param(value = "title") String title,
                @Param(value = "introduction") String introduction,
                @Param(value = "success") int success );
+
+    /**
+     *  删除
+     * @param funId
+     * @return
+     */
+    @Delete({
+            "<script>",
+            "DELETE FROM zcy_funds where fund_id=#{funId,jdbcType=BIGINT} and is_success=1",
+            "</script>"
+    })
+    int CustomDelete(@Param(value = "fundId") Long funId);
 }

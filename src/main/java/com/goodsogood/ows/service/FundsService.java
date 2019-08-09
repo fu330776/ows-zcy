@@ -6,6 +6,7 @@ import com.goodsogood.ows.mapper.FundsMapper;
 import com.goodsogood.ows.model.db.FundsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.vo.FundsVo;
+import com.goodsogood.ows.model.vo.LoginResult;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,27 @@ public class FundsService {
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
         return new PageInfo<>(this.mapper.GetAll(type,name,success,types));
+    }
+
+    /**
+     *  管理员 删除
+     * @param funId
+     * @return
+     */
+    public LoginResult Del(Long funId)
+    {
+        LoginResult result =new LoginResult();
+        result.setMsg("删除失败");
+        result.setIsb(false);
+        int num=this.mapper.CustomDelete(funId);
+        boolean isb=num>0?true:false;
+        if(isb)
+        {
+            result.setIsb(isb);
+            result.setMsg("删除成功");
+        }
+        return  result;
+
     }
 
 }

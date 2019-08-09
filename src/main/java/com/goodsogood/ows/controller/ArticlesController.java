@@ -8,6 +8,7 @@ import com.goodsogood.ows.exception.ApiException;
 import com.goodsogood.ows.model.db.ArticlesEntity;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.vo.ArticlesForm;
+import com.goodsogood.ows.model.vo.LoginResult;
 import com.goodsogood.ows.model.vo.Result;
 import com.goodsogood.ows.service.ArticlesService;
 import io.swagger.annotations.Api;
@@ -140,5 +141,23 @@ public class ArticlesController {
         PageInfo<ArticlesEntity> entities = this.service.GetByType(2, new PageNumber(page, pageSize));
         Result<PageInfo<ArticlesEntity>> result = new Result<>(entities, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     *  根据唯一标识删除，未审核
+     * @param articleId
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "删除")
+    @PostMapping(value = "/del")
+    public  ResponseEntity<Result<LoginResult>> Del(@Valid @RequestBody Long articleId, BindingResult bindingResult)
+    {
+        if (bindingResult.hasFieldErrors() || articleId==null || articleId<=0) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult loginResult=this.service.Del(articleId);
+        Result<LoginResult> result =new Result<>(loginResult,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
     }
 }

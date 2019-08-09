@@ -243,4 +243,22 @@ public class PatentsController {
         Result<PatentsVo> result = new Result<>(entity, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    /**
+     *  根据唯一标识删除，未审核
+     * @param patentId
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "删除")
+    @PostMapping(value = "/del")
+    public  ResponseEntity<Result<LoginResult>> Del(@Valid @RequestBody Long patentId, BindingResult bindingResult)
+    {
+        if (bindingResult.hasFieldErrors() || patentId==null || patentId<=0) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult loginResult=this.service.Del(patentId);
+        Result<LoginResult> result =new Result<>(loginResult,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
 }

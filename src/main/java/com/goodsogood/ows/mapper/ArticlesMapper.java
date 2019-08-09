@@ -42,4 +42,16 @@ public interface ArticlesMapper extends MyMapper<ArticlesEntity> {
             "</script>"
     })
     int Update(@Param(value = "id") Long id, @Param(value = "title") String title, @Param(value = "content") String content);
+
+    /**
+     *  删除
+     * @param articleId
+     * @return
+     */
+    @Delete({
+            "<script>",
+            "DELETE FROM zcy_articles where article_id=#{articleId,jdbcType=BIGINT} ",
+            "</script>"
+    })
+    int CustomDelete(@Param(value = "articleId") Long articleId);
 }

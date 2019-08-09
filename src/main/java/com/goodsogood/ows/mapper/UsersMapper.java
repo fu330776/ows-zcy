@@ -342,4 +342,17 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "</script>"
     })
     String getOpenId(@Param(value = "id") Long id);
+
+    /**
+     *  删除角色账号
+     * @param userId
+     * @return
+     */
+    @Delete({
+            "<script>",
+            "DELETE FROM zcy_users WHERE user_id=#{userId,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int Delete(@Param(value = "userId") Long userId);
+
 }

@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.mapper.NewsMapper;
 import com.goodsogood.ows.model.db.NewsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
+import com.goodsogood.ows.model.vo.LoginResult;
 import com.goodsogood.ows.model.vo.NewsVo;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
@@ -71,5 +72,24 @@ public class NewsService {
             return  new NewsEntity();
         }
         return  entity;
+    }
+    /**
+     *  管理员 删除
+     * @param newId
+     * @return
+     */
+    public LoginResult Del(Long newId)
+    {
+        LoginResult result =new LoginResult();
+        result.setIsb(false);
+        result.setMsg("删除失败");
+        int num=this.mapper.CustomDelete(newId);
+        boolean isb=num > 0 ? true:false;
+        if(isb){
+            result.setIsb(isb);
+            result.setMsg("删除成功");
+        }
+        return  result;
+
     }
 }

@@ -98,4 +98,16 @@ public interface PatentsMapper extends MyMapper<PatentsEntity> {
             "</script>"
     })
     int UpdateState(@Param(value = "id") Long id,@Param(value = "state") String state);
+
+    /**
+     *  删除
+     * @param patentId
+     * @return
+     */
+    @Delete({
+            "<script>",
+            "DELETE FROM zcy_patents where patent_id=#{patentId,jdbcType=BIGINT} and state='递交成功'",
+            "</script>"
+    })
+    int CustomDelete(@Param(value = "patentId") Long patentId);
 }

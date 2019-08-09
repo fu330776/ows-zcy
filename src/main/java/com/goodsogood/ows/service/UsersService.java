@@ -341,44 +341,38 @@ public class UsersService {
 
 
     @Transactional
-    public  LoginResult AddAdministrator(UsersForm user)
-    {
-        LoginResult result =new LoginResult();
-        try{
+    public LoginResult AddAdministrator(UsersForm user) {
+        LoginResult result = new LoginResult();
+        try {
             int num = this.mapper.GetAdminPhone(user.getPhone());
-            if(num >0)
-            {
+            if (num > 0) {
                 result.setIsb(false);
                 result.setMsg("账号已存在，不可注册为管理员");
-                return  result;
+                return result;
             }
 
-            Long AccountId ;
+            Long AccountId;
             AccountsEntity entitys = this.amapper.GetByPhone(user.getPhone());
-            if(entitys ==null)
-            {
-                entitys=new AccountsEntity();
+            if (entitys == null) {
+                entitys = new AccountsEntity();
                 entitys.setAddtime(new Date());
                 entitys.setPassWordLaws(user.getPassword());
                 entitys.setPassWord(MD5Utils.MD5(user.getPassword()));
                 entitys.setPhone(user.getPhone());
                 this.amapper.Insert(entitys);
                 AccountId = entitys.getAccountId();
-            }
-            else
-            {
-                AccountId=entitys.getAccountId();
+            } else {
+                AccountId = entitys.getAccountId();
             }
 
 
-            if(AccountId == null)
-            {
+            if (AccountId == null) {
                 result.setIsb(false);
                 result.setMsg("账号创建失败");
-                return  result;
+                return result;
             }
             //注册资料
-            Long userid ;
+            Long userid;
             UsersEntity entity = new UsersEntity();
             entity.setCompanyCode(user.getCompanyCode());
             entity.setCompanyName(user.getCompanyName());
@@ -426,17 +420,12 @@ public class UsersService {
             }
             result.setIsb(true);
             result.setMsg("注册成功");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             result.setIsb(false);
             result.setMsg(ex.getMessage());
         }
-        return  result;
+        return result;
     }
-
-
-
 
 
     /**
@@ -540,7 +529,8 @@ public class UsersService {
     }
 
     /**
-     *  账号是否注册验证
+     * 账号是否注册验证
+     *
      * @param phone
      * @return
      */
@@ -548,16 +538,15 @@ public class UsersService {
         LoginResult result = new LoginResult();
         result.setIsb(false);
         result.setMsg("账号未注册");
-        int nums=this.smssMapper.NowGetCount(phone);
-        if(nums > 10)
-        {
+        int nums = this.smssMapper.NowGetCount(phone);
+        if (nums > 10) {
             result.setMsg("手机号当天短信数已达到上限");
-            return  result;
+            return result;
         }
         int num = this.mapper.GetPhone(phone);
         if (num > 0) {
             result.setMsg("账号已注册");
-            return  result;
+            return result;
         }
         return result;
     }
@@ -663,12 +652,13 @@ public class UsersService {
     }
 
     /**
-     *  查询所有用户 不分页
+     * 查询所有用户 不分页
+     *
      * @param rid
      * @return
      */
-    public  List<UserInfoVo> GetByRoleNoPage(Long rid){
-        return  this.mapper.GetByRoleAll(rid, null, null, null, null, null, null, null, null, null);
+    public List<UserInfoVo> GetByRoleNoPage(Long rid) {
+        return this.mapper.GetByRoleAll(rid, null, null, null, null, null, null, null, null, null);
     }
 
     /***
@@ -677,14 +667,12 @@ public class UsersService {
      * @param pageNumber
      * @return
      */
-    public  PageInfo<UserInfoVo> GetAdministrator(String name, PageNumber pageNumber)
-    {
+    public PageInfo<UserInfoVo> GetAdministrator(String name, PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return  new PageInfo<>(this.mapper.GetAdministrator(name));
+        return new PageInfo<>(this.mapper.GetAdministrator(name));
     }
-
 
 
     /**
@@ -774,5 +762,53 @@ public class UsersService {
         return true;
 
     }
+
+    @Transactional
+    public LoginResult DeleteHealthCare(Long userId) {
+        LoginResult result = new LoginResult();
+        result.setIsb(false);
+        result.setMsg("删除失败");
+        // 第一步 查询 该账号是否存在多个角色
+        List<AccountsUsersRolesEntity> accountsUsersRolesEntityList = this.aurmapper.GET(userId);
+        // 第二步 多个角色 不删除 账号
+        if (accountsUsersRolesEntityList.size() > 1) {
+            AccountsUsersRolesEntity accountsUsersRolesEntity;
+            for (int i = 0; i < accountsUsersRolesEntityList.size(); i++) {
+                accountsUsersRolesEntity = accountsUsersRolesEntityList.get(i);
+                if (accountsUsersRolesEntity.getUserId().equals(userId)) {
+                    int num = this.aurmapper.delete(accountsUsersRolesEntity);
+                    if (num > 0) {
+                        num = this.mapper.Delete(userId);
+                        if (num > 0) {
+                            result.setIsb(true);
+                            result.setMsg("删除成功");
+                            return result;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        //单个角色删除账号
+        else {
+            int num = 0;
+            num = this.amapper.Delete(accountsUsersRolesEntityList.get(0).getAccountId());
+            if (num > 0) {
+                num = this.aurmapper.delete(accountsUsersRolesEntityList.get(0));
+                if (num > 0) {
+                    num = this.mapper.Delete(userId);
+                    if (num > 0) {
+                        result.setIsb(true);
+                        result.setMsg("删除成功");
+                        return result;
+                    }
+                }
+            }
+
+            return result;
+        }
+        return result;
+    }
+
 
 }

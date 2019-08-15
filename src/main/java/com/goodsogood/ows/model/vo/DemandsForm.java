@@ -13,6 +13,7 @@ public class DemandsForm {
     public String demandName;
     public String demandContent;
     public String picture;
+    public  String rank;
 
 }
 

@@ -31,21 +31,21 @@ public class DemandsService {
     /**
      * 根据用户，类型 ，是否联系，查询
      */
-    public PageInfo<DemandsVo> Get(Long userId, Integer type, Integer isContact,String name,PageNumber pageNumber) {
+    public PageInfo<DemandsVo> Get(Long userId, Integer type, Integer isContact,String name,String twoType,String ThreeType,String rank,PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.Get(userId, type, isContact,name));
+        return new PageInfo<>(this.mapper.Get(userId, type, isContact,name,twoType,ThreeType,rank));
     }
 
     /**
      * 后台管理员查看 根据类型查看
      */
-    public PageInfo<DemandsVo> GetTypeAll(Integer type, Integer isCount, String name,String state, PageNumber pageNumber) {
+    public PageInfo<DemandsVo> GetTypeAll(Integer type, Integer isCount, String name,String state,String rank,String twoType,String threeType ,PageNumber pageNumber) {
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return new PageInfo<>(this.mapper.GetTypeAll(type, isCount,name,state));
+        return new PageInfo<>(this.mapper.GetTypeAll(type, isCount,name,state,rank,twoType,threeType));
     }
 
 
@@ -76,8 +76,8 @@ public class DemandsService {
     /**
      * 修改基本信息 ，如：名称，内容
      */
-    public Boolean UpdateBasic(Long aid, String name, String content) {
-        int num = this.mapper.UpdateContent(aid, name, content);
+    public Boolean UpdateBasic(Long aid, String name, String content,String rank) {
+        int num = this.mapper.UpdateContent(aid, name, content,rank);
         return IsBool(num);
     }
 
@@ -89,9 +89,9 @@ public class DemandsService {
      * @param isContact 是否联系
      * @return
      */
-    public  Boolean Update(Long aid, String name, String content,Integer isContact,String picture)
+    public  Boolean Update(Long aid, String name, String content,Integer isContact,String picture,String rank)
     {
-        int num=this.mapper.Update(aid,name,content,isContact,picture);
+        int num=this.mapper.Update(aid,name,content,isContact,picture,rank);
         return  IsBool(num);
     }
 

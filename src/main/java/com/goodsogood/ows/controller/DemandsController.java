@@ -56,6 +56,9 @@ public class DemandsController {
         entity.setUserId(addForm.getUserId());
         entity.setPicture(addForm.getPicture());
         entity.setState("递交成功");
+        entity.setRank(addForm.getRank());
+        entity.setDemand_type_two(addForm.getDemand_type_two());
+        entity.setDemand_type_three(addForm.getDemand_type_three());
         Boolean bool = this.service.Insert(entity);
 
         /**
@@ -132,7 +135,7 @@ public class DemandsController {
         if (demandsForm.demandName.isEmpty() || demandsForm.demandContent.isEmpty()) {
             throw new ApiException("参数错误,不能为空或空字符串", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean bool = this.service.UpdateBasic(demandsForm.demandId, demandsForm.demandName, demandsForm.demandContent);
+        Boolean bool = this.service.UpdateBasic(demandsForm.demandId, demandsForm.demandName, demandsForm.demandContent,demandsForm.rank);
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -153,7 +156,7 @@ public class DemandsController {
         if (demandsForm.getDemandName().isEmpty() || demandsForm.getDemandContent().isEmpty() || demandsForm.getIsContact() == null) {
             throw new ApiException("参数错误,不能为空或空字符串", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
-        Boolean bool = this.service.Update(demandsForm.getDemandId(), demandsForm.getDemandName(), demandsForm.getDemandContent(), demandsForm.getIsContact(),demandsForm.getPicture());
+        Boolean bool = this.service.Update(demandsForm.getDemandId(), demandsForm.getDemandName(), demandsForm.getDemandContent(), demandsForm.getIsContact(),demandsForm.getPicture(),demandsForm.getRank());
         Result<Boolean> result = new Result<>(bool, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -224,13 +227,13 @@ public class DemandsController {
             @PathVariable
                     Long id,
             Integer type,
-            Integer isContact, String name, Integer page, Integer pageSize
+            Integer isContact, String name,String twoType,String threeType,String rank, Integer page, Integer pageSize
     ) {
         if (page == null || pageSize == null) {
             page = 1;
             pageSize = 11;
         }
-        PageInfo<DemandsVo> demandsEntityList = this.service.Get(id, type, isContact, name, new PageNumber(page, pageSize));
+        PageInfo<DemandsVo> demandsEntityList = this.service.Get(id, type, isContact, name,twoType,threeType,rank, new PageNumber(page, pageSize));
         Result<PageInfo<DemandsVo>> result = new Result<>(demandsEntityList, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -240,13 +243,13 @@ public class DemandsController {
     public ResponseEntity<Result<PageInfo<DemandsVo>>> GetAdminByType(
             @ApiParam(value = "type", required = true)
             @PathVariable
-                    Integer type, Integer IsCount, String name,String state, Integer page, Integer pageSize
+                    Integer type, Integer IsCount, String name,String state,String rank,String twoType,String threeType , Integer page, Integer pageSize
     ) {
         if (page == null || pageSize == null) {
             page = 1;
             pageSize = 10;
         }
-        PageInfo<DemandsVo> demandsEntityList = this.service.GetTypeAll(type, IsCount, name,state,new PageNumber(page, pageSize));
+        PageInfo<DemandsVo> demandsEntityList = this.service.GetTypeAll(type, IsCount, name,state,rank,twoType,threeType,new PageNumber(page, pageSize));
         Result<PageInfo<DemandsVo>> result = new Result<>(demandsEntityList, errors);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

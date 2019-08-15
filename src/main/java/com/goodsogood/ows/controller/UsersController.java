@@ -471,6 +471,52 @@ public class UsersController {
         return  new ResponseEntity<>(result,HttpStatus.OK);
     }
 
+    /**
+     * 医护审核人员身份 变更
+     * @param auditorForm
+     * @param bindingResult
+     * @return
+     */
+    @ApiOperation(value = "设定or取消 医护审核身份")
+    @PostMapping("/isAuditor")
+    public  ResponseEntity<Result<LoginResult>>  IsAuditor(@Valid @RequestBody UserAuditorForm auditorForm,BindingResult bindingResult)
+    {
+        if (bindingResult.hasFieldErrors() || auditorForm.getIsNum() !=1 || auditorForm.getIsNum()  != 2) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        if(auditorForm.getUserId() == null || auditorForm.getIsNum() == null) {
+            throw new ApiException("必填参数不可为空", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult loginResult =this.usersService.IsAuditors(auditorForm.getUserId(),auditorForm.getIsNum());
+        Result<LoginResult> result =new Result<>(loginResult,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+
+    }
+
+    /***
+     *  医护审核员 查询 受邀请的人
+     * @param userId
+     * @param user
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @ApiOperation(value = "医护审核员 查询 受邀请的人")
+    @GetMapping("/getByInvitation/{userId}")
+    public  ResponseEntity<Result<PageInfo<UserInfoVo>>> GetByInvitation(@ApiParam(value = "userId", required = true)
+                                                                         @PathVariable Long userId , UserRoleForm user
+                                                                        , Integer page, Integer pageSize){
+        if(page == null || pageSize == null){
+            page = 1;
+            pageSize = 20;
+        }
+        PageInfo<UserInfoVo> userInfoVos = this.usersService.GetByInvitation(userId,user,new PageNumber(page,pageSize));
+        Result<PageInfo<UserInfoVo>> result = new Result<>(userInfoVos,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+
+
 
     /**
      * 查询资金流水

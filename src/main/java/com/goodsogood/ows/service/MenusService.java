@@ -4,6 +4,7 @@ import com.goodsogood.ows.configuration.CacheConfiguration;
 import com.goodsogood.ows.helper.AesEncryptUtils;
 import com.goodsogood.ows.mapper.AccountsUsersRolesMapper;
 import com.goodsogood.ows.mapper.MenusMapper;
+import com.goodsogood.ows.mapper.UserMenuMapper;
 import com.goodsogood.ows.model.db.AccountsUsersRolesEntity;
 import com.goodsogood.ows.model.db.MenusEntity;
 import com.goodsogood.ows.model.db.MenusResult;
@@ -23,12 +24,13 @@ import java.util.List;
 public class MenusService {
     private final MenusMapper mapper;
     private final AccountsUsersRolesMapper accountsUsersRolesMapper;
-
+    private  final UserMenuMapper userMenuMapper;
 
     @Autowired
-    public MenusService(MenusMapper menusMapper, AccountsUsersRolesMapper accountsUsersRolesMapper) {
+    public MenusService(MenusMapper menusMapper, AccountsUsersRolesMapper accountsUsersRolesMapper,UserMenuMapper userMenuMapper) {
         this.mapper = menusMapper;
         this.accountsUsersRolesMapper = accountsUsersRolesMapper;
+        this.userMenuMapper = userMenuMapper;
     }
 
     /**
@@ -37,6 +39,8 @@ public class MenusService {
     public List<MenusResult> GetMenus(Long userid) throws Exception {
         AccountsUsersRolesEntity entitys = this.accountsUsersRolesMapper.GetUserId(userid);
         List<MenusEntity> entity = this.mapper.GetLogin(entitys.getRoleId());
+        List<MenusEntity> entities = this.userMenuMapper.Get(userid);
+        if(entities.size() > 0){ entity.addAll(entities);}
         return SortMenus(entity);
     }
 

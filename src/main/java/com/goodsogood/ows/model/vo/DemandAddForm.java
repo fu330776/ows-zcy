@@ -30,4 +30,11 @@ public class DemandAddForm {
     public  Long userId;
 
     public  String picture;
+
+    @ApiModelProperty(value = "职级")
+    public  String rank;
+    @ApiModelProperty(value = "二级类型")
+    public  String demand_type_two;
+    @ApiModelProperty(value = "三级类型")
+    public  String demand_type_three;
 }

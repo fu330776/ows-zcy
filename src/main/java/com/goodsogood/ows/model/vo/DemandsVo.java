@@ -41,4 +41,10 @@ public class DemandsVo {
     public  String picture;
 
     public String state;
+    @ApiModelProperty(value = "职级")
+    public  String rank;
+    @ApiModelProperty(value = "二级类型")
+    public  String demand_type_two;
+    @ApiModelProperty(value = "三级类型")
+    public  String demand_type_three;
 }

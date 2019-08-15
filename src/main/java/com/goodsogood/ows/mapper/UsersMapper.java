@@ -124,7 +124,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName",
+            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName,zu.IsAuditor as isAuditor",
             ",zu.`enable`,zu.is_referrer as isReferrer,zu.organization_code as organizationCode,",
             "zu.organization_name as organizationName,zu.referrer ,zu.review ,zu.updatetime,",
             "zu.user_bank_card_number as userBankCardNumber,zu.user_cardholder_idcard as userCardholderIdcard",
@@ -147,7 +147,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName",
+            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName,zu.IsAuditor as isAuditor",
             ",zu.`enable`,zu.is_referrer as isReferrer,zu.organization_code as organizationCode,",
             "zu.organization_name as organizationName,zu.referrer ,zu.review ,zu.updatetime,",
             "zu.user_bank_card_number as userBankCardNumber,zu.user_cardholder_idcard as userCardholderIdcard",
@@ -205,7 +205,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName",
+            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName,zu.IsAuditor as isAuditor",
             ",zu.`enable`,zu.is_referrer as isReferrer,zu.organization_code as organizationCode,",
             "zu.organization_name as organizationName,zu.referrer ,zu.review ,zu.updatetime,",
             "zu.user_bank_card_number as userBankCardNumber,zu.user_cardholder_idcard as userCardholderIdcard",
@@ -231,7 +231,7 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
     @Select({
             "<script>",
             "SELECT ",
-            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName",
+            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName,zu.IsAuditor as isAuditor",
             ",zu.`enable`,zu.is_referrer as isReferrer,zu.organization_code as organizationCode,",
             "zu.organization_name as organizationName,zu.referrer ,zu.review ,zu.updatetime,",
             "zu.user_bank_card_number as userBankCardNumber,zu.user_cardholder_idcard as userCardholderIdcard",
@@ -277,6 +277,72 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             ,@Param(value = "Keyword") String Keyword
             , @Param(value = "review") Integer review
             , @Param(value = "enable") Integer enable);
+
+
+    /**
+     *  根据邀请人编码查询
+     * @param referrer
+     * @param provinces
+     * @param municipalities
+     * @param districts
+     * @param grade
+     * @param nature
+     * @param Keyword
+     * @param review
+     * @param enable
+     * @return
+     */
+    @Select({
+            "<script>",
+            "SELECT ",
+            "zu.addtime,zu.`code`,zu.company_code as companyCode,zu.company_name as companyName,zu.IsAuditor as isAuditor",
+            ",zu.`enable`,zu.is_referrer as isReferrer,zu.organization_code as organizationCode,",
+            "zu.organization_name as organizationName,zu.referrer ,zu.review ,zu.updatetime,",
+            "zu.user_bank_card_number as userBankCardNumber,zu.user_cardholder_idcard as userCardholderIdcard",
+            ",zu.user_cardholder_name as userCardholderName,zu.user_cardholder_phone as userCardholderPhone",
+            ",zu.user_department as userDepartment,zu.user_email as userEmail,zu.user_hospital as userHospital",
+            ",zu.user_id as userId,zu.user_name as userName,zu.user_position as userPosition,",
+            "zr.role_id as roleId,zr.role_name as roleName,",
+            "zu.phone,",
+            "zu.Issub,zu.provinces,zu.municipalities,zu.districts,zu.grade,zu.nature,zu.title",
+            ",contacts,contact_phone,detailed_address,business_license",
+            "FROM zcy_users zu ",
+            "LEFT JOIN zcy_accounts_users_roles zaur on zaur.user_id=zu.user_id",
+            "LEFT JOIN zcy_roles zr on zaur.role_id=zr.role_id ",
+            "where zu.referrer=#{referrer,jdbcType=VARCHAR} and zr.role_id=2",
+            "<if test='review !=null'> and zu.review=#{review,jdbcType=BIT} </if>",
+            "<if test='enable !=null'> and zu.enable=#{enable,jdbcType=BIT} </if>",
+            "<if test='provinces !=null'> and provinces=#{provinces,jdbcType=VARCHAR} </if>",
+            "<if test='municipalities !=null'> and  municipalities=#{municipalities,jdbcType=VARCHAR}</if>",
+            "<if test='districts !=null'> and  districts=#{districts,jdbcType=VARCHAR}</if>",
+            "<if test='grade !=null'> and  grade=#{grade,jdbcType=VARCHAR}</if>",
+            "<if test='nature !=null'> and  nature=#{nature,jdbcType=VARCHAR}</if>",
+            "<if test='Keyword !=null'> and (provinces like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or municipalities like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or  districts like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or grade like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or nature like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or company_code like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%') ",
+            " or company_name like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or organization_code like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or organization_name like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or user_hospital like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            " or user_department like concat(concat('%',#{Keyword,jdbcType=VARCHAR}),'%')",
+            ")</if>",
+            " ORDER BY zu.addtime desc",
+            "</script>"
+
+    })
+    List<UserInfoVo> GetByInvitation(@Param(value = "referrer") String referrer
+                                    ,@Param(value = "provinces") String provinces
+                                    ,@Param(value = "municipalities") String municipalities
+                                    ,@Param(value = "districts") String districts
+                                    ,@Param(value = "grade") String grade
+                                    ,@Param(value = "nature") String nature
+                                    ,@Param(value = "Keyword") String Keyword
+                                    , @Param(value = "review") Integer review
+                                    , @Param(value = "enable") Integer enable);
+
 
     @Update({
             "<script>",
@@ -354,5 +420,19 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
             "</script>"
     })
     int Delete(@Param(value = "userId") Long userId);
+
+    /***
+     *  医护审核人员身份 变更
+     * @param userId
+     * @param is  1：取消 2：医护审核人员
+     * @return
+     */
+    @Update({
+            "<script>",
+            "update  zcy_users set IsAuditor=#{is,jdbcType=BIT} where user_id=#{userId,jdbcType=BIGINT} and IsAuditor=#{isb,jdbcType=BIT}",
+            "</script>"
+    })
+    int IsAuditor(@Param(value = "userId") Long userId,@Param(value = "is") Integer is,@Param(value = "isb") Integer isb);
+
 
 }

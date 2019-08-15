@@ -29,33 +29,33 @@ public class DemandsEntity extends BaseEntity {
     @GeneratedValue(generator = "JDBC")
     @Id
     public  Long demandId;
-
-    @ApiModelProperty(value = "需求类型：1、个人医护创新 2、个人医护帮我找 3、个人医护帮我做 4、企业提出需求 5、企业项目评价 6、企业成果转化 7、机构交易 8、机构合作 9、机构项目评价")
+    @ApiModelProperty(value = "需求类型：1、个人医护创新 2、个人医护帮我找 3、个人医护帮我做 4、企业提出需求 5、企业项目评价 6、企业成果转化 7、机构交易 8、机构合作 9、机构项目评价 10 我的问题 、11 我要推荐")
     @Column(name = "demand_type")
     public  Integer demandType;
-
     @ApiModelProperty(value = "需求名称")
     @Column(name = "demand_name")
     public String demandName;
-
     @ApiModelProperty(value = "需求描述")
     @Column(name = "demand_content")
     public  String demandContent;
-
     @ApiModelProperty(value = "是否联系：1、已联系 2、未联系")
     @Column(name = "is_contact")
     public  Integer isContact;
-
     @ApiModelProperty(value = "用户ID")
     @Column(name = "user_id")
     public  Long userId;
-
     @ApiModelProperty(value = "添加时间")
     @Column(name = "addtime")
     public Date addtime;
-
     @ApiModelProperty(value = "图片")
     public  String picture;
     @ApiModelProperty(value = "状态：递交失败、递交成功、已受理、未受理、受理失败")
     public  String state;
+    @ApiModelProperty(value = "职级")
+    public  String rank;
+    @ApiModelProperty(value = "二级类型")
+    public  String demand_type_two;
+    @ApiModelProperty(value = "三级类型")
+    public  String demand_type_three;
+
 }

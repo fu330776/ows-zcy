@@ -7,10 +7,7 @@ import com.goodsogood.ows.helper.MD5Utils;
 import com.goodsogood.ows.helper.RandomUtils;
 import com.goodsogood.ows.mapper.*;
 import com.goodsogood.ows.model.db.*;
-import com.goodsogood.ows.model.vo.LoginResult;
-import com.goodsogood.ows.model.vo.SonUserForm;
-import com.goodsogood.ows.model.vo.UserInfoVo;
-import com.goodsogood.ows.model.vo.UsersForm;
+import com.goodsogood.ows.model.vo.*;
 import com.google.common.base.Preconditions;
 import lombok.extern.log4j.Log4j2;
 import org.apache.ibatis.annotations.Select;
@@ -33,15 +30,16 @@ public class UsersService {
     private AccountsUsersRolesMapper aurmapper;
     private CodeMapper cmapper;
     private SmssMapper smssMapper;
-
+    private  UserMenuMapper ummapper;
     @Autowired
     public UsersService(UsersMapper usersMapper, AccountsMapper accountsMapper, AccountsUsersRolesMapper accountsUsersRolesMapper,
-                        CodeMapper codeMapper, SmssMapper ssMapper) {
+                        CodeMapper codeMapper, SmssMapper ssMapper,UserMenuMapper userMenuMapper) {
         this.mapper = usersMapper;
         this.amapper = accountsMapper;
         this.aurmapper = accountsUsersRolesMapper;
         this.cmapper = codeMapper;
         this.smssMapper = ssMapper;
+        this.ummapper = userMenuMapper;
     }
 
     /**
@@ -810,5 +808,62 @@ public class UsersService {
         return result;
     }
 
+
+    /***
+     *  医护审核人员身份 变更
+     * @param userId
+     * @param is  1：取消 2：医护审核人员
+     * @return
+     */
+    @Transactional
+    public  LoginResult IsAuditors(Long userId,int is){
+        LoginResult result = new LoginResult();
+        result.setIsb(false);
+        result.setMsg("任命失败");
+        Integer isb;
+        if(is >0 && is < 3){if(is == 2){isb=1;}else{isb=2;}}else {return  result; }
+
+        int num = this.mapper.IsAuditor(userId,is,isb);
+        if(num > 0)
+        {
+            switch (is){
+                case 2:
+                    UserMenuEntity entity =new UserMenuEntity();
+                    entity.setZcyMenuId(56L);
+                    entity.setZcyUserId(userId);
+                    int nums = this.ummapper.Insert(entity);
+                    if(nums >0){
+                        result.setIsb(true);
+                        result.setMsg("任命成功");
+                    }
+                    break;
+                case 1:
+                    int _num = this.ummapper.DelIsAuditor(userId,56L);
+                    if(_num >0){
+                        result.setIsb(true);
+                        result.setMsg("任命取消成功");
+                    }
+                    break;
+            }
+        }
+        return  result;
+    }
+
+    /**
+     *  根据邀请人编码查询
+     * @param userID  用户唯一标识
+     * @param userRoleForm 查询条件
+     * @param pageNumber
+     * @return
+     */
+    public  PageInfo<UserInfoVo> GetByInvitation(Long userID,UserRoleForm userRoleForm, PageNumber pageNumber)
+    {
+        UserInfoVo vo=  this.mapper.GetUserById(userID);
+        if(vo == null){return  null;}
+        int p = Preconditions.checkNotNull(pageNumber.getPage());
+        int r = Preconditions.checkNotNull(pageNumber.getRows());
+        PageHelper.startPage(p, r);
+        return  new PageInfo<>(this.mapper.GetByInvitation(vo.getReferrer(),userRoleForm.getProvinces(),userRoleForm.getMunicipalities(),userRoleForm.getDistricts(),userRoleForm.getGrade(),userRoleForm.getNature(),userRoleForm.getKeyword(),userRoleForm.getReview(),userRoleForm.getEnable()));
+    }
 
 }

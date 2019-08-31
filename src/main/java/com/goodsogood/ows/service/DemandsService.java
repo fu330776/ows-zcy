@@ -2,6 +2,7 @@ package com.goodsogood.ows.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.goodsogood.ows.mapper.DataMapper;
 import com.goodsogood.ows.mapper.DemandsMapper;
 import com.goodsogood.ows.model.db.DemandsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
@@ -22,10 +23,11 @@ import java.util.*;
 public class DemandsService {
 
     private DemandsMapper mapper;
-
+    private DataMapper dataMapper;
     @Autowired
-    public DemandsService(DemandsMapper demandsMapper) {
+    public DemandsService(DemandsMapper demandsMapper,DataMapper dataMappers) {
         this.mapper = demandsMapper;
+        this.dataMapper=dataMappers;
     }
 
     /**
@@ -121,6 +123,8 @@ public class DemandsService {
         {
             result.setIsb(true);
             result.setMsg("撤销成功");
+          DemandsEntity entity = this.mapper.selectByPrimaryKey(id);
+          this.delCount(entity.getDemandType());
             return  result;
         }
         result.setMsg("撤销失败");
@@ -128,6 +132,28 @@ public class DemandsService {
         return  result;
     }
 
+    /**
+     *  减少数量
+     * @param DemandType
+     */
+    private  void delCount(Integer DemandType) {
+        Integer type;
+        switch (DemandType) {
+            case 1: //创新量
+                type = 1;
+                break;
+            case 2:
+            case 3:
+                type = 2;
+                break;
+            default:
+                type = null;
+                break;
+        }
+        if (type != null) {
+            this.dataMapper.delCount(type);
+        }
+    }
 
     /**
      * 判断 是否执行成功 成功返回true

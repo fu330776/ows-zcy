@@ -2,6 +2,7 @@ package com.goodsogood.ows.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.goodsogood.ows.mapper.DataMapper;
 import com.goodsogood.ows.mapper.FundsMapper;
 import com.goodsogood.ows.model.db.FundsEntity;
 import com.goodsogood.ows.model.db.PageNumber;
@@ -18,10 +19,11 @@ import java.util.List;
 @Log4j2
 public class FundsService {
     private FundsMapper mapper;
-
+    private DataMapper dataMapper;
     @Autowired
-    public FundsService(FundsMapper fundsMapper) {
+    public FundsService(FundsMapper fundsMapper,DataMapper dataMappers) {
         this.mapper = fundsMapper;
+        this.dataMapper=dataMappers;
     }
 
     /**
@@ -75,6 +77,7 @@ public class FundsService {
         boolean isb=num>0?true:false;
         if(isb)
         {
+            this.dataMapper.delCount(3);
             result.setIsb(isb);
             result.setMsg("删除成功");
         }

@@ -2,6 +2,7 @@ package com.goodsogood.ows.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.goodsogood.ows.mapper.DataMapper;
 import com.goodsogood.ows.mapper.PatentsMapper;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.PatentsEntity;
@@ -15,9 +16,10 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class PatentsService {
     private PatentsMapper mapper;
-
-    public PatentsService(PatentsMapper patentsMapper) {
+    private DataMapper dataMapper;
+    public PatentsService(PatentsMapper patentsMapper,DataMapper dataMappers) {
         this.mapper = patentsMapper;
+        this.dataMapper=dataMappers;
     }
 
     /**
@@ -121,6 +123,14 @@ public class PatentsService {
         int num=this.mapper.CustomDelete(patentId);
         boolean isb=num > 0 ? true:false;
         if(isb){
+            PatentsEntity entity=this.mapper.selectByPrimaryKey(patentId);
+            if(entity.getPatentType()==2){
+                this.dataMapper.delCount(4);
+            }
+            if(entity.getPatentType()==1)
+            {
+                this.dataMapper.delCount(5);
+            }
             result.setIsb(isb);
             result.setMsg("删除成功");
         }

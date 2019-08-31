@@ -30,10 +30,11 @@ public class UsersService {
     private AccountsUsersRolesMapper aurmapper;
     private CodeMapper cmapper;
     private SmssMapper smssMapper;
-    private  UserMenuMapper ummapper;
+    private UserMenuMapper ummapper;
+
     @Autowired
     public UsersService(UsersMapper usersMapper, AccountsMapper accountsMapper, AccountsUsersRolesMapper accountsUsersRolesMapper,
-                        CodeMapper codeMapper, SmssMapper ssMapper,UserMenuMapper userMenuMapper) {
+                        CodeMapper codeMapper, SmssMapper ssMapper, UserMenuMapper userMenuMapper) {
         this.mapper = usersMapper;
         this.amapper = accountsMapper;
         this.aurmapper = accountsUsersRolesMapper;
@@ -816,54 +817,99 @@ public class UsersService {
      * @return
      */
     @Transactional
-    public  LoginResult IsAuditors(Long userId,int is){
+    public LoginResult IsAuditors(Long userId, int is) {
         LoginResult result = new LoginResult();
         result.setIsb(false);
         result.setMsg("任命失败");
         Integer isb;
-        if(is >0 && is < 3){if(is == 2){isb=1;}else{isb=2;}}else {return  result; }
+        if (is > 0 && is < 3) {
+            if (is == 2) {
+                isb = 1;
+            } else {
+                isb = 2;
+            }
+        } else {
+            return result;
+        }
 
-        int num = this.mapper.IsAuditor(userId,is,isb);
-        if(num > 0)
-        {
-            switch (is){
+        int num = this.mapper.IsAuditor(userId, is, isb);
+        if (num > 0) {
+            switch (is) {
                 case 2:
-                    UserMenuEntity entity =new UserMenuEntity();
+                    UserMenuEntity entity = new UserMenuEntity();
                     entity.setZcyMenuId(56L);
                     entity.setZcyUserId(userId);
                     int nums = this.ummapper.Insert(entity);
-                    if(nums >0){
+                    if (nums > 0) {
                         result.setIsb(true);
                         result.setMsg("任命成功");
                     }
                     break;
                 case 1:
-                    int _num = this.ummapper.DelIsAuditor(userId,56L);
-                    if(_num >0){
+                    int _num = this.ummapper.DelIsAuditor(userId, 56L);
+                    if (_num > 0) {
                         result.setIsb(true);
                         result.setMsg("任命取消成功");
                     }
                     break;
             }
         }
-        return  result;
+        return result;
+    }
+
+
+    /**
+     * 提示框查询
+     *
+     * @param userId
+     * @return
+     */
+    public LoginResult GetIsTips(Long userId) {
+        int num = this.mapper.GetIsTips(userId);
+        LoginResult result = new LoginResult();
+        result.setIsb(num > 0 ? true : false);
+        result.setMsg("温馨提示");
+        return result;
     }
 
     /**
-     *  根据邀请人编码查询
-     * @param userID  用户唯一标识
+     * 修改提示框状态
+     *
+     * @param userId
+     * @param isNum  0：开始提示 1：取消提示
+     * @return
+     */
+    public LoginResult AlterIsTips(Long userId, int isNum) {
+        LoginResult result = new LoginResult();
+        result.setMsg("失败");
+        result.setIsb(false);
+        int num = this.mapper.AlterIsTips(userId, isNum);
+        if (num > 0) {
+            result.setIsb(true);
+            result.setMsg("成功");
+        }
+        return result;
+
+    }
+
+
+    /**
+     * 根据邀请人编码查询
+     *
+     * @param userID       用户唯一标识
      * @param userRoleForm 查询条件
      * @param pageNumber
      * @return
      */
-    public  PageInfo<UserInfoVo> GetByInvitation(Long userID,UserRoleForm userRoleForm, PageNumber pageNumber)
-    {
-        UserInfoVo vo=  this.mapper.GetUserById(userID);
-        if(vo == null){return  null;}
+    public PageInfo<UserInfoVo> GetByInvitation(Long userID, UserRoleForm userRoleForm, PageNumber pageNumber) {
+        UserInfoVo vo = this.mapper.GetUserById(userID);
+        if (vo == null) {
+            return null;
+        }
         int p = Preconditions.checkNotNull(pageNumber.getPage());
         int r = Preconditions.checkNotNull(pageNumber.getRows());
         PageHelper.startPage(p, r);
-        return  new PageInfo<>(this.mapper.GetByInvitation(vo.getReferrer(),userRoleForm.getProvinces(),userRoleForm.getMunicipalities(),userRoleForm.getDistricts(),userRoleForm.getGrade(),userRoleForm.getNature(),userRoleForm.getKeyword(),userRoleForm.getReview(),userRoleForm.getEnable()));
+        return new PageInfo<>(this.mapper.GetByInvitation(vo.getReferrer(), userRoleForm.getProvinces(), userRoleForm.getMunicipalities(), userRoleForm.getDistricts(), userRoleForm.getGrade(), userRoleForm.getNature(), userRoleForm.getKeyword(), userRoleForm.getReview(), userRoleForm.getEnable()));
     }
 
 }

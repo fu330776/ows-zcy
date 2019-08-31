@@ -60,4 +60,16 @@ public interface DataMapper extends MyMapper<DataEntity> {
             "</script>"
     })
     List<DataEntity> GetAll();
+
+    @Update({
+            "<script>",
+            "UPDATE ",
+            "zcy_data ",
+            "SET ",
+            "total=total-1",
+            "where",
+            "type_type=#{type,jdbcType=BIT}",
+            "</script>"
+    })
+    int delCount(@Param(value = "type") Integer type);
 }

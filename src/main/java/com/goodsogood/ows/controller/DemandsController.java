@@ -98,6 +98,8 @@ public class DemandsController {
     }
 
 
+
+
     /**
      * 是否联系
      *
@@ -203,6 +205,7 @@ public class DemandsController {
             throw new ApiException("必传参数不可为空", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
         }
         LoginResult loginResult=this.service.UpdateRevoke(id);
+
         Result<LoginResult> result =new Result<>(loginResult,errors);
         return  new ResponseEntity<>(result,HttpStatus.OK);
 

@@ -58,5 +58,12 @@ public class DataService {
         return this.mapper.GetAll();
     }
 
-
+    /**
+     *  改变总数
+     * @param type
+     * @return
+     */
+    public  int UpdateLow(Integer type){
+         return  this.mapper.delCount(type);
+    }
 }

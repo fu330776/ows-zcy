@@ -1,18 +1,14 @@
 package com.goodsogood.ows.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.goodsogood.ows.component.Errors;
 import com.goodsogood.ows.configuration.Global;
 import com.goodsogood.ows.exception.ApiException;
-import com.goodsogood.ows.helper.HttpUtil;
 import com.goodsogood.ows.helper.SmsUtils;
 import com.goodsogood.ows.model.db.PageNumber;
 import com.goodsogood.ows.model.db.SmssEntity;
 import com.goodsogood.ows.model.db.UsersEntity;
-import com.goodsogood.ows.model.db.VerificationCode;
 import com.goodsogood.ows.model.vo.*;
 import com.goodsogood.ows.service.UsersService;
 import com.goodsogood.ows.service.WithdrawsService;
@@ -28,7 +24,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.validation.Valid;
 import java.util.*;
 
@@ -493,6 +488,7 @@ public class UsersController {
 
     }
 
+
     /***
      *  医护审核员 查询 受邀请的人
      * @param userId
@@ -515,56 +511,38 @@ public class UsersController {
         return  new ResponseEntity<>(result,HttpStatus.OK);
     }
 
-
-
-
     /**
-     * 查询资金流水
-     *
-     * @param userId
-     * @param is
-     * @param page
-     * @param pageSize
+     *  查询 提示框是否需提示
+     * @param num
      * @return
      */
-//    @ApiOperation(value = "查询资金流水")
-//    @GetMapping("/getcapital/{userId}")
-//    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(@ApiParam(value = "userId", required = true)
-//                                                                              @PathVariable Long userId, Integer is, Integer page, Integer pageSize) {
-//        if (page == null || pageSize == null) {
-//            page = 1;
-//            pageSize = 11;
-//        }
-//        PageInfo<WithdrawsVo> entity = this.withdrawsService.Get(userId, is, new PageNumber(page, pageSize));
-//        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
-//        return new ResponseEntity<>(result, HttpStatus.OK);
-//    }
-
+    @ApiOperation(value = "是否需要提示框")
+    @GetMapping("/getIsTips/{num}")
+    public  ResponseEntity<Result<LoginResult>> GetIsTips(@ApiParam(value = "num", required = true)
+                                                          @PathVariable Long num ){
+        LoginResult loginResult =this.usersService.GetIsTips(num);
+        Result<LoginResult> result = new Result<>(loginResult,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
 
     /**
-     * 查询资金流水
-     *
-     * @param is
-     * @param page
-     * @param pageSize
+     * 修改提示框 是否显示
+     * @param form
+     * @param bindingResult
      * @return
      */
-//    @ApiOperation(value = "查询资金流水")
-//    @GetMapping("/getcapitalflow")
-//    public ResponseEntity<Result<PageInfo<WithdrawsVo>>> getCapitalFlowByUser(
-//            Integer is,
-//            Integer page,
-//            Integer pageSize
-//    ) {
-//        if (page == null || pageSize == null) {
-//            page = 1;
-//            pageSize = 10;
-//        }
-//        PageInfo<WithdrawsVo> entity = this.withdrawsService.GetAdmin(is, new PageNumber(page, pageSize));
-//        Result<PageInfo<WithdrawsVo>> result = new Result<>(entity, errors);
-//        return new ResponseEntity<>(result, HttpStatus.OK);
-//
-//    }
+    @ApiOperation(value = "修改提示框 是否显示")
+    @PostMapping("/alterIsTips")
+    public  ResponseEntity<Result<LoginResult>> AlterIsTips(@Valid @RequestBody TipsForm form,BindingResult bindingResult){
+        if (bindingResult.hasFieldErrors() || form.getUserId() == null || form.getIsNum() < 0) {
+            throw new ApiException("参数错误", new Result<>(Global.Errors.VALID_ERROR.getCode(), bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST.value(), null));
+        }
+        LoginResult loginResult = this.usersService.AlterIsTips(form.getUserId(),form.getIsNum());
+        Result<LoginResult> result =new Result<>(loginResult,errors);
+        return  new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+
 
     /**
      * 账号审核

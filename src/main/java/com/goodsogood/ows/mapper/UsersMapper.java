@@ -434,5 +434,17 @@ public interface UsersMapper extends MyMapper<UsersEntity> {
     })
     int IsAuditor(@Param(value = "userId") Long userId,@Param(value = "is") Integer is,@Param(value = "isb") Integer isb);
 
+    @Select({
+            "<script>",
+            "SELECT IsTips FROM zcy_users where user_id=#{userId,jdbcType=BIGINT} LIMIT 1",
+            "</script>"
+    })
+    int GetIsTips(@Param(value = "userId") Long userId);
 
+    @Update({
+            "<script>",
+            "UPDATE zcy_users set IsTips=#{tip,jdbcType=BIT} where user_id=#{userId,jdbcType=BIGINT}",
+            "</script>"
+    })
+    int AlterIsTips(@Param(value = "userId")Long userId,@Param(value = "tip")Integer tip);
 }

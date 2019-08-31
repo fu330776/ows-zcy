@@ -127,4 +127,10 @@ public class UsersEntity extends BaseEntity {
     public  String business_license;
 
     public String openid;
+    @ApiModelProperty(value = "1：不是医护审核员审核员，2：医护审核员")
+    @Column(name = "IsAuditor")
+    public Integer isAuditor;
+    @ApiModelProperty(value = "0:默认开启 1：关闭")
+    @Column(name = "IsTips")
+    public  Integer isTips;
 }
